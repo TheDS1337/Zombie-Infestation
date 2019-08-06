@@ -18,12 +18,6 @@
 **** NO NEED FOR HUMAN/ZOMBIE class pre/post selection, we can just use OnPlayerDisinfect/Infect
 ** I changed the VariantInit class to something prettier, test it out and hope it works!
 
-I TOTALLY MISUNDERSTOOD SIGNED NUMBERS!
-1000 0000 does not mean 0, but -128!
-1000 0001 does not mean, -1, but -127
-
-GET it now? it starts down from -128 and gets higher higher to 0. this explains why a signed byte ranges from -128 to 127 (0 taken to be positive)
-
 
 *** ADDED BULLET TIME (Code in OnPostClientDeath)
 ************************ APPARENTLY THE NIGHTVISION USED IN QUBKA's ZP IS JUST AN OVERLAY, CHECK THE CORRESPONDING FILES FOR VOverlayOnClientUpdate (it uses the material overlays/zp/zvision.vmt found on QUBKA's resources)
