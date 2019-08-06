@@ -1,0 +1,104 @@
+# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
+import os, sys
+
+projectName = 'ZombieInfestation'
+
+# smsdk_ext.cpp will be automatically added later
+sourceFiles = [
+  os.path.join(Extension.csgo_sdk, 'public', 'engine', 'protobuf', 'netmessages.pb.cc'), 
+  os.path.join(Extension.csgo_sdk, 'public', 'game', 'shared', 'csgo', 'protobuf', 'cstrike15_usermessages.pb.cc'), 
+  os.path.join(Extension.csgo_sdk, 'public', 'game', 'shared', 'csgo', 'protobuf', 'cstrike15_usermessage_helpers.cpp'), 
+  os.path.join(Extension.sm_root, 'public', 'CDetour', 'detours.cpp'),
+  os.path.join(Extension.sm_root, 'public', 'asm', 'asm.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'decode.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'itab.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-att.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-intel.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'udis86.c'),   
+  'extension.cpp',  
+  'gameutils.cpp',
+  'gamerules.cpp',
+  'user_messages.cpp',
+  'tempentities.cpp',
+  'macros.cpp',
+  'entity_hooker.cpp',
+  'CellRecipientFilter.cpp', 
+  'hud_manager.cpp',
+  'stringtable.cpp',
+  'sound.cpp', 
+  'takedamageinfo2.cpp',
+  'geoip/maxminddb.c',
+  'geoip/data-pool.c',
+  'zi/zi_entry.cpp',
+  'zi/zi_geoip.cpp',
+  'zi/zi_hooks.cpp',
+  'zi/zi_core.cpp',  
+  'zi/zi_players.cpp',  
+  'zi/zi_humans.cpp',
+  'zi/zi_zombies.cpp',
+  'zi/zi_boss_survivor.cpp',
+  'zi/zi_boss_sniper.cpp',
+  'zi/zi_boss_nemesis.cpp',
+  'zi/zi_boss_assassin.cpp',
+  'zi/zi_human_private.cpp',
+  'zi/zi_human_hunter.cpp',
+  'zi/zi_zombie_classic.cpp',
+  'zi/zi_zombie_raptor.cpp',
+  'zi/zi_zombie_fleshpound.cpp',
+  'zi/zi_zombie_predator.cpp',
+  'zi/zi_items.cpp',
+  'zi/zi_item_tripmine.cpp',
+  'zi/zi_item_infinite_clip.cpp',
+  'zi/zi_item_jetpack_bazooka.cpp',
+  'zi/zi_item_antidote.cpp',
+  'zi/zi_item_rage.cpp',
+  'zi/zi_item_infection_bomb.cpp',
+  'zi/zi_round_modes.cpp',
+  'zi/zi_round_mode_single_infection.cpp',
+  'zi/zi_round_mode_multiple_infection.cpp',
+  'zi/zi_round_mode_swarm.cpp',
+  'zi/zi_round_mode_survivor.cpp',
+  'zi/zi_round_mode_sniper.cpp',
+  'zi/zi_round_mode_nemesis.cpp',
+  'zi/zi_round_mode_assassin.cpp',
+  'zi/zi_round_mode_plague.cpp',
+  'zi/zi_round_mode_armageddon.cpp',
+  'zi/zi_round_mode_assassins_vs_snipers.cpp',
+  'zi/zi_round_mode_nightmare.cpp',
+  'zi/zi_weapons.cpp',
+  'zi/zi_nades.cpp',
+  'zi/zi_timers.cpp',
+  'zi/zi_menus.cpp', 
+  'zi/zi_commands.cpp',
+  'zi/zi_environment.cpp',  
+  'zi/zi_resources.cpp',  
+  'zi/zi_spawns_manager.cpp',  
+  'zi/zi_sourcemod_bridge.cpp',    
+]
+
+###############
+# Make sure to edit PackageScript, which copies your files to their appropriate locations
+# Simple extensions do not need to modify past this point.
+
+project = Extension.HL2Project(builder, projectName + '.ext')
+
+# Windows sockets are required by GeoIP
+if builder.target_platform == 'windows':
+  binary.compiler.postlink += ['ws2_32.lib']
+
+if os.path.isfile(os.path.join(builder.currentSourcePath, 'sdk', 'smsdk_ext.cpp')):
+  # Use the copy included in the project
+  project.sources += [os.path.join('sdk', 'smsdk_ext.cpp')]
+else:
+  # Use the copy included with SM 1.6 and newer
+  project.sources += [os.path.join(Extension.sm_root, 'public', 'smsdk_ext.cpp')]
+
+project.sources += sourceFiles
+  
+for sdk_name in Extension.sdks:
+  sdk = Extension.sdks[sdk_name]
+  
+  binary = Extension.HL2Config(project, projectName + '.ext.' + sdk.ext, sdk)
+
+Extension.extensions = builder.Add(project)

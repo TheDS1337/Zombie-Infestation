@@ -1,0 +1,29 @@
+- Set ammo/clip may give players extra nades
+
+
+--- Search about CBaseCSGrenadeProjectile's GetShakeAmplitude and GetShakeRadius (EDIT: it appears they do the ScreenShake effect, could be usefull in some concussion nade, see basegrenade_shared.cpp)
+--- Headers for ConCommands and ConVars: icvar.h, convar.h, iconvar.h
+
+******* IMPORTANT: Just found out we can replace al dynamic_casts by smth like player->m_pHumanLike == &g_Nemesis? &g_Nemesis : nullptr, 		an example for the nemesis, and by this we can disable RTTI (possibly save some memory and extra cpu processing)
+
+** MSVC Solution: Make sure both Debug/Release uses the VS2017 self-built protobuf lib
+
+** VIEW MODELS:
+	The idea is to use the arms models like we do by default in csgo (use viewmodel[0] only), but when giving a knife, switch the model to our prepared model, this model should have different stab/slash animations etc.. but with no actual knife model, and the animation sounds should be embeded in the model itself. Probably the best thing to try right now, instead of going the hacky way with some miserable shit piece of code.
+
+--------------------
+----	LATEST DEV:
+--------------------
+
+**** NO NEED FOR HUMAN/ZOMBIE class pre/post selection, we can just use OnPlayerDisinfect/Infect
+** I changed the VariantInit class to something prettier, test it out and hope it works!
+
+I TOTALLY MISUNDERSTOOD SIGNED NUMBERS!
+1000 0000 does not mean 0, but -128!
+1000 0001 does not mean, -1, but -127
+
+GET it now? it starts down from -128 and gets higher higher to 0. this explains why a signed byte ranges from -128 to 127 (0 taken to be positive)
+
+
+*** ADDED BULLET TIME (Code in OnPostClientDeath)
+************************ APPARENTLY THE NIGHTVISION USED IN QUBKA's ZP IS JUST AN OVERLAY, CHECK THE CORRESPONDING FILES FOR VOverlayOnClientUpdate (it uses the material overlays/zp/zvision.vmt found on QUBKA's resources)
