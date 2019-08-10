@@ -4,8 +4,8 @@
 
 #include "zi_humans.h"
 
-#define GET_SURVIVOR(player) (dynamic_cast<ZISurvivor *> (player->m_pHumanLike))
-#define GET_LAST_SURVIVOR(player) (dynamic_cast<ZISurvivor *> (player->m_pLastHumanLike))
+#define GET_SURVIVOR(player) (player->m_pHumanLike == &g_Survivor ? &g_Survivor : nullptr)
+#define GET_LAST_SURVIVOR(player) (player->m_pLastHumanLike == &g_Survivor ? &g_Survivor : nullptr)
 
 class ZIModel;
 

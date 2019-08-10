@@ -43,9 +43,7 @@ public:
 	int GetIndex();
 
 	bool IsBoss() final override;
-	virtual bool IsVIP() = 0;
-	
-	SourceHook::CVector<ZIItem *> *GetItems();	
+	virtual bool IsVIP() = 0;	
 };
 
 extern ConVar g_ZombieKnockbackDistance;

@@ -4,8 +4,8 @@
 
 #include "zi_zombies.h"
 
-#define GET_NEMESIS(player) (dynamic_cast<ZINemesis *> (player->m_pHumanLike))
-#define GET_LAST_NEMESIS(player) (dynamic_cast<ZINemesis *> (player->m_pLastHumanLike))
+#define GET_NEMESIS(player) (player->m_pHumanLike == &g_Nemesis ? &g_Nemesis : nullptr)
+#define GET_LAST_NEMESIS(player) (player->m_pLastHumanLike == &g_Nemesis ? &g_Nemesis : nullptr)
 
 class ZIModel;
 

@@ -4,8 +4,8 @@
 
 #include "zi_zombies.h"
 
-#define GET_ASSASSIN(player) (dynamic_cast<ZIAssassin *> (player->m_pHumanLike))
-#define GET_LAST_ASSASSIN(player) (dynamic_cast<ZIAssassin *> (player->m_pLastHumanLike))
+#define GET_ASSASSIN(player) (player->m_pHumanLike == &g_Assassin ? &g_Assassin : nullptr)
+#define GET_LAST_ASSASSIN(player) (player->m_pLastHumanLike == &g_Assassin ? &g_Assassin : nullptr)
 
 class ZIModel;
 

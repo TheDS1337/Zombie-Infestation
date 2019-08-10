@@ -400,9 +400,7 @@ bool ZombieInfestation::OnPreTerminateRound(float &delay, CSGORoundEndReason &re
 		if( estimatedWarningDelay > 0.0f )
 		{
 			ZICore::m_pWarningTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_Warning, estimatedWarningDelay, nullptr, TIMER_FLAG_NO_MAPCHANGE);
-		}
-
-		CONSOLE_DEBUGGER("Game commencing!");
+		}		
 	}
 	else
 	{
@@ -410,7 +408,6 @@ bool ZombieInfestation::OnPreTerminateRound(float &delay, CSGORoundEndReason &re
 		if( ZIPlayer::HumansCount() > 0 )
 		{
 			reason = CSGORoundEnd_CTWin;
-
 			ZICore::m_Winner = RoundModeWinner_Humans;
 			ZICore::m_Score[RoundModeWinner_Humans]++;
 		}
@@ -418,15 +415,12 @@ bool ZombieInfestation::OnPreTerminateRound(float &delay, CSGORoundEndReason &re
 		else if( ZIPlayer::ZombiesCount() > 0 )
 		{
 			reason = CSGORoundEnd_TWin;
-
 			ZICore::m_Winner = RoundModeWinner_Zombies;
 			ZICore::m_Score[RoundModeWinner_Zombies]++;
 		}
 		// We simply dont know
 		else
 		{
-			CONSOLE_DEBUGGER("No one won");
-
 			reason = CSGORoundEnd_Draw;
 			ZICore::m_Winner = RoundModeWinner_Unknown;
 		}
@@ -623,7 +617,6 @@ void ZombieInfestation::OnPostRoundStartEvent(IGameEvent *event)
 
 void ZombieInfestation::OnPostGameStartEvent(IGameEvent *event)
 {
-	CONSOLE_DEBUGGER("Game Started!");
 }
 
 bool ZombieInfestation::OnPreRoundEndEvent(IGameEvent *event, META_RES &metaResult)

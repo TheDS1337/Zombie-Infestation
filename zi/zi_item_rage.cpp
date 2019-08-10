@@ -1,5 +1,7 @@
 #include "zi_item_rage.h"
 #include "zi_zombies.h"
+#include "zi_boss_nemesis.h"
+#include "zi_boss_assassin.h"
 #include "zi_timers.h"
 
 RageItem g_RageItem;
@@ -19,9 +21,18 @@ int RageItem::GetCost()
 	return RAGE_COST;
 }
 
-bool RageItem::OnPreSelection(ZIPlayer *player)
+ItemReturn RageItem::OnPreSelection(ZIPlayer *player)
 {
-	return !ZICore::m_IsRoundEnd;
+	if( !player->m_IsInfected || GET_NEMESIS(player) || GET_ASSASSIN(player)  )
+	{
+		return ItemReturn_DontShow;
+	}
+	else if( ZICore::m_IsRoundEnd )
+	{
+		return ItemReturn_NotAvailable;
+	}
+
+	return ItemReturn_Show;
 }
 
 void RageItem::OnPostSelection(ZIPlayer *player)

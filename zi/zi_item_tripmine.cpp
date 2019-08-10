@@ -91,19 +91,23 @@ int TripmineItem::GetCost()
 	return TRIPMINE_COST;
 }
 
-bool TripmineItem::OnPreSelection(ZIPlayer *player)
+ItemReturn TripmineItem::OnPreSelection(ZIPlayer *player)
 {
-	if( ZICore::m_IsRoundEnd )
+	if( player->m_IsInfected )
 	{
-		return false;
+		return ItemReturn_DontShow;
 	}
-
-	if( player->m_HasTripmine )
+	else if( ZICore::m_IsRoundEnd )
+	{
+		return ItemReturn_NotAvailable;
+	}
+	else if( player->m_HasTripmine )
 	{
 		UM_SayText(&player->m_Index, 1, 0, true, "You already have a \x05planted \x04Tripmine\x01.");
+		return ItemReturn_NotAvailable;
 	}
 
-	return true;
+	return ItemReturn_Show;
 }
 
 void TripmineItem::OnPostSelection(ZIPlayer *player)

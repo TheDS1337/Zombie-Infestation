@@ -1,4 +1,6 @@
 #include "zi_item_infection_bomb.h"
+#include "zi_boss_nemesis.h"
+#include "zi_boss_assassin.h"
 
 InfectionBombItem g_InfectionBombItem;
 
@@ -17,11 +19,15 @@ int InfectionBombItem::GetCost()
 	return INFECTION_BOMB_COST;
 }
 
-bool InfectionBombItem::OnPreSelection(ZIPlayer *player)
+ItemReturn InfectionBombItem::OnPreSelection(ZIPlayer *player)
 {
-	if( ZICore::m_IsRoundEnd || !ZICore::m_CurrentMode->IsInfectionAllowed() || HasInfectionBomb(player) )
+	if( !player->m_IsInfected || GET_NEMESIS(player) || GET_ASSASSIN(player)  )
 	{
-		return false;
+		return ItemReturn_DontShow;
+	}
+	else if( ZICore::m_IsRoundEnd || !ZICore::m_CurrentMode->IsInfectionAllowed() || HasInfectionBomb(player) )
+	{
+		return ItemReturn_NotAvailable;
 	}
 	else if( m_InfectionBombsCounter < INFECTION_BOMB_LIMIT )
 	{
@@ -29,10 +35,10 @@ bool InfectionBombItem::OnPreSelection(ZIPlayer *player)
 		ke::SafeSprintf(buffer, sizeof(buffer), "%d/%d", m_InfectionBombsCounter, INFECTION_BOMB_LIMIT);
 
 		AdditionalInfo(buffer);
-		return true;
+		return ItemReturn_Show;
 	}	
 
-	return false;
+	return ItemReturn_NotAvailable;
 }
 
 void InfectionBombItem::OnPostSelection(ZIPlayer *player)

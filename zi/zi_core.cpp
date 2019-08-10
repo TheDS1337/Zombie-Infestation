@@ -1,5 +1,6 @@
 #include "zi_entry.h"
 #include "zi_core.h"
+#include "zi_items.h"
 #include "zi_round_modes.h"
 #include "zi_weapons.h"
 #include "zi_timers.h"
@@ -97,12 +98,12 @@ void ZICore::OnLoad()
 	ZIRoundMode::Register(&g_NightmareMode);
 
 	// Items
-	ZIItem::Register(&g_TripmineItem, ItemTeam_Humans);
-	ZIItem::Register(&g_InfiniteClipItem, ItemTeam_Humans);
-	ZIItem::Register(&g_JetpackBazookaItem, ItemTeam_Humans);
-	ZIItem::Register(&g_AntidoteItem, ItemTeam_Zombies);
-	ZIItem::Register(&g_RageItem, ItemTeam_Zombies);
-	ZIItem::Register(&g_InfectionBombItem, ItemTeam_Zombies);
+	ZIItem::Register(&g_TripmineItem);
+	ZIItem::Register(&g_InfiniteClipItem);
+	ZIItem::Register(&g_JetpackBazookaItem);
+	ZIItem::Register(&g_AntidoteItem);
+	ZIItem::Register(&g_RageItem);
+	ZIItem::Register(&g_InfectionBombItem);
 
 	m_pPrimaryWeaponsMenu = ZIWeapon::BuildPrimaryWeaponsMenu();
 	m_pSecondaryWeaponsMenu = ZIWeapon::BuildSecondaryWeaponsMenu();
@@ -134,8 +135,6 @@ void ZICore::OnUnload()
 
 	g_pHumanClasses.clear();
 	g_pZombieClasses.clear();
-	g_pHumansItems.clear();
-	g_pZombiesItems.clear();
 	g_pRoundModes.clear();
 }
 
@@ -229,32 +228,27 @@ void ZICore::OnClientLastZombie(ZIPlayer *player)
 	}
 }
 
-bool ZICore::OnPreItemSelection(ZIItem *item, ZIPlayer *player)
+ItemReturn ZICore::OnPreItemSelection(ZIItem *item, ZIPlayer *player)
 {
 	if( ZISourceModBridge::m_pPreItemSelection )
 	{
-		ZISourceModBridge::m_pPreItemSelection->PushCell(item ? item->GetIndex() : -1);
-		ZISourceModBridge::m_pPreItemSelection->PushCell(item ? item->GetTeam() : -1);
+		ZISourceModBridge::m_pPreItemSelection->PushCell(item ? item->GetIndex() : -1);		
 		ZISourceModBridge::m_pPreItemSelection->PushCell(player ? player->m_Index : 0);
 
 		cell_t result = Pl_Continue;
 		ZISourceModBridge::m_pPreItemSelection->Execute(&result);
 
-		if( result == Pl_Handled )
-		{
-			return false;
-		}
+		return (ItemReturn) result;
 	}
 
-	return true;
+	return ItemReturn_Show;
 }
 
 void ZICore::OnPostItemSelection(ZIItem *item, ZIPlayer *player)
 {
 	if( ZISourceModBridge::m_pPostItemSelection )
 	{
-		ZISourceModBridge::m_pPostItemSelection->PushCell(item ? item->GetIndex() : -1);
-		ZISourceModBridge::m_pPostItemSelection->PushCell(item ? item->GetTeam() : -1);
+		ZISourceModBridge::m_pPostItemSelection->PushCell(item ? item->GetIndex() : -1);		
 		ZISourceModBridge::m_pPostItemSelection->PushCell(player ? player->m_Index : 0);
 		ZISourceModBridge::m_pPostItemSelection->Execute(NULL);
 	}

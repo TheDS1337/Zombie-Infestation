@@ -51,6 +51,7 @@ public:
 	bool IsVIP() override;
 	int GetCost() override;
 
+	ItemReturn OnPreSelection(ZIPlayer *player) override;
 	void OnPostSelection(ZIPlayer *player) override;
 
 	void Precache();

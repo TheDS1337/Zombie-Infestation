@@ -4,8 +4,8 @@
 
 #include "zi_humans.h"
 
-#define GET_SNIPER(player) (dynamic_cast<ZISniper *> (player->m_pHumanLike))
-#define GET_LAST_SNIPER(player) (dynamic_cast<ZISniper *> (player->m_pLastHumanLike))
+#define GET_SNIPER(player) (player->m_pHumanLike == &g_Sniper ? &g_Sniper : nullptr)
+#define GET_LAST_SNIPER(player) (player->m_pLastHumanLike == &g_Sniper ? &g_Sniper : nullptr)
 
 class ZIModel;
 

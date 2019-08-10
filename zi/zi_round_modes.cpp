@@ -54,7 +54,7 @@ ZIRoundMode *ZIRoundMode::Choose()
 		// Search for a new mode
 		mode = GetFromTotalChances(RandomInt(1, m_TotalChances));
 		
-		if( !mode )
+		if( !mode || ZICore::m_LastMode == mode )
 		{
 			continue;
 		}
@@ -63,11 +63,7 @@ ZIRoundMode *ZIRoundMode::Choose()
 		if( strcmp(mode->GetName(), "Single Infection") == 0 )
 		{
 			break;
-		}
-		else if( ZICore::m_LastMode != mode )
-		{
-			break;
-		}
+		}		
 	} while( !mode->OnPreSelection() );
 	
 	if( !mode )

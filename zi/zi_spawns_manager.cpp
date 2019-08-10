@@ -1,4 +1,5 @@
 #include "zi_spawns_manager.h"
+#include "zi_players.h"
 #include "zi_timers.h"
 
 #define ZOMBIEINFESTATION_SPAWNS_FOLDER "addons/ZombieInfestation/spawns"

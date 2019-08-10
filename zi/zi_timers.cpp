@@ -201,6 +201,13 @@ ResultType ZITimersCallback::StartMode::OnTimer(ITimer *timer, void *data)
 	ZICore::OnRoundModeStart();
 	ZICore::m_IsModeStarted = true;	
 
+	int aliveCount = ZIPlayer::AliveCount();
+
+	if( aliveCount == ZIPlayer::HumansCount() || aliveCount == ZIPlayer::ZombiesCount() )
+	{
+		CONSOLE_DEBUGGER("Something is wrong with this game mode! (%s)", mode->GetName());
+	}
+
 	// Play ambient sound
 	ZICore::m_pAmbientSoundTimer = timersys->CreateTimer(&ZITimersCallback::m_AmbientSound, RandomFloat(3.0f, 5.0f), mode->GetAmbientSound(), TIMER_FLAG_NO_MAPCHANGE);
 

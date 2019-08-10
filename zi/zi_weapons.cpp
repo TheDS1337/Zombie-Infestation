@@ -79,7 +79,10 @@ ZIWeapon *ZIWeapon::Find(const char *classname)
 		return weapon;
 	}
 
-	CONSOLE_DEBUGGER("Warning: weapon isn't registred: %s", classname);
+	if( !strstr(classname, "knife") )
+	{
+		CONSOLE_DEBUGGER("Warning: weapon isn't registred: %s", classname);
+	}
 	return nullptr;
 }
 

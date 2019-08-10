@@ -4,7 +4,7 @@
 
 #include "zi_entry.h"
 #include "zi_round_modes.h"
-#include "zi_items.h"
+
 
 #define HUD_ROUND_STATUS_X -1.0
 #define HUD_ROUND_STATUS_Y 0.17
@@ -18,6 +18,8 @@ class ZIRoundMode;
 class ZIItem;
 class ZITimersCallback;
 class ZIMenusCallback;
+
+enum ItemReturn;
 
 class ZICore
 {
@@ -34,7 +36,7 @@ public:
 	static void OnClientLastHuman(ZIPlayer *player);
 	static void OnClientLastZombie(ZIPlayer *player);
 
-	static bool OnPreItemSelection(ZIItem *item, ZIPlayer *player);
+	static ItemReturn OnPreItemSelection(ZIItem *item, ZIPlayer *player);
 	static void OnPostItemSelection(ZIItem *item, ZIPlayer *player);
 
 	static void OnRoundModeStart();

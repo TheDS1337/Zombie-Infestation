@@ -1,4 +1,6 @@
 #include "zi_item_jetpack_bazooka.h"
+#include "zi_boss_survivor.h"
+#include "zi_boss_sniper.h"
 #include "zi_resources.h"
 
 JetpackBazookaItem g_JetpackBazookaItem;
@@ -19,6 +21,20 @@ bool JetpackBazookaItem::IsVIP()
 int JetpackBazookaItem::GetCost()
 {
 	return JETPACK_BAZOOKA_COST;
+}
+
+ItemReturn JetpackBazookaItem::OnPreSelection(ZIPlayer *player)
+{
+	if( player->m_IsInfected || GET_SURVIVOR(player) || GET_SNIPER(player) )
+	{
+		return ItemReturn_DontShow;
+	}
+	else if( player->m_HasJetpack )
+	{		
+		return ItemReturn_NotAvailable;
+	}
+
+	return ItemReturn_Show;
 }
 
 void JetpackBazookaItem::OnPostSelection(ZIPlayer *player)

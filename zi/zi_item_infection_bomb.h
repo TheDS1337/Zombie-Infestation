@@ -20,7 +20,7 @@ public:
 	bool IsVIP() override;
 	int GetCost() override;
 
-	bool OnPreSelection(ZIPlayer *player) override;
+	ItemReturn OnPreSelection(ZIPlayer *player) override;
 	void OnPostSelection(ZIPlayer *player) override;
 
 	bool HasInfectionBomb(ZIPlayer *player);

@@ -1107,14 +1107,6 @@ bool ZIPlayer::Infect(ZIPlayer *attacker, ZIInfected *zclass)
 
 bool ZIPlayer::Disinfect(ZIPlayer *attacker, ZIHumanoid *hclass)
 {
-	ZIInfected *infected = dynamic_cast<ZIInfected *> (hclass);
-
-	if( hclass && infected )
-	{
-		CONSOLE_DEBUGGER("Trying to disinfect player with an infected class.");
-		return false;
-	}
-
 	if( !ZICore::OnPreClientDisinfection(this, attacker, hclass == &g_Survivor, hclass == &g_Sniper) && HumansCount() > 0 )
 	{
 		return false;
@@ -1573,36 +1565,11 @@ void ZIPlayer::ShowItemsMenu()
 		return;
 	}
 
-	if( m_pHumanLike->IsBoss() )
+	if( g_pExtraItems.size() < 1 )
 	{
 		UM_SayText(&m_Index, 1, 0, true, "This class doesn't have any items.");
 		return;
-	}
-
-	SourceHook::CVector<ZIItem *> *items = nullptr;
-
-	if( m_IsInfected )
-	{
-		ZIZombie *zombie = GET_ZOMBIE(this);
-		items = zombie ? zombie->GetItems() : nullptr;
-	}
-	else
-	{
-		ZISoldier *soldier = GET_SOLDIER(this);
-		items = soldier ? soldier->GetItems() : nullptr;
-	}
-
-	if( ZICore::m_IsRoundEnd )
-	{
-		UM_SayText(&m_Index, 1, 0, true, "Items are not available right now.");
-		return;
-	}
-
-	if( !items || items->size() < 1 )
-	{
-		UM_SayText(&m_Index, 1, 0, true, "This class doesn't have any items.");
-		return;
-	}
+	}	
 
 	RELEASE_MENU(m_pItemsMenu);
 	m_pItemsMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZICore::m_MenusCallback.m_Items);
@@ -1614,9 +1581,9 @@ void ZIPlayer::ShowItemsMenu()
 		static char buffer[128];
 
 		ZIItem *item = nullptr;
-		bool selectable = true;
+		ItemReturn itemReturn = ItemReturn_Show;
 
-		for( auto iterator = items->begin(); iterator != items->end(); iterator++ )
+		for( auto iterator = g_pExtraItems.begin(); iterator != g_pExtraItems.end(); iterator++ )
 		{
 			item = *iterator;
 
@@ -1626,17 +1593,30 @@ void ZIPlayer::ShowItemsMenu()
 			}
 
 			// Calling this here before item's AdditionalInfo so it can update it
-			selectable = item->OnPreSelection(this);
+			itemReturn = item->OnPreSelection(this);
+
+			if( itemReturn == ItemReturn_DontShow )
+			{
+				continue;
+			}
+
+			const char *additionalInfo = item->AdditionalInfo();
 
 			if( item->IsVIP() )
 			{
-				ke::SafeSprintf(buffer, sizeof(buffer), "%s [%d Points] (VIP only)", item->GetName(), item->GetCost());
-				m_pItemsMenu->AppendItem("", ItemDrawInfo(buffer, ITEMDRAW_DISABLED));
+				if( additionalInfo && *additionalInfo )
+				{
+					ke::SafeSprintf(buffer, sizeof(buffer), "%s [%s] [%d Points] (VIP only)", item->GetName(), additionalInfo, item->GetCost());
+				}
+				else
+				{
+					ke::SafeSprintf(buffer, sizeof(buffer), "%s [%d Points] (VIP only)", item->GetName(), item->GetCost());
+				}
+
+				m_pItemsMenu->AppendItem("", ItemDrawInfo(buffer, m_IsVIP && itemReturn == ItemReturn_Show ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED));
 			}
 			else
 			{
-				const char *additionalInfo = item->AdditionalInfo();
-
 				if( additionalInfo && *additionalInfo )
 				{
 					ke::SafeSprintf(buffer, sizeof(buffer), "%s [%s] [%d Points]", item->GetName(), additionalInfo, item->GetCost());
@@ -1644,12 +1624,12 @@ void ZIPlayer::ShowItemsMenu()
 				else
 				{
 					ke::SafeSprintf(buffer, sizeof(buffer), "%s [%d Points]", item->GetName(), item->GetCost());
-				}
+				}	
 
-				m_pItemsMenu->AppendItem("", ItemDrawInfo(buffer, selectable ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED));
+				m_pItemsMenu->AppendItem("", ItemDrawInfo(buffer, itemReturn == ItemReturn_Show ? ITEMDRAW_DEFAULT : ITEMDRAW_DISABLED));			
 			}
 		}
-
+		
 		m_pItemsMenu->SetMenuOptionFlags(m_pItemsMenu->GetMenuOptionFlags() | MENUFLAG_BUTTON_EXIT | MENUFLAG_BUTTON_EXITBACK);
 		m_pItemsMenu->Display(m_Index, MENU_TIME_FOREVER);
 	}

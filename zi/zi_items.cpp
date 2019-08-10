@@ -1,67 +1,36 @@
 #include "zi_items.h"
 
-SourceHook::CVector<ZIItem *> g_pHumansItems;
-SourceHook::CVector<ZIItem *> g_pZombiesItems;
+SourceHook::CVector<ZIItem *> g_pExtraItems;
 
-int ZIItem::Register(ZIItem *item, ItemTeam team)
+int ZIItem::Register(ZIItem *item)
 {
 	if( !item )
 	{
 		return -1;
-	}
+	}	
 
-	switch( team )
-	{
-	case ItemTeam_Humans:
-		item->m_Index = g_pHumansItems.size();
-		item->m_Team = ItemTeam_Humans;
-
-		g_pHumansItems.push_back(item);
-
-		break;
-
-	case ItemTeam_Zombies:
-		item->m_Index = g_pZombiesItems.size();
-		item->m_Team = ItemTeam_Zombies;
-
-		g_pZombiesItems.push_back(item);
-
-		break;
-	}
+	item->m_Index = g_pExtraItems.size();	
+	g_pExtraItems.push_back(item);
 
 	return item->m_Index;
 }
 
-ZIItem *ZIItem::Find(const char *name, ItemTeam team)
+ZIItem *ZIItem::Find(const char *name)
 {
-	SourceHook::CVector<ZIItem *> *items = nullptr;
+	ZIItem *item = nullptr;
 
-	switch( team )
+	for( auto iterator = g_pExtraItems.begin(); iterator != g_pExtraItems.end(); iterator++ )
 	{
-	case ItemTeam_Humans:
-		items = &g_pHumansItems;
+		item = *iterator;
 
-	case ItemTeam_Zombies:
-		items = &g_pZombiesItems;
-	}
-
-	if( items )
-	{
-		ZIItem *item = nullptr;
-
-		for( auto iterator = items->begin(); iterator != items->end(); iterator++ )
+		if( !item )
 		{
-			item = *iterator;
+			continue;
+		}
 
-			if( !item )
-			{
-				continue;
-			}
-
-			if( strcmp(item->GetName(), name) == 0 )
-			{
-				return item;
-			}
+		if( strcmp(item->GetName(), name) == 0 )
+		{
+			return item;
 		}
 	}
 
@@ -71,11 +40,6 @@ ZIItem *ZIItem::Find(const char *name, ItemTeam team)
 int ZIItem::GetIndex()
 {
 	return m_Index;
-}
-
-ItemTeam ZIItem::GetTeam()
-{
-	return m_Team;
 }
 
 const char *ZIItem::AdditionalInfo()
@@ -88,7 +52,7 @@ void ZIItem::AdditionalInfo(const char *info)
 	m_AdditionalInfo = (char *) info;
 }
 
-bool ZIItem::OnPreSelection(ZIPlayer *player)
+ItemReturn ZIItem::OnPreSelection(ZIPlayer *player)
 {
-	return true;
+	return ItemReturn_Show;
 }

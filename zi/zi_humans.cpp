@@ -89,8 +89,3 @@ bool ZISoldier::IsBoss()
 {
 	return false;
 }
-
-SourceHook::CVector<ZIItem *> *ZISoldier::GetItems()
-{
-	return &g_pHumansItems;		
-}

@@ -844,21 +844,20 @@ static cell_t RegisterItem(IPluginContext *context, const cell_t *params)
 {
 	char *name = nullptr;
 	context->LocalToString(params[1], &name);
-
-	ItemTeam team = (ItemTeam) params[2];
-	ZIItem *item = ZIItem::Find(name, team);
+	
+	ZIItem *item = ZIItem::Find(name);
 
 	if( item )
 	{
 		return item->GetIndex();
 	}
 
-	item = new ZISMItem(name, params[3] > 0 ? true : false, params[4]);
+	item = new ZISMItem(name, params[2] > 0 ? true : false, params[3]);
 
 	// Releasing it later...
 	g_pSMItems.push_back(item);
 
-	return ZIItem::Register(item, team);
+	return ZIItem::Register(item);
 }
 
 static cell_t GetItem(IPluginContext *context, const cell_t *params)
@@ -866,7 +865,7 @@ static cell_t GetItem(IPluginContext *context, const cell_t *params)
 	char *name = nullptr;
 	context->LocalToString(params[1], &name);
 
-	ZIItem *item = ZIItem::Find(name, (ItemTeam) params[2]);
+	ZIItem *item = ZIItem::Find(name);
 
 	if( item )
 	{
@@ -879,101 +878,48 @@ static cell_t GetItem(IPluginContext *context, const cell_t *params)
 static cell_t GetItemCost(IPluginContext *context, const cell_t *params)
 {
 	size_t item = params[1];
-	ItemTeam team = (ItemTeam) params[2];
-
-	SourceHook::CVector<ZIItem *> *items = nullptr;
-
-	switch( team )
+	
+	if( item >= g_pExtraItems.size() )
 	{
-	case ItemTeam_Humans:
-		items = &g_pHumansItems;
-
-	case ItemTeam_Zombies:
-		items = &g_pZombiesItems;
+		context->ReportError("No item was found");
+		return 0;
 	}
 
-	if( items )
-	{
-		if( item >= items->size() )
-		{
-			context->ReportError("No item was found");
-			return 0;
-		}
-
-		return items->at(item)->GetCost();
-	}
-
-	context->ReportError("No item was found");
-	return 0;
+	return g_pExtraItems.at(item)->GetCost();
 }
 
 static cell_t IsItemVIP(IPluginContext *context, const cell_t *params)
 {
 	size_t item = params[1];
-	ItemTeam team = (ItemTeam) params[2];
-
-	SourceHook::CVector<ZIItem *> *items = nullptr;
-
-	switch( team )
+	
+	if( item >= g_pExtraItems.size() )
 	{
-	case ItemTeam_Humans:
-		items = &g_pHumansItems;
-		break;
-
-	case ItemTeam_Zombies:
-		items = &g_pZombiesItems;
-		break;
+		context->ReportError("No item was found");
+		return 0;
 	}
 
-	if( items )
-	{
-		if( item >= items->size() )
-		{
-			context->ReportError("No item was found");
-			return 0;
-		}
-
-		return items->at(item)->IsVIP() ? 1 : 0;
-	}
-
-	context->ReportError("No item was found");
-	return 0;
+	return g_pExtraItems.at(item)->IsVIP();
 }
 
 static cell_t ZI_AdditionalItemInfo(IPluginContext *context, const cell_t *params)
 {
 	size_t item = params[1];
-	ItemTeam team = (ItemTeam) params[2];
 
-	SourceHook::CVector<ZIItem *> *items = nullptr;
-
-	switch( team )
+	if( item >= g_pExtraItems.size() )
 	{
-	case ItemTeam_Humans:
-		items = &g_pHumansItems;
-
-	case ItemTeam_Zombies:
-		items = &g_pZombiesItems;
+		context->ReportError("No item was found");
+		return 0;
 	}
 
-	if( items )
+	char *info = nullptr;
+	context->LocalToString(params[2], &info);
+
+	ZISMItem *extraItem = dynamic_cast<ZISMItem *> (g_pExtraItems.at(item));
+
+	if( extraItem )
 	{
-		if( item >= items->size() )
-		{
-			context->ReportError("No item was found");
-			return 0;
-		}
-
-		char *info = nullptr;
-		context->LocalToString(params[3], &info);
-
-		ZISMItem *extraItem = dynamic_cast<ZISMItem *> (items->at(item));
-
-		if( extraItem )
-		{
-			extraItem->AdditionalInfo(info);
-			return 1;
-		}
+		extraItem->AdditionalInfo(info);
+		return 1;
 	}
 
 	context->ReportError("No item was found");
@@ -1150,8 +1096,8 @@ void ZISourceModBridge::Load()
 	m_pPostPlayerDisinfection = g_pForwards->CreateForward("ZI_OnPostPlayerDisinfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
 	m_pPlayerLastHuman = g_pForwards->CreateForward("ZI_OnPlayerLastHuman", ET_Event, 1, NULL, Param_Cell);
 	m_pPlayerLastZombie = g_pForwards->CreateForward("ZI_OnPlayerLastZombie", ET_Event, 1, NULL, Param_Cell);
-	m_pPreItemSelection = g_pForwards->CreateForward("ZI_OnPreItemSelection", ET_Event, 3, NULL, Param_Cell, Param_Cell, Param_Cell);
-	m_pPostItemSelection = g_pForwards->CreateForward("ZI_OnPostItemSelection", ET_Event, 3, NULL, Param_Cell, Param_Cell, Param_Cell);
+	m_pPreItemSelection = g_pForwards->CreateForward("ZI_OnPreItemSelection", ET_Event, 2, NULL, Param_Cell, Param_Cell);
+	m_pPostItemSelection = g_pForwards->CreateForward("ZI_OnPostItemSelection", ET_Event, 2, NULL, Param_Cell, Param_Cell);
 	m_pRoundModeStart = g_pForwards->CreateForward("ZI_OnRoundModeStart", ET_Event, 2, NULL, Param_Cell, Param_Cell);
 	m_pRoundModeEnd = g_pForwards->CreateForward("ZI_OnRoundModeEnd", ET_Event, 2, NULL, Param_Cell, Param_Cell);	
 }

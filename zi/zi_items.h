@@ -5,25 +5,24 @@
 #include "zi_core.h"
 #include "zi_players.h"
 
-enum ItemTeam
+enum ItemReturn
 {
-	ItemTeam_Humans = 0,
-	ItemTeam_Zombies	
+	ItemReturn_Show = 0,
+	ItemReturn_NotAvailable,
+	ItemReturn_DontShow	
 };
 
 class ZIItem
 {
 private:
-	int m_Index;
-	ItemTeam m_Team;
+	int m_Index;	
 	char *m_AdditionalInfo;
 
 public:
-	static int Register(ZIItem *item, ItemTeam team);
-	static ZIItem *Find(const char *name, ItemTeam team);
+	static int Register(ZIItem *item);
+	static ZIItem *Find(const char *name);
 
-	int GetIndex();
-	ItemTeam GetTeam();
+	int GetIndex();	
 
 	virtual const char *GetName() = 0;	
 	virtual bool IsVIP() = 0;
@@ -31,11 +30,10 @@ public:
 	const char *AdditionalInfo();
 	void AdditionalInfo(const char *info);	
 
-	virtual bool OnPreSelection(ZIPlayer *player);
+	virtual ItemReturn OnPreSelection(ZIPlayer *player);
 	virtual void OnPostSelection(ZIPlayer *player) = 0;
 };
 
-extern SourceHook::CVector<ZIItem *> g_pHumansItems;
-extern SourceHook::CVector<ZIItem *> g_pZombiesItems;
+extern SourceHook::CVector<ZIItem *> g_pExtraItems;
 
 #endif 

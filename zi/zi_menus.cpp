@@ -307,20 +307,7 @@ void ZIMenusCallback::Items::OnMenuSelect2(IBaseMenu *menu, int client, unsigned
 		return;
 	}
 
-	SourceHook::CVector<ZIItem *> *extraItems = nullptr;
-
-	if( player->m_IsInfected )
-	{
-		ZIZombie *zombie = GET_ZOMBIE(player);
-		extraItems = zombie ? zombie->GetItems() : nullptr;
-	}
-	else
-	{
-		ZISoldier *soldier = GET_SOLDIER(player);
-		extraItems = soldier ? soldier->GetItems() : nullptr;
-	}
-
-	if( !extraItems || extraItems->size() < 1 )
+	if( g_pExtraItems.size() < 1 )
 	{
 		UM_SayText(playerIndex, 1, 0, true, "This class doesn't have any items.");
 
@@ -328,7 +315,7 @@ void ZIMenusCallback::Items::OnMenuSelect2(IBaseMenu *menu, int client, unsigned
 		return;
 	}
 
-	ZIItem *extraItem = extraItems->at(item);
+	ZIItem *extraItem = g_pExtraItems.at(item);
 
 	if( extraItem )
 	{
@@ -340,9 +327,9 @@ void ZIMenusCallback::Items::OnMenuSelect2(IBaseMenu *menu, int client, unsigned
 			return;
 		}
 
-		if( !extraItem->OnPreSelection(player) || !ZICore::OnPreItemSelection(extraItem, player) )
+		if( extraItem->OnPreSelection(player) == ItemReturn_NotAvailable || ZICore::OnPreItemSelection(extraItem, player) == ItemReturn_NotAvailable )
 		{
-			RELEASE_MENU(player->m_pItemsMenu);
+//			RELEASE_MENU(player->m_pItemsMenu);
 			return;
 		}
 

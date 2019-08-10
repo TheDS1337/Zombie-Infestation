@@ -45,7 +45,6 @@ public:
 	virtual bool IsVIP() = 0;
 	virtual int GetArmor() = 0;
 	virtual float GetKnockbackPower() = 0;
-	SourceHook::CVector<ZIItem *> *GetItems();	
 };
 
 extern SourceHook::CVector<ZISoldier *> g_pHumanClasses;

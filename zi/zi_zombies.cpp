@@ -163,8 +163,3 @@ bool ZIZombie::IsBoss()
 {
 	return false;
 }
-
-SourceHook::CVector<ZIItem *> *ZIZombie::GetItems()
-{
-	return &g_pZombiesItems;		
-}
