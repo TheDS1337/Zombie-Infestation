@@ -25,21 +25,21 @@ void ZISpawnsManager::Load()
 	
 	if( file )
 	{
-		float data[6] = { 0.0f };		
+		float data[6] = { 0.0f };
 		char *dataEnd = nullptr;
 
 		char line[256];
 		int spaces = 0;
 
 		// We devide the buffer into lines first
-		while( !feof(file) && fgets(line, 256, file) )
+		while( !feof(file) && fgets(line, sizeof(line), file) )
 		{
-			dataEnd = line;	
+			dataEnd = line;
 
 			for( spaces = 0; spaces < 5; spaces++ )
 			{
 				data[spaces] = strtod(dataEnd, &dataEnd);
-			}		
+			}
 
 			// We need atleast the origin
 			if( spaces >= 2 )
@@ -54,8 +54,10 @@ void ZISpawnsManager::Load()
 				}
 
 				m_SpawnData.push_back(spawn);
-			}			
+			}
 		}
+
+		fclose(file);
 	}
 }
 

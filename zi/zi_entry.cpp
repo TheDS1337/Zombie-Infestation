@@ -1204,18 +1204,14 @@ HookReturnValue<int> ZombieInfestation::OnPreClientTakeDamage(ZIPlayer *player, 
 					CellRecipientFilter filter;
 					g_pExtension->m_pEngineSound->EmitSound(filter, player->m_Index, CHAN_BODY, "ZombieInfestation/human_armor_damage.mp3", -1, "ZombieInfestation/human_armor_damage.mp3", VOL_NORM, ATTN_NORM, 0);
 
-					damage = info.GetDamage();					
+					damage = info.GetDamage();
 
-					if( ZICore::m_CurrentMode->IsInfectionAllowed() )
+					if( !ZICore::m_CurrentMode->IsInfectionAllowed() )
 					{
-						armor -= damage;
-					}
-					else
-					{
-						// Making things harder for humans, no one can afford armor for the rest of his life :)
-						// Everything comes with a price!
-						armor -= damage * RandomFloat(1.5f, 2.0f);
-					}
+						HOOK_RETURN_VALUE(MRES_IGNORED, int, 0, false);
+					}					
+
+					armor -= damage;
 
 					// Show damage
 					static char buffer[16];
@@ -1226,7 +1222,7 @@ HookReturnValue<int> ZombieInfestation::OnPreClientTakeDamage(ZIPlayer *player, 
 					playerEnt->SetVelocityModifier(0.5f);
 
 					// Block the real damage		
-					HOOK_RETURN_VALUE(MRES_SUPERCEDE, int, 1, false);
+					HOOK_RETURN_VALUE(MRES_SUPERCEDE, int, 1, false);					
 				}
 				else if( ZICore::m_CurrentMode->IsInfectionAllowed() )
 				{
@@ -1379,7 +1375,7 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 	{
 		playerEnt->SetFOV(ZOMBIE_FOV);
 		playerEnt->SetFlashLight(false);
-		playerEnt->SetNightVision(true);
+		playerEnt->SetNightVision(true, "ZombieInfestation/effects/zombie_vision.vmt");
 	}
 
 	// Remove previous timers, if any...
@@ -1424,7 +1420,7 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 	static ConVarRef host_timescale("host_timescale");
 	static float *oldValue = nullptr;
 
-	// If it's a boss, end any currently-playing bullettime and start a new one, for the BOSS!
+	// If it's a boss, end any currently-playing bullet-time and start a new one, for the BOSS!
 	if( GET_NEMESIS(player) || GET_ASSASSIN(player) )
 	{
 		RELEASE_TIMER(ZICore::m_pBulletTime);
@@ -1460,7 +1456,9 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 		}
 	}
 
-	// Only start BulletTime if it isn't running already
+	CONSOLE_DEBUGGER("bulletTimeDuration: %f", bulletTimeDuration);
+
+	// Only start bullet-time if it isn't running already
 	if( !ZICore::m_pBulletTime )
 	{
 		static float startTime = 0.0f;
@@ -1475,10 +1473,9 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 
 		if( player->m_IsInfected && attacker && !attacker->m_IsInfected )
 		{
-			killedZombiesCount++;
 			killingDuration = endTime - startTime;
 
-			if( GET_NEMESIS(player) || GET_ASSASSIN(player) || (killingDuration > 0.0f && killingDuration <= g_BulletTimeActivationInterval.GetFloat() && (killedZombiesCount / killingDuration) >= g_BulletTimeActivationRate.GetFloat()) )
+			if( GET_NEMESIS(player) || GET_ASSASSIN(player) || (killingDuration > 0.0f && killingDuration <= g_BulletTimeActivationInterval.GetFloat() && (++killedZombiesCount / killingDuration) >= g_BulletTimeActivationRate.GetFloat()) )
 			{
 				oldValue = new float;
 				*oldValue = host_timescale.GetFloat();
@@ -1491,6 +1488,8 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 
 				// TODO: Add that amazing bullet time-travel-spacetime-bending sound
 				//			Possibly some visual effects, too
+
+				gamehelpers->TextMsg(1, TEXTMSG_DEST_CHAT, "Bullet time started");
 			}
 		}
 		else

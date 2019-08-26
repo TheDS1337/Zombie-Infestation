@@ -1054,7 +1054,7 @@ bool ZIPlayer::Infect(ZIPlayer *attacker, ZIInfected *zclass)
 	{
 		m_pEntity->SetFOV(ZOMBIE_FOV);
 		m_pEntity->SetFlashLight(false);
-		m_pEntity->SetNightVision(true);
+		m_pEntity->SetNightVision(true, "ZombieInfestation/effects/zombie_vision.vmt");
 	}
 	
 	m_pEntity->RemoveItemsFromSlot(CSGO_WEAPON_SLOT_PRIMARY);
@@ -1107,6 +1107,14 @@ bool ZIPlayer::Infect(ZIPlayer *attacker, ZIInfected *zclass)
 
 bool ZIPlayer::Disinfect(ZIPlayer *attacker, ZIHumanoid *hclass)
 {
+	ZIInfected *infected = dynamic_cast<ZIInfected *> (hclass);
+
+	if( hclass && infected )
+	{
+		CONSOLE_DEBUGGER("Trying to disinfect player with an infected class.");
+		return false;
+	}
+
 	if( !ZICore::OnPreClientDisinfection(this, attacker, hclass == &g_Survivor, hclass == &g_Sniper) && HumansCount() > 0 )
 	{
 		return false;

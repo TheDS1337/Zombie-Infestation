@@ -292,9 +292,11 @@ ResultType ZITimersCallback::BulletTime::OnTimer(ITimer *timer, void *data)
 	static ConVarRef host_timescale("host_timescale");
 	host_timescale.SetValue(**oldValue);
 
-	delete *oldValue; *oldValue = nullptr;
-
+	gamehelpers->TextMsg(1, TEXTMSG_DEST_CHAT, "Bullet time stopped");
 	// TODO: Add the bullet time stopping sound
+
+	// Free the memory
+	delete *oldValue;
 
 	ZICore::m_pBulletTime = nullptr;
 	return Pl_Stop;

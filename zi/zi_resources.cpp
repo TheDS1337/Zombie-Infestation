@@ -317,17 +317,51 @@ void ZIResources::Load()
 	PRECACHE_MODEL("models/gibs/rgib_p6.mdl");
 	PRECACHE_MODEL("models/gibs/gibhead.mdl");	
 
+
+
+//////////////////////////
+//// MATERIALS
+//////////////////////////
+
+	AddFileToDownloadsTable("materials/ZombieInfestation/effects/zombie_vision.vtf");
+	AddFileToDownloadsTable("materials/ZombieInfestation/effects/zombie_vision.vmt");
+
 //////////////////////////
 //// CONFIG
 //////////////////////////
-/*	char config[256];
+	char config[256];
 	g_pSM->BuildPath(Path_Game, config, sizeof(config), ZOMBIEINFESTATION_CONFIG);
+	
+	if( !libsys->PathExists(config) || !libsys->IsPathFile(config) )
+	{
+		CONSOLE_DEBUGGER("The config file was not found!");
+		return;
+	}
 
-	char command[256];
-	ke::SafeSprintf(command, sizeof(command), "exec %s\n", config);
-	CONSOLE_DEBUGGER("Config path: %s", config);*/
+	FILE *file = fopen(config, "rt");
 
-	gamehelpers->ServerCommand("exec zombieinfestation_config.cfg\n");
+	if( file )
+	{
+		char line[512];
+		int lineLength = 0;
+
+		while( !feof(file) && fgets(line, sizeof(line), file) )
+		{
+			if( line[0] == '\0' || !isalpha(line[0]) )
+			{
+				continue;
+			}
+
+			lineLength = strlen(line);
+
+			line[lineLength] = '\n';
+			line[lineLength + 1] = '\0';
+
+			gamehelpers->ServerCommand(line);
+		}
+
+		fclose(file);
+	}
 }
 
 void ZIResources::Free()
