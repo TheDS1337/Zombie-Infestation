@@ -58,7 +58,7 @@ void ArmageddonMode::OnPostSelection()
 
 	ZIPlayer *target = ZIRoundMode::m_RoundTarget;	// We start from you baby
 	
-	while( nemesisCount++ < maxNemesis )
+	while( nemesisCount < maxNemesis )
 	{
 		if( !target || (target->m_IsInfected && GET_NEMESIS(target)) )
 		{
@@ -68,7 +68,8 @@ void ArmageddonMode::OnPostSelection()
 		}
 
 		target->Infect(nullptr, &g_Nemesis);
-		
+		nemesisCount++;
+
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
 	}

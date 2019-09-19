@@ -45,7 +45,7 @@ void MultipleInfectionMode::OnPostSelection()
 	
 	ZIPlayer *target = ZIRoundMode::m_RoundTarget;	// We start from you baby
 
-	while( zombiesCount++ < maxZombies )
+	while( zombiesCount < maxZombies )
 	{
 		if( !target || target->m_IsInfected )
 		{
@@ -55,6 +55,7 @@ void MultipleInfectionMode::OnPostSelection()
 		}
 
 		target->Infect();
+		zombiesCount++;
 
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();		

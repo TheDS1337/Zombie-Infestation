@@ -67,7 +67,7 @@ void PlagueMode::OnPostSelection()
 
 	ZIPlayer *target = ZIRoundMode::m_RoundTarget;	// We start from you baby
 
-	while( survivorsCount++ < maxSurvivors )
+	while( survivorsCount < maxSurvivors )
 	{
 		if( !target || (!target->m_IsInfected && GET_SURVIVOR(target)) )
 		{
@@ -77,12 +77,13 @@ void PlagueMode::OnPostSelection()
 		}
 
 		target->Disinfect(nullptr, &g_Survivor);
+		survivorsCount++;
 
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
 	}
 
-	while( nemesisCount++ < maxNemesis )
+	while( nemesisCount < maxNemesis )
 	{
 		if( !target || (!target->m_IsInfected && GET_SURVIVOR(target)) || (target->m_IsInfected && GET_NEMESIS(target)) )
 		{
@@ -92,12 +93,13 @@ void PlagueMode::OnPostSelection()
 		}
 
 		target->Infect(nullptr, &g_Nemesis);
+		nemesisCount++;
 
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
 	}
 
-	while( zombiesCount++ < maxZombies )
+	while( zombiesCount < maxZombies )
 	{
 		if( !target || (!target->m_IsInfected && GET_SURVIVOR(target)) || target->m_IsInfected )
 		{
@@ -107,6 +109,7 @@ void PlagueMode::OnPostSelection()
 		}
 
 		target->Infect();
+		zombiesCount++;
 
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
@@ -126,7 +129,7 @@ void PlagueMode::OnPostSelection()
 			continue;
 		}
 
-		if( player->m_IsAlive && !player->m_IsInfected && !GET_SURVIVOR(target) && player->m_pEntity->GetTeam() != CSGO_TEAM_CT )
+		if( player->m_IsAlive && !player->m_IsInfected && !GET_SURVIVOR(player) && player->m_pEntity->GetTeam() != CSGO_TEAM_CT )
 		{
 			player->m_pEntity->SetTeam(CSGO_TEAM_CT);
 		}

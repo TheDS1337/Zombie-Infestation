@@ -211,6 +211,10 @@ void ZIResources::Load()
 	PRECACHE_SOUND("ZombieInfestation/explosion3.mp3");
 	PRECACHE_SOUND("ZombieInfestation/flatline.mp3");
 
+	// Bullet-Time
+	PRECACHE_SOUND("ZombieInfestation/bullettime_start.mp3");
+	PRECACHE_SOUND("ZombieInfestation/bullettime_end.mp3");
+
 //////////////////////////
 //// MODELS
 //////////////////////////

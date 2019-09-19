@@ -19,5 +19,9 @@
 ** I changed the VariantInit class to something prettier, test it out and hope it works!
 
 
-*** ADDED BULLET TIME (Code in OnPostClientDeath)
-************************ APPARENTLY THE NIGHTVISION USED IN QUBKA's ZP IS JUST AN OVERLAY, CHECK THE CORRESPONDING FILES FOR VOverlayOnClientUpdate (it uses the material overlays/zp/zvision.vmt found on QUBKA's resources)
+
+19092019:
+
+* The bullet-time time is dilated because of host_timescale, TODO: find a way to fix it
+* Some models are not being precached
+* r_screenoverlay wasn't found

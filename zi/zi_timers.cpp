@@ -281,22 +281,42 @@ void ZITimersCallback::TeamsRandomization::OnTimerEnd(ITimer *timer, void *data)
 
 ResultType ZITimersCallback::BulletTime::OnTimer(ITimer *timer, void *data)
 {
-	float **oldValue = (float **) data;
-
-	if( !oldValue )
-	{
-		ZICore::m_pBulletTime = nullptr;
-		return Pl_Stop;
-	}
-	
 	static ConVarRef host_timescale("host_timescale");
-	host_timescale.SetValue(**oldValue);
 
-	gamehelpers->TextMsg(1, TEXTMSG_DEST_CHAT, "Bullet time stopped");
-	// TODO: Add the bullet time stopping sound
+	bool *start = (bool *) data;	
 
-	// Free the memory
-	delete *oldValue;
+	if( start && *start )
+	{
+		float speed = g_BulletTimeSpeed.GetFloat();
+
+		// Start our bullet time
+		host_timescale.SetValue(speed);
+
+		// We don't have to keep it forever, it becomes ugly
+		*start = false;
+		ZICore::m_pBulletTime = timersys->CreateTimer(&ZITimersCallback::m_BulletTime, g_BulletTimeDuration.GetFloat() * speed, start, TIMER_FLAG_NO_MAPCHANGE);
+
+		//	Possibly some visual effects, too
+	}
+	else	
+	{		
+		host_timescale.SetValue(1.0f);
+
+		ZIPlayer *player = nullptr;
+
+		for( auto iterator = ZICore::m_pOnlinePlayers.begin(); iterator != ZICore::m_pOnlinePlayers.end(); iterator++ )
+		{
+			player = *iterator;
+
+			if( !player || player->m_IsBot )
+			{
+				continue;
+			}
+
+			// Play sound
+			player->PlaySound("ZombieInfestation/bullettime_end.mp3");
+		}
+	}
 
 	ZICore::m_pBulletTime = nullptr;
 	return Pl_Stop;

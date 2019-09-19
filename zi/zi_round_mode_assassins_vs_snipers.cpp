@@ -58,7 +58,7 @@ void AssassinsVSSnipersMode::OnPostSelection()
 
 	ZIPlayer *target = ZIRoundMode::m_RoundTarget;	// We start from you baby
 	
-	while( assassinsCount++ < maxAssassins )
+	while( assassinsCount < maxAssassins )
 	{
 		if( !target || (target->m_IsInfected && GET_ASSASSIN(target)) )
 		{
@@ -68,7 +68,8 @@ void AssassinsVSSnipersMode::OnPostSelection()
 		}
 
 		target->Infect(nullptr, &g_Assassin);
-		
+		assassinsCount++;
+
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
 	}

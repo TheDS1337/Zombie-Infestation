@@ -69,7 +69,7 @@ void NightmareMode::OnPostSelection()
 
 	ZIPlayer *target = ZIRoundMode::m_RoundTarget;	// We start from you baby
 
-	while( survivorsCount++ < maxSurvivors )
+	while( survivorsCount < maxSurvivors )
 	{
 		if( !target || (!target->m_IsInfected && GET_SURVIVOR(target)) )
 		{
@@ -79,12 +79,13 @@ void NightmareMode::OnPostSelection()
 		}
 
 		target->Disinfect(nullptr, &g_Survivor);
+		survivorsCount++;
 
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
 	}
 
-	while( snipersCount++ < maxSnipers )
+	while( snipersCount < maxSnipers )
 	{
 		if( !target || (!target->m_IsInfected && (GET_SURVIVOR(target) || GET_SNIPER(target))) )
 		{
@@ -94,12 +95,13 @@ void NightmareMode::OnPostSelection()
 		}
 
 		target->Disinfect(nullptr, &g_Sniper);
+		snipersCount++;
 
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
 	}
 
-	while( nemesisCount++ < maxNemesis )
+	while( nemesisCount < maxNemesis )
 	{
 		if( !target || (!target->m_IsInfected && (GET_SURVIVOR(target) || GET_SNIPER(target))) || (target->m_IsInfected && GET_NEMESIS(target)) )
 		{
@@ -109,6 +111,7 @@ void NightmareMode::OnPostSelection()
 		}
 
 		target->Infect(nullptr, &g_Nemesis);
+		nemesisCount++;
 
 		// Search for a next target
 		target = ZIPlayer::RandomAlive();
@@ -128,9 +131,9 @@ void NightmareMode::OnPostSelection()
 			continue;
 		}
 
-		if( player->m_IsAlive && !player->m_IsInfected && !GET_SURVIVOR(target) && !GET_SNIPER(target) )
+		if( player->m_IsAlive && !player->m_IsInfected && !GET_SURVIVOR(player) && !GET_SNIPER(player) )
 		{
-			target->Infect(nullptr, &g_Assassin);
+			player->Infect(nullptr, &g_Assassin);
 		}
 
 		if( !player->m_IsBot )

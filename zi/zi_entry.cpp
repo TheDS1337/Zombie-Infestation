@@ -11,6 +11,9 @@
 #include "zi_item_jetpack_bazooka.h"
 #include "zi_item_infection_bomb.h"
 #include "zi_round_modes.h"
+#include "zi_round_mode_nemesis.h"
+#include "zi_round_mode_assassin.h"
+#include "zi_round_mode_plague.h"
 #include "zi_timers.h"
 #include "zi_environment.h"
 #include "zi_weapons.h"
@@ -1286,8 +1289,6 @@ void ZombieInfestation::OnPostClientTakeDamage(ZIPlayer *player, CTakeDamageInfo
 
 bool ZombieInfestation::OnPreClientDeath(ZIPlayer *player, CTakeDamageInfo2 &info)
 {
-	player->m_IsAlive = false;	
-
 	// The first viewmodel is hidden by the game dll, we need to do the same for the second.
 /*	BaseViewModel *viewmodelEnt = player->m_pSecondViewModel;
 
@@ -1353,9 +1354,7 @@ bool ZombieInfestation::OnPreClientDeath(ZIPlayer *player, CTakeDamageInfo2 &inf
 }
 
 void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &info)
-{
-	player->m_pHumanLike = nullptr;
-	
+{	
 	BasePlayer *playerEnt = player->m_pEntity;
 
 	ZIPlayer *attacker = ZIPlayer::Find(gamehelpers->ReferenceToIndex(info.GetAttacker()), false);
@@ -1414,49 +1413,14 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 		ZICore::m_CurrentMode = ZIRoundMode::Choose();		
 	}
 
-	// Bullet Time
-	float bulletTimeDuration = g_BulletTimeDuration.GetFloat();
-
+	// Bullet Time	
 	static ConVarRef host_timescale("host_timescale");
-	static float *oldValue = nullptr;
-
+	
 	// If it's a boss, end any currently-playing bullet-time and start a new one, for the BOSS!
 	if( GET_NEMESIS(player) || GET_ASSASSIN(player) )
 	{
-		RELEASE_TIMER(ZICore::m_pBulletTime);
-
-		if( oldValue )
-		{
-			host_timescale.SetValue(*oldValue);
-
-			// Because we are killing our timer, we won't have a chance to free the previously dynamically allocated block
-			// So we better free it here.... as long as we have our very last chance of doing so
-			delete oldValue; oldValue = nullptr;
-		}
-
-		// Round modes like Armageddon, Assassins Vs Snipers etc... have more than one boss
-		// To make our bullet time truly worth it we must reduce it's usage, the more bosses are dead the more it becomes longer and exciting
-		// Giving our human players that adrenaline boost you're supposed to get when you survive something horrible, a key for every horror movie/game!
-
-		int remainingBossesCount = ZIPlayer::NemesisCount() + ZIPlayer::AssassinsCount();
-		static int startingBossesCount = 0;
-
-		if( startingBossesCount == 0 && remainingBossesCount != 0 )
-		{
-			startingBossesCount = remainingBossesCount + 1;
-		}
-		else
-		{
-			startingBossesCount = 0;
-		}
-
-		if( remainingBossesCount > 0 && startingBossesCount > 0 )
-		{
-			bulletTimeDuration *= 1.0f - 0.5f * (remainingBossesCount / startingBossesCount);
-		}
-	}
-
-	CONSOLE_DEBUGGER("bulletTimeDuration: %f", bulletTimeDuration);
+		RELEASE_TIMER(ZICore::m_pBulletTime);			
+	}	
 
 	// Only start bullet-time if it isn't running already
 	if( !ZICore::m_pBulletTime )
@@ -1475,21 +1439,30 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 		{
 			killingDuration = endTime - startTime;
 
-			if( GET_NEMESIS(player) || GET_ASSASSIN(player) || (killingDuration > 0.0f && killingDuration <= g_BulletTimeActivationInterval.GetFloat() && (++killedZombiesCount / killingDuration) >= g_BulletTimeActivationRate.GetFloat()) )
+			BaseWeapon *weaponEnt = attacker->m_pEntity->GetActiveWeapon();
+
+			if( (GET_NEMESIS(player) && (ZICore::m_CurrentMode == &g_NemesisMode || ZICore::m_CurrentMode == &g_PlagueMode)) || (GET_ASSASSIN(player) && ZICore::m_CurrentMode == &g_AssassinMode) || (!GET_SURVIVOR(attacker) && !GET_SNIPER(attacker) && weaponEnt && strncmp(weaponEnt->GetClassname(), "weapon_knife", 10) == 0) || (killingDuration > 0.0f && killingDuration <= g_BulletTimeActivationInterval.GetFloat() && ++killedZombiesCount / killingDuration >= g_BulletTimeActivationRate.GetFloat()) )
 			{
-				oldValue = new float;
-				*oldValue = host_timescale.GetFloat();
+				// Just before we actually start it, we play the sound and then start it (prevents the sound from being pithced down)
+				ZIPlayer *playerIterator = nullptr;
 
-				// Start our bullet time
-				host_timescale.SetValue(g_BulletTimeSpeed.GetFloat());
-				
-				// We don't have to keep it forever, it becomes ugly
-				ZICore::m_pBulletTime = timersys->CreateTimer(&ZITimersCallback::m_BulletTime, bulletTimeDuration, &oldValue, TIMER_FLAG_NO_MAPCHANGE);
+				for( auto iterator = ZICore::m_pOnlinePlayers.begin(); iterator != ZICore::m_pOnlinePlayers.end(); iterator++ )
+				{
+					playerIterator = *iterator;
 
-				// TODO: Add that amazing bullet time-travel-spacetime-bending sound
-				//			Possibly some visual effects, too
+					if( !playerIterator || playerIterator->m_IsBot )
+					{
+						continue;
+					}
 
-				gamehelpers->TextMsg(1, TEXTMSG_DEST_CHAT, "Bullet time started");
+					// Play sound
+					playerIterator->PlaySound("ZombieInfestation/bullettime_start.mp3");
+				}
+
+				static bool start;				
+				start = true;				
+
+				ZICore::m_pBulletTime = timersys->CreateTimer(&ZITimersCallback::m_BulletTime, RandomFloat(0.8f, 1.2f), &start, TIMER_FLAG_NO_MAPCHANGE);						
 			}
 		}
 		else
@@ -1498,6 +1471,9 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 			startTime = endTime;
 		}
 	}
+
+	player->m_IsAlive = false;
+	player->m_pHumanLike = nullptr;
 
 	// This needs to be here, players can die outta no where, we prevent the check for an attacker...
 	player->UpdateCount();	
