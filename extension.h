@@ -11,6 +11,7 @@
 #include <igameevents.h>
 #include <iplayerinfo.h>
 #include <filesystem.h>
+#include <vphysics_interface.h>
 #include <usercmd.h>
 #include <in_buttons.h>
 #include <ai_activity.h>
@@ -185,6 +186,8 @@ public:
 	ICvar *m_pConsoleVars;
 	INetworkStringTableContainer *m_pNetworkStringTable;
 	IFileSystem *m_pFileSystem;
+	IPhysics *m_pPhysics;
+	IPhysicsSurfaceProps *m_pPhysicsSurfaceProps;
 	IBinTools *m_pBinTools;
 	ISDKHooks *m_pSDKHooks;
 	ISDKTools *m_pSDKTools;
@@ -267,6 +270,7 @@ public:
 	unsigned int m_iPrimaryAddon;
 	unsigned int m_iSecondaryAddon;
 	unsigned int m_flVelocityModifier;
+	unsigned int m_bIsScoped;
 	unsigned int m_takedamage;
 	unsigned int m_OnUser1;
 	unsigned int m_OnUser2;

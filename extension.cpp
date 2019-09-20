@@ -86,6 +86,8 @@ bool Evolutionary::SDK_OnMetamodLoad(ISmmAPI *ismm, char *error, size_t maxlen, 
 	GET_V_IFACE_CURRENT(GetEngineFactory, m_pConsoleVars, ICvar, CVAR_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetEngineFactory, m_pNetworkStringTable, INetworkStringTableContainer, INTERFACENAME_NETWORKSTRINGTABLESERVER); 
 	GET_V_IFACE_CURRENT(GetFileSystemFactory, m_pFileSystem, IFileSystem, FILESYSTEM_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetPhysicsFactory, m_pPhysics, IPhysics, VPHYSICS_INTERFACE_VERSION);
+	GET_V_IFACE_CURRENT(GetPhysicsFactory, m_pPhysicsSurfaceProps, IPhysicsSurfaceProps, VPHYSICS_SURFACEPROPS_INTERFACE_VERSION);
 
 	g_pCVar = m_pConsoleVars;
 	ConVar_Register(0, this);
@@ -635,6 +637,7 @@ bool Evolutionary::GetSendPropOffsets()
 	GET_SENDPROP_OFFSET(CCSPlayer, m_iPrimaryAddon);
 	GET_SENDPROP_OFFSET(CCSPlayer, m_iSecondaryAddon);
 	GET_SENDPROP_OFFSET(CCSPlayer, m_flVelocityModifier);
+	GET_SENDPROP_OFFSET(CCSPlayer, m_bIsScoped);
 
 	// Weapons only
 	GET_SENDPROP_OFFSET(CBaseCombatWeapon, m_nViewModelIndex);

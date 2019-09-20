@@ -8,7 +8,6 @@ struct VariantWrapper
 
 	VariantWrapper()
 	{
-		memset(data, 0, sizeof(data));
 		*(unsigned int *) &data[12] = INVALID_EHANDLE_INDEX;		
 	}
 
@@ -39,6 +38,15 @@ public:
 
 private:
 	IHandleEntity *m_pPassEnt;
+};
+
+class CTraceFilterAimTarget2 final: public CTraceFilterEntitiesOnly
+{
+public:
+	bool ShouldHitEntity(IHandleEntity *serverEntity, int contentsMask) override
+	{
+		return gamehelpers->ReferenceToIndex(gamehelpers->EntityToReference((CBaseEntity *) serverEntity)) > g_pExtension->m_pGlobals->maxClients;
+	}	
 };
 
 class CTraceFilterVacant final: public CTraceFilter
@@ -143,7 +151,7 @@ BaseEntity *BaseEntity::FindEntityByNetClass(int start, const char *classname)
 
 void BaseEntity::SetInputVariant(bool value)
 {
-	unsigned char *variant = (unsigned char *) &g_Variant.data;
+	unsigned char *variant = (unsigned char *) &g_Variant;
 
 	*(bool *) variant = value; variant += 3 * sizeof(int) + sizeof(unsigned long);
 	*(fieldtype_t *) variant = FIELD_BOOLEAN;
@@ -151,7 +159,7 @@ void BaseEntity::SetInputVariant(bool value)
 
 void BaseEntity::SetInputVariant(int value)
 {
-	unsigned char *variant = (unsigned char *) &g_Variant.data;
+	unsigned char *variant = (unsigned char *) &g_Variant;
 
 	*(int *) variant = value; variant += 3 * sizeof(int) + sizeof(unsigned long);
 	*(fieldtype_t *) variant = FIELD_INTEGER;
@@ -159,7 +167,7 @@ void BaseEntity::SetInputVariant(int value)
 
 void BaseEntity::SetInputVariant(float value)
 {
-	unsigned char *variant = (unsigned char *) &g_Variant.data;
+	unsigned char *variant = (unsigned char *) &g_Variant;
 
 	*(float *) variant = value; variant += 3 * sizeof(int) + sizeof(unsigned long);
 	*(fieldtype_t *) variant = FIELD_FLOAT;
@@ -167,7 +175,7 @@ void BaseEntity::SetInputVariant(float value)
 
 void BaseEntity::SetInputVariant(const char *value)
 {
-	unsigned char *variant = (unsigned char *) &g_Variant.data;
+	unsigned char *variant = (unsigned char *) &g_Variant;
 
 	*(string_t *) variant = MAKE_STRING(value); variant += 3 * sizeof(int) + sizeof(unsigned long);
 	*(fieldtype_t *) variant = FIELD_STRING;
@@ -175,7 +183,7 @@ void BaseEntity::SetInputVariant(const char *value)
 
 void BaseEntity::SetInputVariant(Color value)
 {
-	unsigned char *variant = (unsigned char *) &g_Variant.data;
+	unsigned char *variant = (unsigned char *) &g_Variant;
 
 	*(color32 *) variant = value.ToColor32(); variant += 3 * sizeof(int) + sizeof(unsigned long);
 	*(fieldtype_t *) variant = FIELD_COLOR32;
@@ -183,7 +191,7 @@ void BaseEntity::SetInputVariant(Color value)
 
 void BaseEntity::SetInputVariant(Vector value, bool posVector)
 {
-	unsigned char *variant = (unsigned char *) &g_Variant.data;
+	unsigned char *variant = (unsigned char *) &g_Variant;
 
 	*(Vector *) variant = value; variant += 3 * sizeof(int) + sizeof(unsigned long);
 	*(fieldtype_t *) variant = posVector ? FIELD_POSITION_VECTOR : FIELD_VECTOR;
@@ -192,7 +200,7 @@ void BaseEntity::SetInputVariant(Vector value, bool posVector)
 void BaseEntity::SetInputVariant(BaseEntity *value)
 {
 	CBaseHandle handle = ((IHandleEntity *) value)->GetRefEHandle();
-	unsigned char *variant = (unsigned char *) &g_Variant.data + 3 * sizeof(int);
+	unsigned char *variant = (unsigned char *) &g_Variant + 3 * sizeof(int);
 
 	*(unsigned long *) variant = handle.ToInt(); variant += sizeof(unsigned long);
 	*(fieldtype_t *) variant = FIELD_EHANDLE;
@@ -201,6 +209,7 @@ void BaseEntity::SetInputVariant(BaseEntity *value)
 bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntity *caller, int outputId)
 {
 	static ICallWrapper *callWrapper = nullptr;
+	static int variantSize = sizeof(g_Variant.data);
 
 	if( !callWrapper )
 	{
@@ -221,7 +230,7 @@ bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntit
 		info[1].size = info[2].size = sizeof(CBaseEntity *);
 		info[3].type = PassType_Object;
 		info[3].flags = PASSFLAG_BYVAL | PASSFLAG_OCTOR | PASSFLAG_ODTOR | PASSFLAG_OASSIGNOP;
-		info[3].size = SIZEOF_VARIANT_T;
+		info[3].size = variantSize;
 		info[4].type = PassType_Basic;
 		info[4].flags = PASSFLAG_BYVAL;
 		info[4].size = sizeof(int);
@@ -240,14 +249,14 @@ bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntit
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[3 * sizeof(CBaseEntity *) + sizeof(const char *) + SIZEOF_VARIANT_T + sizeof(int) + sizeof(bool)];
+	unsigned char *params = new unsigned char[3 * sizeof(CBaseEntity *) + sizeof(const char *) + variantSize + sizeof(int) + sizeof(bool)];
 	unsigned char *vparams = params;
 	
 	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
 	*(const char **) vparams = input; vparams += sizeof(const char *);
 	*(CBaseEntity **) vparams = (CBaseEntity *) activator; vparams += sizeof(CBaseEntity *);
 	*(CBaseEntity **) vparams = (CBaseEntity *) caller; vparams += sizeof(CBaseEntity *);	
-	memcpy(vparams, &g_Variant.data, SIZEOF_VARIANT_T); vparams += SIZEOF_VARIANT_T;
+	memcpy(vparams, &g_Variant, variantSize); vparams += variantSize;
 	*(int *) vparams = outputId;
 
 	bool ret;
@@ -255,6 +264,9 @@ bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntit
 
 	// Reset the global variant
 	g_Variant.Reset();
+
+	// Release the memory
+	delete params;
 
 	return ret;
 }
@@ -2949,6 +2961,37 @@ BaseEntity *BasePlayer::GetAimTarget()
 	return nullptr;
 }
 
+Vector BasePlayer::GetAimTarget2()
+{
+	edict_t *client = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
+
+	if( !client )
+	{
+		return Vector(0.0f, 0.0f, 0.0f);
+	}
+
+	Vector dir;
+	AngleVectors(GetEyeAngles(), &dir);
+
+	Vector eyePos;
+	g_pExtension->m_pServerGameClients->ClientEarPosition(client, &eyePos);
+
+	Ray_t ray;
+	ray.Init(eyePos, eyePos + dir * 8000.0f);
+
+	trace_t trace;
+	CTraceFilterAimTarget2 target;
+
+	g_pExtension->m_pEngineTrace->TraceRay(ray, MASK_SHOT, &target, &trace);
+
+	if( trace.DidHit() )
+	{
+		return trace.endpos;
+	}
+
+	return Vector(0.0f, 0.0f, 0.0f);
+}
+
 int BasePlayer::GetArmor()
 {
 	if( g_pExtension->m_ArmorValue < 1 )
@@ -3049,6 +3092,35 @@ void BasePlayer::SetVelocityModifier(float value)
 	}
 }
 
+bool BasePlayer::IsScoped()
+{
+	if( g_pExtension->m_bIsScoped < 1 )
+	{
+		CONSOLE_DEBUGGER("Offset not found yet.");
+		return false;
+	}
+
+	return *(bool *) ((unsigned char *) this + g_pExtension->m_bIsScoped);
+}
+
+void BasePlayer::SetScoped(bool value)
+{
+	if( g_pExtension->m_bIsScoped < 1 )
+	{
+		CONSOLE_DEBUGGER("Offset not found yet.");
+		return;
+	}
+
+	*(bool *) ((unsigned char *) this + g_pExtension->m_bIsScoped) = value;
+
+	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
+
+	if( edict )
+	{
+		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bIsScoped);
+	}
+}
+
 int BasePlayer::GetFOV()
 {
 	if( g_pExtension->m_iFOV < 1 || g_pExtension->m_iDefaultFOV < 1 )
@@ -3121,7 +3193,7 @@ bool BasePlayer::IsNightVisionOn()
 	return *(bool *) ((unsigned char *) this + g_pExtension->m_bNightVisionOn);
 }
 
-void BasePlayer::SetNightVision(bool on)
+void BasePlayer::SetNightVision(bool on, const char *overlay)
 {
 	if( g_pExtension->m_bHasNightVision < 1 || g_pExtension->m_bNightVisionOn < 1 )
 	{
@@ -3138,6 +3210,33 @@ void BasePlayer::SetNightVision(bool on)
 	{
 		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bHasNightVision);
 		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bNightVisionOn);
+
+		static ConCommandBase *r_screenoverlay = g_pExtension->m_pConsoleVars->FindCommandBase("r_screenoverlay");
+
+		if( r_screenoverlay && overlay && *overlay )
+		{
+			if( r_screenoverlay->GetFlags() & FCVAR_CHEAT  )
+			{
+				CONSOLE_DEBUGGER("r_screenoverlay is cheaty!");
+			}
+			else
+			{
+				CONSOLE_DEBUGGER("r_screenoverlay is not cheaty!");
+			}
+
+			if( on )
+			{
+				g_pExtension->m_pEngineServer->ClientCommand(edict, "r_screenoverlay %s", overlay);
+			}
+			else
+			{
+				g_pExtension->m_pEngineServer->ClientCommand(edict, "r_screenoverlay \"\"");
+			}
+		}
+		else
+		{
+			CONSOLE_DEBUGGER("Could not find r_screenoverlay!");
+		}
 	}
 }
 

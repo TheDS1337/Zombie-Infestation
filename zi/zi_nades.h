@@ -38,13 +38,7 @@ struct NadeData
 class ZINades
 {
 public:
-	static int m_BeamModelIndex;
-	static int m_HaloModelIndex;
-	static int m_GlassModelIndex[6];	
-
 	static void SetColor(BaseGrenade *nadeEnt, Color color);	
-
-	static void Precache();	
 
 	static void OnPostHEGrenadeCreation(BaseGrenade *nadeEnt);
 	static void OnPostHEGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);

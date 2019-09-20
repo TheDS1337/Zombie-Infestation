@@ -21,7 +21,7 @@ const char *ZIAssassin::GetDescription()
 
 ZIModel *ZIAssassin::GetModel()
 {
-	return ZIResources::GetModel(g_AssassinModel.GetString(), ModelType_Assassin);
+	return ZIResources::GetModel(g_AssassinModel.GetString(), ModelType_Nemesis);
 }
 
 bool ZIAssassin::IsBoss()

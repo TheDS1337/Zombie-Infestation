@@ -85,8 +85,11 @@ extern void TE_BeamFollow(IRecipientFilter &filter, float delay, int beamModelIn
 	float amplitude, int speed, Color color, int flags, BaseEntity *entity);
 extern void TE_BeamRingPoint(IRecipientFilter &filter, float delay, int beamModelIndex, int haloModelIndex, int startFrame, int frameRate, float life, float width, float endWidth, int fadeLength,
 	float amplitude, int speed, Color color, int flags, Vector center, float startRadius, float endRadius);
+extern void TE_BeamPoints(IRecipientFilter &filter, float delay, int beamModelIndex, int haloModelIndex, int startFrame, int frameRate, float life, float width, float endWidth, int fadeLength,
+	float amplitude, int speed, Color color, int flags, Vector startPos, Vector endPos);
 extern void TE_Sparks(IRecipientFilter &filter, float delay, Vector origin, int magnitude, int trailLength, Vector direction);
 extern void TE_BreakModel(IRecipientFilter &filter, float delay, Vector origin, QAngle rotation, Vector size, Vector velocity, int modelIndex, int randomization, int count, float time, int flags);
+extern void TE_GlowSprite(IRecipientFilter &filter, float delay, Vector origin, int glowModelIndex, float scale, float life, int brightness);
 extern void TE_BloodSprite(IRecipientFilter &filter, float delay, Vector origin, Vector direction, Color color, int sprayModelIndex, int dropModelIndex, int size);
 extern void TE_EnergySplash(IRecipientFilter &filter, float delay, Vector origin, Vector direction, bool explosive);
 extern void TE_Explosion(IRecipientFilter &filter, float delay, Vector origin, int modelIndex, float scale, int frameRate, int flags, Vector normal, int materialType, int radius, int magnitude);

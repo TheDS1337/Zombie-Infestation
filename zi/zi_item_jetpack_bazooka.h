@@ -37,13 +37,7 @@ struct RocketData
 
 class JetpackBazookaItem final: public ZIItem
 {
-public:
-	int m_BeamModelIndex;
 private:
-//	int m_BeamModelIndex;
-	int m_FireModelIndex;
-	int m_ExplosionModelIndex;
-
 //	void UpdateRocketVelocity(void *data);
 
 public:

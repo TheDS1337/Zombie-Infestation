@@ -6,6 +6,16 @@
 #define ZOMBIEINFESTATION_MODELS_CONFIG "addons/ZombieInfestation/resources/models.ini"
 #define ZOMBIEINFESTATION_CONFIG "addons/ZombieInfestation/config.cfg"
 
+int ZIResources::m_BloodSprayModelIndex = -1;
+int ZIResources::m_BloodDropModelIndex = -1;
+int ZIResources::m_LaserModelIndex = -1; 																										  
+int ZIResources::m_BeamModelIndex = -1;
+int ZIResources::m_HaloModelIndex = -1;
+int ZIResources::m_GlowModelIndex = -1;
+int ZIResources::m_FireModelIndex = -1;
+int ZIResources::m_ExplosionModelIndex = -1;
+int ZIResources::m_GlassModelIndex[] = { -1 };
+
 ZIResources g_Resources;
 
 static KeyValues *g_pSoundsKeyValues = nullptr, *g_pModelsKeyValues = nullptr;
@@ -329,6 +339,25 @@ void ZIResources::Load()
 
 	AddFileToDownloadsTable("materials/ZombieInfestation/effects/zombie_vision.vtf");
 	AddFileToDownloadsTable("materials/ZombieInfestation/effects/zombie_vision.vmt");
+
+	m_BloodSprayModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/bloodspray.vmt", true);
+	m_BloodDropModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/effects/blood_drop.vmt", true);
+
+	m_LaserModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/laserbeam.vmt", true); // dronegun_laser.vmt or purplelaser1.vmt are good too
+//	m_BeamModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/laserbeam.vmt", true);
+	m_BeamModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/physbeam.vmt", true);
+	m_HaloModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/glow01.vmt", true);
+	m_GlowModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/ledglow.vmt", true);
+
+	m_FireModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/xfireball3.vmt", true);
+	m_ExplosionModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/zerogxplode.vmt", true);
+
+	m_GlassModelIndex[0] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard01.mdl", true);
+	m_GlassModelIndex[1] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard02.mdl", true);
+	m_GlassModelIndex[2] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard03.mdl", true);
+	m_GlassModelIndex[3] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard04.mdl", true);
+	m_GlassModelIndex[4] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard05.mdl", true);
+	m_GlassModelIndex[5] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard06.mdl", true);	
 
 //////////////////////////
 //// CONFIG

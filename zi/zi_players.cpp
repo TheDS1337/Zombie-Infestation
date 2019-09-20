@@ -15,15 +15,6 @@
 #include "zi_timers.h"
 #include "zi_menus.h"
 
-int ZIPlayer::m_BloodSprayModelIndex = -1;
-int ZIPlayer::m_BloodDropModelIndex = -1;
-
-void ZIPlayer::Precache()
-{
-	m_BloodSprayModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/bloodspray.vmt", true);
-	m_BloodDropModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/effects/blood_drop.vmt", true);
-}
-
 ZIPlayer *ZIPlayer::Find(const char *name)
 {
 	if( !name )
@@ -711,15 +702,11 @@ ZIPlayer::ZIPlayer(edict_t *edict)
 	m_Index = gamehelpers->IndexOfEdict(edict);
 	m_pEntity = (BasePlayer *) g_pExtension->m_pServerGameEntities->EdictToBaseEntity(m_pEdict);
 	
-	Initiate();	
-
-	CONSOLE_DEBUGGER("Creating player %s, id=%d, size: %d", m_Name, m_Index, ZICore::m_pOnlinePlayers.size());
+	Initiate();		
 }
 
 ZIPlayer::~ZIPlayer()
 {
-	CONSOLE_DEBUGGER("Removing player %s, id=%d, size: %d", m_Name, m_Index, ZICore::m_pOnlinePlayers.size());
-	
 	delete[] m_pDamageDealtToZombies; m_pDamageDealtToZombies = nullptr;
 	
 	RELEASE_TIMER(m_pStatsTimer);
@@ -1401,7 +1388,7 @@ void ZIPlayer::Gib(Vector force)
 
 	// Blood
 	CellRecipientFilter bloodFilter;
-	TE_BloodSprite(bloodFilter, 0.0f, m_pEntity->GetOrigin(), force/*Vector(RandomFloat(-50.0f, 50.0f), RandomFloat(-50.0f, 50.0f), RandomFloat(0.0f, 100.0f))*/, Color(255, 0, 0, 200), ZIPlayer::m_BloodSprayModelIndex, ZIPlayer::m_BloodDropModelIndex, 150);
+	TE_BloodSprite(bloodFilter, 0.0f, m_pEntity->GetOrigin(), force/*Vector(RandomFloat(-50.0f, 50.0f), RandomFloat(-50.0f, 50.0f), RandomFloat(0.0f, 100.0f))*/, Color(255, 0, 0, 200), ZIResources::m_BloodSprayModelIndex, ZIResources::m_BloodDropModelIndex, 150);
 }
 
 bool ZIPlayer::Freeze(float duration)
@@ -1474,7 +1461,7 @@ void ZIPlayer::Unfreeze()
 	Vector pos = m_pEntity->GetOrigin();
 	pos.z += 25.0f;
 
-	TE_BreakModel(filter, 0.0f, pos, QAngle(0.0f, 0.0f, 0.0f), Vector(20.0f, 20.0f, 20.0f), Vector(RandomFloat(-50.0f, 50.0f), RandomFloat(-50.0f, 50.0f), 25.0f), ZINades::m_GlassModelIndex[RandomInt(0, ARRAY_SIZE(ZINades::m_GlassModelIndex) - 1)], 10, 10, 25.0f, BREAK_GLASS);
+	TE_BreakModel(filter, 0.0f, pos, QAngle(0.0f, 0.0f, 0.0f), Vector(20.0f, 20.0f, 20.0f), Vector(RandomFloat(-50.0f, 50.0f), RandomFloat(-50.0f, 50.0f), 25.0f), ZIResources::m_GlassModelIndex[RandomInt(0, ARRAY_SIZE(ZIResources::m_GlassModelIndex) - 1)], 10, 10, 25.0f, BREAK_GLASS);
 }
 
 void ZIPlayer::ClearEffects()

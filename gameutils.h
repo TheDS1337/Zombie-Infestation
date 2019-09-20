@@ -339,6 +339,7 @@ public:
 	QAngle GetEyeAngles();
 
 	BaseEntity *GetAimTarget();	
+	Vector GetAimTarget2();
 
 	int GetArmor();																	// Sendprop
 	void SetArmor(int value, bool helmet = false);									// Sendprop
@@ -349,6 +350,9 @@ public:
 	float GetVelocityModifier();													// Sendprop
 	void SetVelocityModifier(float value);											// Sendprop
 
+	bool IsScoped();																// Sendprop
+	void SetScoped(bool value);														// Sendprop
+
 	int GetFOV();																	// Sendprop
 	void SetFOV(int value);															// Sendprop
 
@@ -357,7 +361,7 @@ public:
 	bool ToggleFlashLight();														// Sendprop
 
 	bool IsNightVisionOn();															// Sendprop
-	void SetNightVision(bool value);												// Sendprop
+	void SetNightVision(bool value, const char *overlay = nullptr);					// Sendprop
 	bool ToggleNightVision();														// Sendprop
 
 	const char *GetArmsmodel();														// Sendprop

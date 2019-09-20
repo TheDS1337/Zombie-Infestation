@@ -437,34 +437,66 @@ void TE_BeamFollow(IRecipientFilter &filter, float delay, int beamModelIndex, in
 void TE_BeamRingPoint(IRecipientFilter &filter, float delay, int beamModelIndex, int haloModelIndex, int startFrame, int frameRate, float life, float width, float endWidth, int fadeLength,
 	float amplitude, int speed, Color color, int flags, Vector center, float startRadius, float endRadius)
 {
-	static TempEntity *beamEnt = TempEntity::FindTempEntity("BeamRingPoint");
+	static TempEntity *beamRingPoint = TempEntity::FindTempEntity("BeamRingPoint");
 
-	if( !beamEnt )
+	if( !beamRingPoint )
 	{
 		return;
 	}
 
-	beamEnt->SetProperty<int>("m_nModelIndex", beamModelIndex);
-	beamEnt->SetProperty<int>("m_nHaloIndex", haloModelIndex);
-	beamEnt->SetProperty<int>("m_nStartFrame", startFrame);	// look for more info about this
-	beamEnt->SetProperty<int>("m_nFrameRate", frameRate);	// look for more info about this
-	beamEnt->SetProperty<float>("m_fLife", life);
-	beamEnt->SetProperty<float>("m_fWidth", width);
-	beamEnt->SetProperty<float>("m_fEndWidth", endWidth);		// look for more info about this
-	beamEnt->SetProperty<int>("m_nFadeLength", fadeLength);
-	beamEnt->SetProperty<float>("m_fAmplitude", amplitude);		// look for more info about this
-	beamEnt->SetProperty<int>("m_nSpeed", speed);				// look for more info about this
-	beamEnt->SetProperty<int>("r", color.r());
-	beamEnt->SetProperty<int>("g", color.g());
-	beamEnt->SetProperty<int>("b", color.b());
-	beamEnt->SetProperty<int>("a", color.a());
-	beamEnt->SetProperty<int>("m_nFlags", flags);				// look for more info about this
-	beamEnt->SetProperty<Vector>("m_vecCenter", center);
-	beamEnt->SetProperty<float>("m_flStartRadius", startRadius);
-	beamEnt->SetProperty<float>("m_flEndRadius", endRadius);
+	beamRingPoint->SetProperty<int>("m_nModelIndex", beamModelIndex);
+	beamRingPoint->SetProperty<int>("m_nHaloIndex", haloModelIndex);
+	beamRingPoint->SetProperty<int>("m_nStartFrame", startFrame);	// look for more info about this
+	beamRingPoint->SetProperty<int>("m_nFrameRate", frameRate);	// look for more info about this
+	beamRingPoint->SetProperty<float>("m_fLife", life);
+	beamRingPoint->SetProperty<float>("m_fWidth", width);
+	beamRingPoint->SetProperty<float>("m_fEndWidth", endWidth);		// look for more info about this
+	beamRingPoint->SetProperty<int>("m_nFadeLength", fadeLength);
+	beamRingPoint->SetProperty<float>("m_fAmplitude", amplitude);		// look for more info about this
+	beamRingPoint->SetProperty<int>("m_nSpeed", speed);				// look for more info about this
+	beamRingPoint->SetProperty<int>("r", color.r());
+	beamRingPoint->SetProperty<int>("g", color.g());
+	beamRingPoint->SetProperty<int>("b", color.b());
+	beamRingPoint->SetProperty<int>("a", color.a());
+	beamRingPoint->SetProperty<int>("m_nFlags", flags);				// look for more info about this
+	beamRingPoint->SetProperty<Vector>("m_vecCenter", center);
+	beamRingPoint->SetProperty<float>("m_flStartRadius", startRadius);
+	beamRingPoint->SetProperty<float>("m_flEndRadius", endRadius);
 
 	// Fire after carefull NASA preparation
-	beamEnt->Fire(filter, delay);
+	beamRingPoint->Fire(filter, delay);
+}
+
+void TE_BeamPoints(IRecipientFilter &filter, float delay, int beamModelIndex, int haloModelIndex, int startFrame, int frameRate, float life, float width, float endWidth, int fadeLength,
+	float amplitude, int speed, Color color, int flags, Vector startPos, Vector endPos)
+{
+	static TempEntity *beamPoints = TempEntity::FindTempEntity("BeamPoints");
+
+	if( !beamPoints )
+	{
+		return;
+	}
+
+	beamPoints->SetProperty<int>("m_nModelIndex", beamModelIndex);
+	beamPoints->SetProperty<int>("m_nHaloIndex", haloModelIndex);
+	beamPoints->SetProperty<int>("m_nStartFrame", startFrame);	// look for more info about this
+	beamPoints->SetProperty<int>("m_nFrameRate", frameRate);	// look for more info about this
+	beamPoints->SetProperty<float>("m_fLife", life);
+	beamPoints->SetProperty<float>("m_fWidth", width);
+	beamPoints->SetProperty<float>("m_fEndWidth", endWidth);		// look for more info about this
+	beamPoints->SetProperty<int>("m_nFadeLength", fadeLength);
+	beamPoints->SetProperty<float>("m_fAmplitude", amplitude);		// look for more info about this
+	beamPoints->SetProperty<int>("m_nSpeed", speed);				// look for more info about this
+	beamPoints->SetProperty<int>("r", color.r());
+	beamPoints->SetProperty<int>("g", color.g());
+	beamPoints->SetProperty<int>("b", color.b());
+	beamPoints->SetProperty<int>("a", color.a());
+	beamPoints->SetProperty<int>("m_nFlags", flags);				// look for more info about this
+	beamPoints->SetProperty<Vector>("m_vecStartPoint", startPos);
+	beamPoints->SetProperty<Vector>("m_vecEndPoint", endPos);
+
+	// Fire after carefull NASA preparation
+	beamPoints->Fire(filter, delay);
 }
 
 void TE_Sparks(IRecipientFilter &filter, float delay, Vector origin, int magnitude, int trailLength, Vector direction)
@@ -506,6 +538,25 @@ void TE_BreakModel(IRecipientFilter &filter, float delay, Vector origin, QAngle 
 
 	// Fire after carefull NASA preparation
 	breakModelEnt->Fire(filter, delay);
+}
+
+void TE_GlowSprite(IRecipientFilter &filter, float delay, Vector origin, int glowModelIndex, float scale, float life, int brightness)
+{
+	static TempEntity *glowSpriteEnt = TempEntity::FindTempEntity("GlowSprite");
+
+	if( !glowSpriteEnt )
+	{
+		return;
+	}
+
+	glowSpriteEnt->SetProperty<Vector>("m_vecOrigin", origin);
+	glowSpriteEnt->SetProperty<int>("m_nModelIndex", glowModelIndex);
+	glowSpriteEnt->SetProperty<float>("m_fScale", scale);
+	glowSpriteEnt->SetProperty<float>("m_fLife", life);
+	glowSpriteEnt->SetProperty<int>("m_nBrightness", brightness);
+
+	// Fire after carefull NASA preparation
+	glowSpriteEnt->Fire(filter, delay);
 }
 
 void TE_BloodSprite(IRecipientFilter &filter, float delay, Vector origin, Vector direction, Color color, int sprayModelIndex, int dropModelIndex, int size)

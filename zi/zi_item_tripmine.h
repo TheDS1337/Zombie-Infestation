@@ -48,8 +48,6 @@ struct TripmineData
 class TripmineItem final: public ZIItem, public ICommandCallback
 {
 private:
-	int m_ExplosionModelIndex;
-
 	ConCommand *m_pPlantTripmineCmd;
 	ConCommand *m_pTakeTripmineCmd;
 

@@ -52,6 +52,19 @@ public:
 class ZIResources
 {
 public:
+	static int m_BloodSprayModelIndex;
+	static int m_BloodDropModelIndex;
+
+	static int m_LaserModelIndex;
+	static int m_BeamModelIndex;
+	static int m_HaloModelIndex;
+	static int m_GlowModelIndex;
+
+	static int m_FireModelIndex;
+	static int m_ExplosionModelIndex;
+
+	static int m_GlassModelIndex[6];
+
 	static void Load();
 	static void Free();
 

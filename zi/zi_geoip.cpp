@@ -29,8 +29,6 @@ void ZIGeoIP::Load()
 		CONSOLE_DEBUGGER("Cannot open database file!");
 		return;
 	}
-
-	CONSOLE_DEBUGGER("Database loaded: %s", m_pDataBase->filename);
 }
 
 void ZIGeoIP::Free()

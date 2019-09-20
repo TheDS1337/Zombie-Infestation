@@ -160,12 +160,6 @@ void ZombieInfestation::OnUnload()
 
 void ZombieInfestation::OnCoreMapStart(edict_t *edictList, int edictCount, int clientMax)
 {
-	// Player materials
-	ZIPlayer::Precache();
-
-	// Nades materials
-	ZINades::Precache();
-
 	// Pre-cache resources
 	ZIResources::Load();
 	
@@ -764,12 +758,54 @@ void ZombieInfestation::OnPostClientThink(ZIPlayer *player)
 		return;
 	}	
 
+	BasePlayer *playerEnt = player->m_pEntity;
+	BaseWeapon *weaponEnt = playerEnt->GetActiveWeapon();
+
+	if( weaponEnt )
+	{
+		// Sniper laser beam
+		if( /*playerEnt->IsScoped() && */GET_SNIPER(player) && strncmp(weaponEnt->GetClassname(), "weapon_awp", 10) == 0 )
+		{
+			Vector pos = playerEnt->GetOrigin();
+
+			if( playerEnt->GetFlags() & FL_DUCKING )
+			{
+				pos.z += 40.0f;
+			}
+			else
+			{
+				pos.z += 60.0f;
+			}
+
+			Vector endPos = playerEnt->GetAimTarget2();
+			endPos = pos * 1.5f;
+			
+			float distance = pos.DistTo(endPos);
+			float percentage = 4.0f / (distance / 100.0f);
+
+			Vector oldPos(pos);
+
+			pos.x = oldPos.x + (endPos.x - oldPos.x) * percentage;
+			pos.y = oldPos.y + (endPos.y - oldPos.y) * percentage;
+			pos.z = oldPos.z + (endPos.z - oldPos.z) * percentage;
+
+			/*
+			pos = pos + 400.0f * (endPos - pos) / pos.DistTo(endPos);
+			*/
+			pos.y -= 0.08f;			
+
+			CellRecipientFilter beamFilter;
+			TE_BeamPoints(beamFilter, 0.0f, ZIResources::m_LaserModelIndex, 0, 0, 0, 0.1f, 0.12f, 0.0f, 1.0, 0.0f, 0, Color(50, 0, 200, 17), 0, pos, endPos);
+
+			CellRecipientFilter glowFilter;
+			TE_GlowSprite(glowFilter, 0.0f, endPos, ZIResources::m_GlowModelIndex, 0.1f, 0.25f, 17);
+		}
+	}
+
 	if( RandomInt(0, 10) != 0 )
 	{
 		return;
-	}
-
-	BasePlayer *playerEnt = player->m_pEntity;
+	}	
 	
 	int health = playerEnt->GetHealth(), armor = playerEnt->GetArmor();
 
@@ -781,8 +817,6 @@ void ZombieInfestation::OnPostClientThink(ZIPlayer *player)
 	{		
 		playerEnt->SetGravity(player->m_pHumanLike->GetGravity());
 	}	
-
-	BaseWeapon *weaponEnt = playerEnt->GetActiveWeapon();
 
 	if( weaponEnt )
 	{
@@ -800,9 +834,9 @@ void ZombieInfestation::OnPostClientThink(ZIPlayer *player)
 				weaponEnt->SetClip(weapon->GetClip());
 			}
 
-			playerEnt->SetWeaponAmmo(weaponEnt, weapon->GetAmmo());
+			playerEnt->SetWeaponAmmo(weaponEnt, weapon->GetAmmo());			
 		}		
-	}	
+	}		
 }
 
 void ZombieInfestation::OnPostClientRunCommand(ZIPlayer *player, CUserCmd *userCmd, IMoveHelper *moveHelper)
@@ -915,16 +949,23 @@ void ZombieInfestation::OnPostClientTraceAttack(ZIPlayer *player, CTakeDamageInf
 	// Human attacking zombie
 	if( player->m_IsInfected && !attacker->m_IsInfected )
 	{
-/*
-		// Not bullet damage
-		if (!(damage_type & DMG_BULLET))
+		if( !(info.GetDamageType() & DMG_BULLET) )
+		{
 			return;
-
+		}
+/*
 		// Knockback only if damage is done to victim
-		if (damage <= 0.0 || GetHamReturnStatus() == HAM_SUPERCEDE || get_tr2(tracehandle, TR_pHit) != victim)
+		if (GetHamReturnStatus() == HAM_SUPERCEDE)
 			return;
 
 */
+		float damage = info.GetDamage();
+
+		if( damage <= 0.0f )
+		{
+			return;
+		}
+
 		if( !trace->DidHit() || trace->m_pEnt != (CBaseEntity *) player->m_pEntity )
 		{
 			return;
@@ -944,7 +985,7 @@ void ZombieInfestation::OnPostClientTraceAttack(ZIPlayer *player, CTakeDamageInf
 				return;
 			}
 
-			float power = info.GetDamage() * weapon->GetKnockbackPower();
+			float power = damage * weapon->GetKnockbackPower();
 
 			if( !player->m_IsInfected || power <= 1.0f )
 			{

@@ -12,25 +12,7 @@
 
 #define INFECTION_EXPLOSION_RADIUS RandomFloat(150.0f, 200.0f)
 
-int ZINades::m_BeamModelIndex = -1;
-int ZINades::m_HaloModelIndex = -1;
-int ZINades::m_GlassModelIndex[] = { -1 };
-
 ZINades g_Nades;
-
-void ZINades::Precache()
-{
-//	m_BeamModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/laserbeam.vmt", true);
-	m_BeamModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/physbeam.vmt", true);
-	m_HaloModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/glow01.vmt", true);
-	
-	m_GlassModelIndex[0] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard01.mdl", true);
-	m_GlassModelIndex[1] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard02.mdl", true);
-	m_GlassModelIndex[2] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard03.mdl", true);
-	m_GlassModelIndex[3] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard04.mdl", true);
-	m_GlassModelIndex[4] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard05.mdl", true);
-	m_GlassModelIndex[5] = g_pExtension->m_pEngineServer->PrecacheModel("models/gibs/glass_shard06.mdl", true);
-}
 
 static void UpdateHEGrenadeVelocity(void *data)
 {
@@ -69,7 +51,7 @@ void ZINades::SetColor(BaseGrenade *nadeEnt, Color color)
 
 	// Trail
 	CellRecipientFilter filter;
-	TE_BeamFollow(filter, 0.0f, m_BeamModelIndex, m_HaloModelIndex, 0, 100, 5.0f, 5.0f, 5.0f, 10, 1.0f, 5, color, 0, nadeEnt);
+	TE_BeamFollow(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 100, 5.0f, 5.0f, 5.0f, 10, 1.0f, 5, color, 0, nadeEnt);
 }
 
 void ZINades::OnPostHEGrenadeCreation(BaseGrenade *nadeEnt)
@@ -168,9 +150,9 @@ HookReturn ZINades::OnPostFlashbangStartTouch(BaseGrenade *nadeEnt, ZIPlayer *ow
 		CellRecipientFilter filter;
 		g_pExtension->m_pEngineSound->EmitSound(filter, gamehelpers->ReferenceToIndex(gamehelpers->EntityToReference((CBaseEntity *) nadeEnt)), CHAN_WEAPON, "ZombieInfestation/grenade_frost_explode.mp3", -1, "ZombieInfestation/grenade_frost_explode.mp3", VOL_NORM, ATTN_NORM, 0);
 
-		TE_BeamRingPoint(filter, 0.0f, m_BeamModelIndex, m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 50.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 385.0f);
-		TE_BeamRingPoint(filter, 0.0f, m_BeamModelIndex, m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 40.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 470.0f);
-		TE_BeamRingPoint(filter, 0.0f, m_BeamModelIndex, m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 20.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 550.0f);
+		TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 50.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 385.0f);
+		TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 40.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 470.0f);
+		TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 20.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 550.0f);
 
 		TE_Sparks(filter, 0.0f, origin, 5000, 1000, Vector(0.0f, 0.0f, 0.0f));
 

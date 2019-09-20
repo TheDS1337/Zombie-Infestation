@@ -147,30 +147,27 @@ void ZIEnvironment::ChangeWeather()
 
 void ZIEnvironment::RemoveUndesirableEnts(BaseEntity *entity, const char *classname)
 {
-	if( strstr(classname, "c4") || strstr(classname, "func_bomb_target") || strstr(classname, "info_bomb_target") || strstr(classname, "func_no_defuse") || strstr(classname, "vip") || strstr(classname, "hostage") || 
-		strcmp(classname, "info_hostage_spawn") == 0 || strcmp(classname, "info_hostage_rescue") == 0 || strcmp(classname, "func_hostage_rescue") == 0 || strcmp(classname, "hostage_entity") == 0 
-		|| strcmp(classname, "hostage_carriable_prop") == 0 )
+	if( strstr(classname, "defuse") || strstr(classname, "vip") )
 	{
-		CONSOLE_DEBUGGER("Suspecious entity: %s", classname);
-		entity->AcceptInput("Kill");
+		CONSOLE_DEBUGGER("Suspecious entity: %s", classname);		
 	}
 
-	else if( strstr(classname, "hostage") )
+	else if( strcmp(classname, "weapon_c4") == 0 || strcmp(classname, "planted_c4") == 0 || strcmp(classname, "planted_c4_training") == 0 || strcmp(classname, "planted_c4_survival") == 0 )
 	{
-		CONSOLE_DEBUGGER("Suspecious hostage entity: %s", classname);
+		entity->AcceptInput("Kill");
 	}
-	else if( strstr(classname, "c4") )
+	else if( strcmp(classname, "hostage_entity") == 0 || strcmp(classname, "hostage_carriable_prop") == 0 || strcmp(classname, "info_hostage_spawn") == 0 || strcmp(classname, "info_hostage_rescue") == 0
+		|| strcmp(classname, "func_hostage_rescue") == 0 )
 	{
-		CONSOLE_DEBUGGER("Suspecious c4 entity: %s", classname);
+		entity->AcceptInput("Kill");
 	}
-	else if( strstr(classname, "bomb") )
+	else if( strcmp(classname, "func_bomb_target") == 0 || strcmp(classname, "info_bomb_target") == 0 )
 	{
-		CONSOLE_DEBUGGER("Suspecious bomb entity: %s", classname);
+		entity->AcceptInput("Kill");
 	}
 	else if( strcmp(classname, "func_buyzone") == 0 || strstr(classname, "buy") )
 	{
-		entity->AcceptInput("Kill");
-		CONSOLE_DEBUGGER("Suspecious buy entity: %s", classname);
+		entity->AcceptInput("Kill");		
 	}
 
 /*

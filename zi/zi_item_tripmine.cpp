@@ -146,9 +146,7 @@ void TripmineItem::Precache()
 	AddFileToDownloadsTable("models/weapons/eminem/laser_mine/w_laser_mine_dropped3.phy");
 	AddFileToDownloadsTable("materials/models/weapons/eminem/laser_mine/combine_mine.vtf");
 	AddFileToDownloadsTable("materials/models/weapons/eminem/laser_mine/combine_mine_normal.vtf");
-	AddFileToDownloadsTable("materials/models/weapons/eminem/laser_mine/combine_mine.vmt");
-
-	m_ExplosionModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/zerogxplode.vmt", true);
+	AddFileToDownloadsTable("materials/models/weapons/eminem/laser_mine/combine_mine.vmt");	
 }
 
 void TripmineItem::GetOffsets()
@@ -347,7 +345,7 @@ int TripmineItem::OnPreMineTakeDamage(CTakeDamageInfo2 &info)
 		Vector center = tripmineEnt->GetOrigin();
 
 		CellRecipientFilter filter;
-		TE_Explosion(filter, 0.0f, center, m_ExplosionModelIndex, 8.5f, 15, 0, Vector(0.0f, 0.0f, 1.0f), 'C', TRIPMINE_EXPLOSION_RADIUS, 1000);
+		TE_Explosion(filter, 0.0f, center, ZIResources::m_ExplosionModelIndex, 8.5f, 15, 0, Vector(0.0f, 0.0f, 1.0f), 'C', TRIPMINE_EXPLOSION_RADIUS, 1000);
 
 		const char *sound = ZIResources::GetRandomExplosionSound();
 

@@ -53,11 +53,7 @@ void JetpackBazookaItem::Precache()
 	PRECACHE_MODEL("models/weapons/w_missile_launch.mdl");
 
 	AddFileToDownloadsTable("models/weapons/w_missile_launch.mdl");
-	AddFileToDownloadsTable("materials/models/weapons/w_missile/missile side.vmt");
-
-	m_BeamModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/laserbeam.vmt", true);
-	m_FireModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/xfireball3.vmt", true);
-	m_ExplosionModelIndex = g_pExtension->m_pEngineServer->PrecacheModel("materials/sprites/zerogxplode.vmt", true);
+	AddFileToDownloadsTable("materials/models/weapons/w_missile/missile side.vmt");	
 }
 
 void JetpackBazookaItem::GetOffsets()
@@ -128,7 +124,7 @@ HookReturn JetpackBazookaItem::OnPostClientRunCommand(ZIPlayer *player, CUserCmd
 
 		if( RandomInt(0, 3) == 0 )
 		{
-			TE_Sprite(filter, 0.0f, playerEnt->GetOrigin(), m_FireModelIndex, 0.8f, 200);
+			TE_Sprite(filter, 0.0f, playerEnt->GetOrigin(), ZIResources::m_FireModelIndex, 0.8f, 200);
 		}
 
 		CellRecipientFilter filter2;
@@ -233,7 +229,7 @@ void JetpackBazookaItem::OnPostRocketSpawn()
 	BaseEntity *rocketEnt = (BaseEntity *) META_IFACEPTR(CBaseEntity);	
 
 	CellRecipientFilter filter;
-	TE_BeamFollow(filter, 0.0f, g_JetpackBazookaItem.m_BeamModelIndex, 0, 0, 100, 2.5f, 8.0f, 8.0f, 10, 1.0f, 5, Color(200, 200, 200, RandomInt(215, 255)), 0, rocketEnt);
+	TE_BeamFollow(filter, 0.0f, ZIResources::m_BeamModelIndex, 0, 0, 100, 2.5f, 8.0f, 8.0f, 10, 1.0f, 5, Color(200, 200, 200, RandomInt(215, 255)), 0, rocketEnt);
 
 	CellRecipientFilter filter2;
 	g_pExtension->m_pEngineSound->EmitSound(filter2, gamehelpers->ReferenceToIndex(gamehelpers->EntityToReference((CBaseEntity *) rocketEnt)), CHAN_WEAPON, "ZombieInfestation/jetpack_rocket.mp3", -1, "ZombieInfestation/jetpack_rocket.mp3", VOL_NORM, ATTN_NORM, 0);
@@ -252,7 +248,7 @@ void JetpackBazookaItem::OnPostRocketStartTouch(BaseEntity *other)
 	Vector center = rocketEnt->GetOrigin();
 
 	CellRecipientFilter filter;
-	TE_Explosion(filter, 0.0f, center, m_ExplosionModelIndex, 8.5f, 15, 0, Vector(0.0f, 0.0f, 1.0f), 'C', JETPACK_BAZOOKA_EXPLOSION_RADIUS, 1000);	
+	TE_Explosion(filter, 0.0f, center, ZIResources::m_ExplosionModelIndex, 8.5f, 15, 0, Vector(0.0f, 0.0f, 1.0f), 'C', JETPACK_BAZOOKA_EXPLOSION_RADIUS, 1000);
 
 	const char *sound = ZIResources::GetRandomExplosionSound();
 

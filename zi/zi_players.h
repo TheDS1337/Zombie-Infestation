@@ -30,11 +30,6 @@ class ZIModel;
 class ZIPlayer 
 {
 public:
-	static int m_BloodSprayModelIndex;
-	static int m_BloodDropModelIndex;
-
-	static void Precache();
-
 	static ZIPlayer *Find(const char *name);
 	static ZIPlayer *Find(int id, bool userId);
 	static ZIPlayer *Find(edict_t *client);
