@@ -396,7 +396,7 @@ bool ZombieInfestation::OnPreTerminateRound(float &delay, CSGORoundEndReason &re
 
 		if( estimatedWarningDelay > 0.0f )
 		{
-			ZICore::m_pWarningTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_Warning, estimatedWarningDelay, nullptr, TIMER_FLAG_NO_MAPCHANGE);
+			ZICore::m_pWarningTimer = timersys->CreateTimer(&ZITimersCallback::m_Warning, estimatedWarningDelay, nullptr, TIMER_FLAG_NO_MAPCHANGE);
 		}		
 	}
 	else
@@ -554,7 +554,7 @@ void ZombieInfestation::OnPostTerminateRound(float delay, CSGORoundEndReason rea
 	delay -= 0.1;
 
 	// Make a timer to randomize the teams and reset humans/zombies count right at the end of the round
-	ZICore::m_pTeamsRandomization = timersys->CreateTimer(&ZICore::m_TimersCallback.m_TeamsRandomization, delay, nullptr, TIMER_FLAG_NO_MAPCHANGE);
+	ZICore::m_pTeamsRandomization = timersys->CreateTimer(&ZITimersCallback::m_TeamsRandomization, delay, nullptr, TIMER_FLAG_NO_MAPCHANGE);
 
 	ZIPlayer *player = nullptr;
 
@@ -604,8 +604,8 @@ void ZombieInfestation::OnPostRoundStartEvent(IGameEvent *event)
 	ZICore::m_Countdown = -1;
 	ZICore::m_Winner = RoundModeWinner_Unknown;
 
-	ZICore::m_pInfo = timersys->CreateTimer(&ZICore::m_TimersCallback.m_Info, 2.0f, nullptr, TIMER_FLAG_NO_MAPCHANGE);
-	ZICore::m_pCountdownTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_Countdown, RandomFloat(2.0f, 3.0f), nullptr, TIMER_FLAG_NO_MAPCHANGE);
+	ZICore::m_pInfo = timersys->CreateTimer(&ZITimersCallback::m_Info, 2.0f, nullptr, TIMER_FLAG_NO_MAPCHANGE);
+	ZICore::m_pCountdownTimer = timersys->CreateTimer(&ZITimersCallback::m_Countdown, RandomFloat(2.0f, 3.0f), nullptr, TIMER_FLAG_NO_MAPCHANGE);
 
 	// Items
 	g_TripmineItem.OnPostRoundStart();
@@ -748,7 +748,7 @@ void ZombieInfestation::OnPostClientSpawn(ZIPlayer *player)
 	ZISpawnsManager::Teleport(player);		
 
 	RELEASE_TIMER(player->m_pRespawnTimer);
-	player->m_pRespawnTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_Respawn, 2.0f, player, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	player->m_pRespawnTimer = timersys->CreateTimer(&ZITimersCallback::m_Respawn, 2.0f, player, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 }
 
 void ZombieInfestation::OnPostClientThink(ZIPlayer *player)
@@ -764,9 +764,9 @@ void ZombieInfestation::OnPostClientThink(ZIPlayer *player)
 	if( weaponEnt )
 	{
 		// Sniper laser beam
-		if( /*playerEnt->IsScoped() && */GET_SNIPER(player) && strncmp(weaponEnt->GetClassname(), "weapon_awp", 10) == 0 )
+		if( playerEnt->IsScoped() && GET_SNIPER(player) && strncmp(weaponEnt->GetClassname(), "weapon_awp", 10) == 0 )
 		{
-			Vector pos = playerEnt->GetOrigin();
+/*			Vector pos = playerEnt->GetOrigin();
 
 			if( playerEnt->GetFlags() & FL_DUCKING )
 			{
@@ -779,26 +779,28 @@ void ZombieInfestation::OnPostClientThink(ZIPlayer *player)
 
 			Vector endPos = playerEnt->GetAimTarget2();
 			endPos = pos * 1.5f;
+*/			
+			Vector pos = weaponEnt->GetOrigin();
 			
-			float distance = pos.DistTo(endPos);
-			float percentage = 4.0f / (distance / 100.0f);
+/*
+			if( !((BaseAnimating *) weaponEnt)->GetAttachment("1", pos, angles) )
+			{
+				CONSOLE_DEBUGGER("Couldn't get attachment");
+			}
+*/
+			Vector dir(0.0f, 0.0f, 0.0f);
+			AngleVectors(playerEnt->GetEyeAngles(), &dir);			
 
-			Vector oldPos(pos);
+			pos += dir * 50.0f;
+			pos.z -= 5.0f;
 
-			pos.x = oldPos.x + (endPos.x - oldPos.x) * percentage;
-			pos.y = oldPos.y + (endPos.y - oldPos.y) * percentage;
-			pos.z = oldPos.z + (endPos.z - oldPos.z) * percentage;
-
-			/*
-			pos = pos + 400.0f * (endPos - pos) / pos.DistTo(endPos);
-			*/
-			pos.y -= 0.08f;			
+			Vector endPos = pos + dir * 1000.0f;
 
 			CellRecipientFilter beamFilter;
-			TE_BeamPoints(beamFilter, 0.0f, ZIResources::m_LaserModelIndex, 0, 0, 0, 0.1f, 0.12f, 0.0f, 1.0, 0.0f, 0, Color(50, 0, 200, 17), 0, pos, endPos);
+			TE_BeamPoints(beamFilter, 0.0f, ZIResources::m_LaserModelIndex, 0, 0, 0, 0.1f, 0.12f, 0.0f, 1.0, 0.0f, 0, Color(200, 0, 0, 25), 0, pos, endPos);
 
 			CellRecipientFilter glowFilter;
-			TE_GlowSprite(glowFilter, 0.0f, endPos, ZIResources::m_GlowModelIndex, 0.1f, 0.25f, 17);
+			TE_GlowSprite(glowFilter, 0.0f, endPos, ZIResources::m_GlowModelIndex, 0.1f, 0.1f, 25);
 		}
 	}
 
@@ -1153,8 +1155,6 @@ HookReturnValue<int> ZombieInfestation::OnPreClientTakeDamage(ZIPlayer *player, 
 		// Human attacking zombie
 		if( player->m_IsInfected && !attacker->m_IsInfected )
 		{
-			int playerId = player->m_Index - 1;
-
 			if( survivor )
 			{
 				info.ScaleDamage(survivor->GetDamageMultiplier());
@@ -1175,6 +1175,8 @@ HookReturnValue<int> ZombieInfestation::OnPreClientTakeDamage(ZIPlayer *player, 
 			}
 
 			damage = info.GetDamage();
+
+			int playerId = player->m_Index - 1;
 
 			// Frozen zombies shouldn't take much damage
 			if( player->m_IsFrozen && !survivor && !sniper )
@@ -1455,13 +1457,7 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 	}
 
 	// Bullet Time	
-	static ConVarRef host_timescale("host_timescale");
-	
-	// If it's a boss, end any currently-playing bullet-time and start a new one, for the BOSS!
-	if( GET_NEMESIS(player) || GET_ASSASSIN(player) )
-	{
-		RELEASE_TIMER(ZICore::m_pBulletTime);			
-	}	
+	static ConVarRef host_timescale("host_timescale");	
 
 	// Only start bullet-time if it isn't running already
 	if( !ZICore::m_pBulletTime )
@@ -1480,9 +1476,10 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 		{
 			killingDuration = endTime - startTime;
 
+			int bossCount = ZIPlayer::NemesisCount() + ZIPlayer::AssassinsCount();
 			BaseWeapon *weaponEnt = attacker->m_pEntity->GetActiveWeapon();
 
-			if( (GET_NEMESIS(player) && (ZICore::m_CurrentMode == &g_NemesisMode || ZICore::m_CurrentMode == &g_PlagueMode)) || (GET_ASSASSIN(player) && ZICore::m_CurrentMode == &g_AssassinMode) || (!GET_SURVIVOR(attacker) && !GET_SNIPER(attacker) && weaponEnt && strncmp(weaponEnt->GetClassname(), "weapon_knife", 10) == 0) || (killingDuration > 0.0f && killingDuration <= g_BulletTimeActivationInterval.GetFloat() && ++killedZombiesCount / killingDuration >= g_BulletTimeActivationRate.GetFloat()) )
+			if( bossCount == 1 || (GET_NEMESIS(player) && ZICore::m_CurrentMode == &g_PlagueMode) || (!GET_SURVIVOR(attacker) && !GET_SNIPER(attacker) && weaponEnt && strncmp(weaponEnt->GetClassname(), "weapon_knife", 10) == 0) || (killingDuration > 0.0f && killingDuration <= g_BulletTimeActivationInterval.GetFloat() && ++killedZombiesCount / killingDuration >= g_BulletTimeActivationRate.GetFloat()) )
 			{
 				// Just before we actually start it, we play the sound and then start it (prevents the sound from being pithced down)
 				ZIPlayer *playerIterator = nullptr;
@@ -1491,7 +1488,7 @@ void ZombieInfestation::OnPostClientDeath(ZIPlayer *player, CTakeDamageInfo2 &in
 				{
 					playerIterator = *iterator;
 
-					if( !playerIterator || playerIterator->m_IsBot )
+					if( !playerIterator )
 					{
 						continue;
 					}

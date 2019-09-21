@@ -78,30 +78,26 @@ public:
 	VGUIMenu m_VGUIMenu;
 };
 
-class ZIHooks
+namespace ZIHooks
 {
-private:
-	static void SetupDetours();
-	static void ReleaseDetours();
+	extern int m_VGUIMenuMsg;
+	extern ZIUserMessagesCallback m_UserMessagesCallback;
 
-	static void GetOffsets();
+	void SetupDetours();
+	void ReleaseDetours();
 
-public:
-	static void AttachToServer();
-	static void AttachToClient(BasePlayer *clientEnt);
-	static void AttachToWeapon(BaseWeapon *weaponEnt);
+	void GetOffsets();
+
+	void AttachToServer();
+	void AttachToClient(BasePlayer *clientEnt);
+	void AttachToWeapon(BaseWeapon *weaponEnt);
 	
-	static void OnPostProjectileCreation(BaseGrenade *nadeEnt, const char *classname);
-	static bool OnPreProjectileDestruction(BaseGrenade *nadeEnt, const char *classname);
+	void OnPostProjectileCreation(BaseGrenade *nadeEnt, const char *classname);
+	bool OnPreProjectileDestruction(BaseGrenade *nadeEnt, const char *classname);
 	
-	static void Release();
-
-	static int m_VGUIMenuMsg;
-	static ZIUserMessagesCallback m_UserMessagesCallback;
+	void Release();	
 };
 
 extern CDetour *g_pTerminateRoundDetour;
-
-extern ZIHooks g_Hooks;
 
 #endif 

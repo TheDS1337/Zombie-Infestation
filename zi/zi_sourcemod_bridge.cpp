@@ -219,9 +219,9 @@ public:
 	}
 };
 
-static SourceHook::CVector<ZISoldier *> g_pSMHumanClasses;
-static SourceHook::CVector<ZIZombie *> g_pSMZombieClasses;
-static SourceHook::CVector<ZIItem *> g_pSMItems;
+SourceHook::CVector<ZISoldier *> g_pSMHumanClasses;
+SourceHook::CVector<ZIZombie *> g_pSMZombieClasses;
+SourceHook::CVector<ZIItem *> g_pSMItems;
 
 static cell_t IsPlayerVIP(IPluginContext *context, const cell_t *params)
 {
@@ -315,33 +315,33 @@ static cell_t IsPlayerSniper(IPluginContext *context, const cell_t *params)
 
 static cell_t IsPlayerNemesis(IPluginContext *context, const cell_t *params)
 {
-	int playerIndex = params[1]; 
+	int playerIndex = params[1];
 
-	ZIPlayer *player = ZIPlayer::Find(playerIndex, false); 
+	ZIPlayer *player = ZIPlayer::Find(playerIndex, false);
 
-	if( !player ) 
-	{ 
-	   context->ReportError("Player %d must be disconnected.", playerIndex); 
-	   return 0; 
-	} 
+	if( !player )
+	{
+		context->ReportError("Player %d must be disconnected.", playerIndex);
+		return 0;
+	}
 
-	return player->m_IsInfected && GET_NEMESIS(player) ? 1 : 0; 
-} 
+	return player->m_IsInfected && GET_NEMESIS(player) ? 1 : 0;
+}
 
 static cell_t IsPlayerAssassin(IPluginContext *context, const cell_t *params)
 {
-	int playerIndex = params[1]; 
+	int playerIndex = params[1];
 
-	ZIPlayer *player = ZIPlayer::Find(playerIndex, false); 
+	ZIPlayer *player = ZIPlayer::Find(playerIndex, false);
 
-	if( !player ) 
-	{ 
-	   context->ReportError("Player %d must be disconnected.", playerIndex); 
-	   return 0; 
-	} 
+	if( !player )
+	{
+		context->ReportError("Player %d must be disconnected.", playerIndex);
+		return 0;
+	}
 
-	return player->m_IsInfected && GET_ASSASSIN(player) ? 1 : 0; 
-} 
+	return player->m_IsInfected && GET_ASSASSIN(player) ? 1 : 0;
+}
 
 static cell_t IsPlayerFrozen(IPluginContext *context, const cell_t *params)
 {
@@ -844,7 +844,7 @@ static cell_t RegisterItem(IPluginContext *context, const cell_t *params)
 {
 	char *name = nullptr;
 	context->LocalToString(params[1], &name);
-	
+
 	ZIItem *item = ZIItem::Find(name);
 
 	if( item )
@@ -878,7 +878,7 @@ static cell_t GetItem(IPluginContext *context, const cell_t *params)
 static cell_t GetItemCost(IPluginContext *context, const cell_t *params)
 {
 	size_t item = params[1];
-	
+
 	if( item >= g_pExtraItems.size() )
 	{
 		context->ReportError("No item was found");
@@ -891,7 +891,7 @@ static cell_t GetItemCost(IPluginContext *context, const cell_t *params)
 static cell_t IsItemVIP(IPluginContext *context, const cell_t *params)
 {
 	size_t item = params[1];
-	
+
 	if( item >= g_pExtraItems.size() )
 	{
 		context->ReportError("No item was found");
@@ -1000,7 +1000,7 @@ static cell_t StartRoundMode(IPluginContext *context, const cell_t *params)
 }
 
 static const sp_nativeinfo_t g_SourceModNatives[] =
-{	
+{
 	// Player
 	{ "ZI_IsPlayerVIP", IsPlayerVIP },
 	{ "ZI_IsPlayerInfected", IsPlayerInfected },
@@ -1032,8 +1032,8 @@ static const sp_nativeinfo_t g_SourceModNatives[] =
 	{ "ZI_GetRandomAlivePlayer", GetRandomAlivePlayer },
 
 	// Human classes
-	{ "ZI_RegisterHumanClass", RegisterHumanClass }, 
-	{ "ZI_GetHumanClass", GetHumanClass }, 
+	{ "ZI_RegisterHumanClass", RegisterHumanClass },
+	{ "ZI_GetHumanClass", GetHumanClass },
 	{ "ZI_GetHumanClassHealth", GetHumanClassHealth },
 	{ "ZI_GetHumanClassArmor", GetHumanClassArmor },
 	{ "ZI_GetHumanClassSpeed", GetHumanClassSpeed },
@@ -1055,7 +1055,7 @@ static const sp_nativeinfo_t g_SourceModNatives[] =
 	{ "ZI_GetItem", GetItem },
 	{ "ZI_GetItemCost", GetItemCost },
 	{ "ZI_IsItemVIP", IsItemVIP },
-	{ "ZI_AdditionalItemInfo", ZI_AdditionalItemInfo },	
+	{ "ZI_AdditionalItemInfo", ZI_AdditionalItemInfo },
 
 	// Round modes
 	{ "ZI_GetRoundMode", GetRoundMode },
@@ -1068,54 +1068,55 @@ static const sp_nativeinfo_t g_SourceModNatives[] =
 	{ NULL, NULL }
 };
 
-IForward *ZISourceModBridge::m_pPrePlayerInfection = nullptr;
-IForward *ZISourceModBridge::m_pPostPlayerInfection = nullptr;
-IForward *ZISourceModBridge::m_pPrePlayerDisinfection = nullptr;
-IForward *ZISourceModBridge::m_pPostPlayerDisinfection = nullptr;
-IForward *ZISourceModBridge::m_pPlayerLastHuman = nullptr;
-IForward *ZISourceModBridge::m_pPlayerLastZombie = nullptr;
-IForward *ZISourceModBridge::m_pPreItemSelection = nullptr;
-IForward *ZISourceModBridge::m_pPostItemSelection = nullptr;
-IForward *ZISourceModBridge::m_pRoundModeStart = nullptr;
-IForward *ZISourceModBridge::m_pRoundModeEnd = nullptr;
-
-ZISourceModBridge g_SourceModBridge;
-
-void ZISourceModBridge::Load()
+namespace ZISourceModBridge
 {
-	// Register our library
-	g_pShareSys->RegisterLibrary(myself, "ZombieInfestation");
+	IForward *m_pPrePlayerInfection = nullptr;
+	IForward *m_pPostPlayerInfection = nullptr;
+	IForward *m_pPrePlayerDisinfection = nullptr;
+	IForward *m_pPostPlayerDisinfection = nullptr;
+	IForward *m_pPlayerLastHuman = nullptr;
+	IForward *m_pPlayerLastZombie = nullptr;
+	IForward *m_pPreItemSelection = nullptr;
+	IForward *m_pPostItemSelection = nullptr;
+	IForward *m_pRoundModeStart = nullptr;
+	IForward *m_pRoundModeEnd = nullptr;
 
-	// Natives
-	g_pShareSys->AddNatives(myself, g_SourceModNatives);
+	void Load()
+	{
+		// Register our library
+		g_pShareSys->RegisterLibrary(myself, "ZombieInfestation");
 
-	// Forwards
-	m_pPrePlayerInfection = g_pForwards->CreateForward("ZI_OnPrePlayerInfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
-	m_pPostPlayerInfection = g_pForwards->CreateForward("ZI_OnPostPlayerInfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
-	m_pPrePlayerDisinfection = g_pForwards->CreateForward("ZI_OnPrePlayerDisinfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
-	m_pPostPlayerDisinfection = g_pForwards->CreateForward("ZI_OnPostPlayerDisinfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
-	m_pPlayerLastHuman = g_pForwards->CreateForward("ZI_OnPlayerLastHuman", ET_Event, 1, NULL, Param_Cell);
-	m_pPlayerLastZombie = g_pForwards->CreateForward("ZI_OnPlayerLastZombie", ET_Event, 1, NULL, Param_Cell);
-	m_pPreItemSelection = g_pForwards->CreateForward("ZI_OnPreItemSelection", ET_Event, 2, NULL, Param_Cell, Param_Cell);
-	m_pPostItemSelection = g_pForwards->CreateForward("ZI_OnPostItemSelection", ET_Event, 2, NULL, Param_Cell, Param_Cell);
-	m_pRoundModeStart = g_pForwards->CreateForward("ZI_OnRoundModeStart", ET_Event, 2, NULL, Param_Cell, Param_Cell);
-	m_pRoundModeEnd = g_pForwards->CreateForward("ZI_OnRoundModeEnd", ET_Event, 2, NULL, Param_Cell, Param_Cell);	
-}
+		// Natives
+		g_pShareSys->AddNatives(myself, g_SourceModNatives);
 
-void ZISourceModBridge::Free()
-{
-	RELEASE_POINTERS_ARRAY(g_pSMHumanClasses);
-	RELEASE_POINTERS_ARRAY(g_pSMZombieClasses);
-	RELEASE_POINTERS_ARRAY(g_pSMItems);
+		// Forwards
+		m_pPrePlayerInfection = g_pForwards->CreateForward("ZI_OnPrePlayerInfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+		m_pPostPlayerInfection = g_pForwards->CreateForward("ZI_OnPostPlayerInfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+		m_pPrePlayerDisinfection = g_pForwards->CreateForward("ZI_OnPrePlayerDisinfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+		m_pPostPlayerDisinfection = g_pForwards->CreateForward("ZI_OnPostPlayerDisinfection", ET_Event, 4, NULL, Param_Cell, Param_Cell, Param_Cell, Param_Cell);
+		m_pPlayerLastHuman = g_pForwards->CreateForward("ZI_OnPlayerLastHuman", ET_Event, 1, NULL, Param_Cell);
+		m_pPlayerLastZombie = g_pForwards->CreateForward("ZI_OnPlayerLastZombie", ET_Event, 1, NULL, Param_Cell);
+		m_pPreItemSelection = g_pForwards->CreateForward("ZI_OnPreItemSelection", ET_Event, 2, NULL, Param_Cell, Param_Cell);
+		m_pPostItemSelection = g_pForwards->CreateForward("ZI_OnPostItemSelection", ET_Event, 2, NULL, Param_Cell, Param_Cell);
+		m_pRoundModeStart = g_pForwards->CreateForward("ZI_OnRoundModeStart", ET_Event, 2, NULL, Param_Cell, Param_Cell);
+		m_pRoundModeEnd = g_pForwards->CreateForward("ZI_OnRoundModeEnd", ET_Event, 2, NULL, Param_Cell, Param_Cell);
+	}
 
-	g_pForwards->ReleaseForward(m_pPrePlayerInfection); m_pPrePlayerInfection = nullptr;
-	g_pForwards->ReleaseForward(m_pPostPlayerInfection); m_pPostPlayerInfection = nullptr;
-	g_pForwards->ReleaseForward(m_pPrePlayerDisinfection); m_pPrePlayerDisinfection = nullptr;
-	g_pForwards->ReleaseForward(m_pPostPlayerDisinfection); m_pPostPlayerDisinfection = nullptr;
-	g_pForwards->ReleaseForward(m_pPlayerLastHuman); m_pPlayerLastHuman = nullptr;
-	g_pForwards->ReleaseForward(m_pPlayerLastZombie); m_pPlayerLastZombie = nullptr;
-	g_pForwards->ReleaseForward(m_pPreItemSelection); m_pPreItemSelection = nullptr;
-	g_pForwards->ReleaseForward(m_pPostItemSelection); m_pPostItemSelection = nullptr;
-	g_pForwards->ReleaseForward(m_pRoundModeStart); m_pRoundModeStart = nullptr;
-	g_pForwards->ReleaseForward(m_pRoundModeEnd); m_pRoundModeEnd = nullptr;
+	void Free()
+	{
+		RELEASE_POINTERS_ARRAY(g_pSMHumanClasses);
+		RELEASE_POINTERS_ARRAY(g_pSMZombieClasses);
+		RELEASE_POINTERS_ARRAY(g_pSMItems);
+
+		g_pForwards->ReleaseForward(m_pPrePlayerInfection); m_pPrePlayerInfection = nullptr;
+		g_pForwards->ReleaseForward(m_pPostPlayerInfection); m_pPostPlayerInfection = nullptr;
+		g_pForwards->ReleaseForward(m_pPrePlayerDisinfection); m_pPrePlayerDisinfection = nullptr;
+		g_pForwards->ReleaseForward(m_pPostPlayerDisinfection); m_pPostPlayerDisinfection = nullptr;
+		g_pForwards->ReleaseForward(m_pPlayerLastHuman); m_pPlayerLastHuman = nullptr;
+		g_pForwards->ReleaseForward(m_pPlayerLastZombie); m_pPlayerLastZombie = nullptr;
+		g_pForwards->ReleaseForward(m_pPreItemSelection); m_pPreItemSelection = nullptr;
+		g_pForwards->ReleaseForward(m_pPostItemSelection); m_pPostItemSelection = nullptr;
+		g_pForwards->ReleaseForward(m_pRoundModeStart); m_pRoundModeStart = nullptr;
+		g_pForwards->ReleaseForward(m_pRoundModeEnd); m_pRoundModeEnd = nullptr;
+	}
 }

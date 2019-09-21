@@ -35,43 +35,39 @@ struct NadeData
 	}
 };
 
-class ZINades
+namespace ZINades
 {
-public:
-	static void SetColor(BaseGrenade *nadeEnt, Color color);	
+	void SetColor(BaseGrenade *nadeEnt, Color color);	
 
-	static void OnPostHEGrenadeCreation(BaseGrenade *nadeEnt);
-	static void OnPostHEGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPostHEGrenadeStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
+	void OnPostHEGrenadeCreation(BaseGrenade *nadeEnt);
+	void OnPostHEGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPostHEGrenadeStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
 	
-	static void OnPostFlashbangCreation(BaseGrenade *nadeEnt);
-	static void OnPostFlashbangSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPreFlashbangThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPostFlashbangStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
+	void OnPostFlashbangCreation(BaseGrenade *nadeEnt);
+	void OnPostFlashbangSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPreFlashbangThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPostFlashbangStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
 	
-	static void OnPostSmokeGrenadeCreation(BaseGrenade *nadeEnt);
-	static void OnPostSmokeGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPreSmokeGrenadeThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPreSmokeGrenadeDetonate(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	void OnPostSmokeGrenadeCreation(BaseGrenade *nadeEnt);
+	void OnPostSmokeGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPreSmokeGrenadeThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPreSmokeGrenadeDetonate(BaseGrenade *nadeEnt, ZIPlayer *owner);
 
-	static void OnPostMolotovCreation(BaseGrenade *nadeEnt);
-	static void OnPostMolotovSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	void OnPostMolotovCreation(BaseGrenade *nadeEnt);
+	void OnPostMolotovSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
 
-	static void OnPostDecoyCreation(BaseGrenade *nadeEnt);
-	static void OnPostDecoySpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPreDecoyThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPostDecoyStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
-	static HookReturn OnPreDecoyDetonate(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	void OnPostDecoyCreation(BaseGrenade *nadeEnt);
+	void OnPostDecoySpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPreDecoyThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPostDecoyStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
+	HookReturn OnPreDecoyDetonate(BaseGrenade *nadeEnt, ZIPlayer *owner);
 
-	static void OnPostTAGrenadeCreation(BaseGrenade *nadeEnt);
-	static void OnPostTAGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPreTAGrenadeThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
-	static HookReturn OnPostTAGrenadeStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
+	void OnPostTAGrenadeCreation(BaseGrenade *nadeEnt);
+	void OnPostTAGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPreTAGrenadeThink(BaseGrenade *nadeEnt, ZIPlayer *owner);
+	HookReturn OnPostTAGrenadeStartTouch(BaseGrenade *nadeEnt, ZIPlayer *owner, BaseEntity *otherEnt);
 
-	static void OnPreNadeRemoval(BaseGrenade *nadeEnt);	
+	void OnPreNadeRemoval(BaseGrenade *nadeEnt);	
 };
-
-extern ZINades g_Nades;
-
 
 #endif 

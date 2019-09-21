@@ -2,12 +2,15 @@
 
 #define SIZEOF_VARIANT_T 20
 
-struct VariantWrapper
+class VariantWrapper
 {
+private:
 	unsigned char data[SIZEOF_VARIANT_T] = { 0 };
 
+public:
 	VariantWrapper()
 	{
+		memset(this, 0, sizeof(data));
 		*(unsigned int *) &data[12] = INVALID_EHANDLE_INDEX;		
 	}
 
@@ -209,7 +212,7 @@ void BaseEntity::SetInputVariant(BaseEntity *value)
 bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntity *caller, int outputId)
 {
 	static ICallWrapper *callWrapper = nullptr;
-	static int variantSize = sizeof(g_Variant.data);
+	static int variantSize = sizeof(g_Variant);
 
 	if( !callWrapper )
 	{
@@ -1663,6 +1666,104 @@ int BaseAnimating::SelectWeightedSequence(Activity activity)
 	return ret;
 }
 
+int BaseAnimating::LookupAttachment(const char *name)
+{
+	static ICallWrapper *callWrapper = nullptr;
+
+	if( !callWrapper )
+	{
+		void *address = nullptr;
+		if( !g_pGameMod->GetConfig()->GetMemSig("CBaseAnimating::LookupAttachment", &address) || !address )
+		{
+			CONSOLE_DEBUGGER("CBaseAnimating::LookupAttachment address is not found!");
+			return -1;
+		}
+
+		PassInfo info[2];
+
+		info[0].flags = PASSFLAG_BYVAL;
+		info[0].size = sizeof(const char *);
+		info[0].type = PassType_Basic;
+		info[1].flags = PASSFLAG_BYVAL;
+		info[1].size = sizeof(int);
+		info[1].type = PassType_Basic;
+
+		callWrapper = g_pExtension->m_pBinTools->CreateCall(address, CallConv_ThisCall, &info[1], info, 1);
+
+		if( !callWrapper )
+		{
+			CONSOLE_DEBUGGER("CS:GO is not supported!");
+			return -1;
+		}
+
+		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
+	}
+
+	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *)];
+	unsigned char *vparams = params;
+
+	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
+	*(const char **) vparams = name;
+
+	int ret = -1;
+	callWrapper->Execute(params, &ret);
+
+	return ret;
+}
+
+bool BaseAnimating::GetAttachment(const char *name, Vector &origin, QAngle &angles)
+{
+	static ICallWrapper *callWrapper = nullptr;
+
+	if( !callWrapper )
+	{
+		void *address = nullptr;
+		if( !g_pGameMod->GetConfig()->GetMemSig("CBaseAnimating::GetAttachment", &address) || !address )
+		{
+			CONSOLE_DEBUGGER("CBaseAnimating::GetAttachment address is not found!");
+			return false;
+		}
+
+		PassInfo info[4];
+
+		info[0].flags = PASSFLAG_BYVAL;
+		info[0].size = sizeof(const char *);
+		info[0].type = PassType_Basic;
+		info[1].flags = PASSFLAG_BYVAL;
+		info[1].size = sizeof(Vector *);
+		info[1].type = PassType_Basic;		
+		info[2].flags = PASSFLAG_BYVAL;
+		info[2].size = sizeof(QAngle *);
+		info[2].type = PassType_Basic;	
+		info[3].flags = PASSFLAG_BYVAL;
+		info[3].size = sizeof(bool);
+		info[3].type = PassType_Basic;		
+
+		callWrapper = g_pExtension->m_pBinTools->CreateCall(address, CallConv_ThisCall, &info[3], info, 3);
+
+		if( !callWrapper )
+		{
+			CONSOLE_DEBUGGER("CS:GO is not supported!");
+			return false;
+		}
+
+		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
+	}
+
+	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *) + sizeof(Vector *) + sizeof(QAngle *)];
+	unsigned char *vparams = params;
+
+	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
+	*(const char **) vparams = name; vparams += sizeof(const char *);
+	*(Vector **) vparams = &origin; vparams += sizeof(Vector);
+	*(QAngle **) vparams = &angles; 
+
+	bool ret = true;
+	callWrapper->Execute(params, &ret);
+
+	return ret;
+}
+
 bool BaseProp::IsGlowing()
 {
 	if( g_pExtension->m_bShouldGlow < 1 )
@@ -2890,6 +2991,24 @@ QAngle BasePlayer::GetAngles()
 	return info->GetAbsAngles();
 }
 
+Vector BasePlayer::GetEyePosition()
+{
+	edict_t *client = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
+
+	if( !client )
+	{
+		return Vector(0.0f, 0.0f, 0.0f);
+	}
+
+	Vector dir;
+	AngleVectors(GetEyeAngles(), &dir);
+
+	Vector eyePos;
+	g_pExtension->m_pServerGameClients->ClientEarPosition(client, &eyePos);
+
+	return eyePos;
+}
+
 QAngle BasePlayer::GetEyeAngles()
 {
 	static ICallWrapper *callWrapper = nullptr;
@@ -3201,21 +3320,22 @@ void BasePlayer::SetNightVision(bool on, const char *overlay)
 		return;
 	}
 
-	*(bool *) ((unsigned char *) this + g_pExtension->m_bHasNightVision) = on;
-	*(bool *) ((unsigned char *) this + g_pExtension->m_bNightVisionOn) = on;
+//	*(bool *) ((unsigned char *) this + g_pExtension->m_bHasNightVision) = on;
+//	*(bool *) ((unsigned char *) this + g_pExtension->m_bNightVisionOn) = on;
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
 	if( edict )
 	{
-		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bHasNightVision);
-		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bNightVisionOn);
+//		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bHasNightVision);
+//		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bNightVisionOn);
 
-		static ConCommandBase *r_screenoverlay = g_pExtension->m_pConsoleVars->FindCommandBase("r_screenoverlay");
+//		static ConCommandBase *r_screenoverlay = g_pExtension->m_pConsoleVars->FindCommandBase("r_screenoverlay");
+		static ConVarRef r_screenoverlay("r_screenoverlay");
 
-		if( r_screenoverlay && overlay && *overlay )
+		if( r_screenoverlay.IsValid() )
 		{
-			if( r_screenoverlay->GetFlags() & FCVAR_CHEAT  )
+			if( r_screenoverlay.IsFlagSet(FCVAR_CHEAT) )
 			{
 				CONSOLE_DEBUGGER("r_screenoverlay is cheaty!");
 			}
@@ -3224,18 +3344,19 @@ void BasePlayer::SetNightVision(bool on, const char *overlay)
 				CONSOLE_DEBUGGER("r_screenoverlay is not cheaty!");
 			}
 
-			if( on )
-			{
-				g_pExtension->m_pEngineServer->ClientCommand(edict, "r_screenoverlay %s", overlay);
-			}
-			else
-			{
-				g_pExtension->m_pEngineServer->ClientCommand(edict, "r_screenoverlay \"\"");
-			}
 		}
 		else
 		{
 			CONSOLE_DEBUGGER("Could not find r_screenoverlay!");
+		}
+
+		if( on && overlay && *overlay )
+		{
+			g_pExtension->m_pEngineServer->ClientCommand(edict, "r_screenoverlay %s", overlay);
+		}
+		else
+		{
+			g_pExtension->m_pEngineServer->ClientCommand(edict, "r_screenoverlay \"\"");
 		}
 	}
 }
@@ -3376,11 +3497,13 @@ BaseEntity *BasePlayer::GetRagdoll()
 	}
 
 	CBaseHandle *ragdollHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hRagdoll);
-
+/*
 	if( !ragdollHandle->IsValid() )
 	{
 		return nullptr;
 	}
+*/
+	CONSOLE_DEBUGGER("ragdollHandle->GetEntryIndex(): %d", ragdollHandle->GetEntryIndex());
 
 	CBaseEntity *ragdollEnt = gamehelpers->ReferenceToEntity(ragdollHandle->GetEntryIndex());
 
@@ -3389,7 +3512,7 @@ BaseEntity *BasePlayer::GetRagdoll()
 		return nullptr;
 	}
 
-	return (BaseEntity *) ragdollEnt;
+	return (BaseWeapon *) ragdollEnt;
 }
 
 BaseWeapon *BasePlayer::GetActiveWeapon()

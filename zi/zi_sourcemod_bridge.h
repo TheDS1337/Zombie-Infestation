@@ -4,24 +4,21 @@
 
 #include "zi_core.h"
 
-class ZISourceModBridge
+namespace ZISourceModBridge
 {
-public:
-	static void Load();
-	static void Free();
+	void Load();
+	void Free();
 
-	static IForward *m_pPrePlayerInfection;
-	static IForward	*m_pPostPlayerInfection;
-	static IForward *m_pPrePlayerDisinfection;
-	static IForward *m_pPostPlayerDisinfection;
-	static IForward *m_pPlayerLastHuman;
-	static IForward *m_pPlayerLastZombie;
-	static IForward *m_pPreItemSelection;
-	static IForward *m_pPostItemSelection;
-	static IForward *m_pRoundModeStart;
-	static IForward *m_pRoundModeEnd;
+	extern IForward *m_pPrePlayerInfection;
+	extern IForward	*m_pPostPlayerInfection;
+	extern IForward *m_pPrePlayerDisinfection;
+	extern IForward *m_pPostPlayerDisinfection;
+	extern IForward *m_pPlayerLastHuman;
+	extern IForward *m_pPlayerLastZombie;
+	extern IForward *m_pPreItemSelection;
+	extern IForward *m_pPostItemSelection;
+	extern IForward *m_pRoundModeStart;
+	extern IForward *m_pRoundModeEnd;
 };
-
-extern ZISourceModBridge g_SourceModBridge;
 
 #endif 

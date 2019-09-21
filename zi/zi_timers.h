@@ -4,9 +4,8 @@
 
 #include "zi_core.h"
 
-class ZITimersCallback
+namespace ZITimersCallback
 {
-public:
 	class Info final: public ITimedEvent
 	{
 	public:
@@ -14,7 +13,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static Info m_Info;
+	extern Info m_Info;
 
 	class Warning final: public ITimedEvent
 	{
@@ -23,7 +22,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static Warning m_Warning;
+	extern Warning m_Warning;
 
 	class Countdown final: public ITimedEvent
 	{
@@ -32,7 +31,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 	
-	static Countdown m_Countdown;
+	extern Countdown m_Countdown;
 
 	class StartMode final: public ITimedEvent
 	{
@@ -41,7 +40,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static StartMode m_StartMode;
+	extern StartMode m_StartMode;
 
 	class AmbientSound final: public ITimedEvent
 	{
@@ -50,7 +49,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static AmbientSound m_AmbientSound;
+	extern AmbientSound m_AmbientSound;
 
 	class TeamsRandomization final: public ITimedEvent
 	{
@@ -59,7 +58,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static TeamsRandomization m_TeamsRandomization;
+	extern TeamsRandomization m_TeamsRandomization;
 
 	class BulletTime final: public ITimedEvent
 	{
@@ -68,7 +67,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static BulletTime m_BulletTime;
+	extern BulletTime m_BulletTime;
 
 	class Stats final: public ITimedEvent
 	{
@@ -77,7 +76,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static Stats m_Stats;
+	extern Stats m_Stats;
 
 	class SetModel final: public ITimedEvent
 	{
@@ -86,7 +85,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};	
 	
-	static SetModel m_SetModel;
+	extern SetModel m_SetModel;
 
 	class RemoveProtection final: public ITimedEvent
 	{
@@ -95,7 +94,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static RemoveProtection m_RemoveProtection;
+	extern RemoveProtection m_RemoveProtection;
 
 	class Respawn final: public ITimedEvent
 	{
@@ -104,7 +103,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static Respawn m_Respawn;
+	extern Respawn m_Respawn;
 
 	class ZombieGrowl final: public ITimedEvent
 	{
@@ -113,7 +112,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static ZombieGrowl m_ZombieGrowl;
+	extern ZombieGrowl m_ZombieGrowl;
 
 	class ZombieBleed final: public ITimedEvent
 	{
@@ -122,7 +121,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 	
-	static ZombieBleed m_ZombieBleed;
+	extern ZombieBleed m_ZombieBleed;
 
 	class ZombieUnfreeze final: public ITimedEvent
 	{
@@ -131,7 +130,7 @@ public:
 		void OnTimerEnd(ITimer *timer, void *data) override;
 	};
 
-	static ZombieUnfreeze m_ZombieUnfreeze;	
+	extern ZombieUnfreeze m_ZombieUnfreeze;	
 };
 
 #endif 

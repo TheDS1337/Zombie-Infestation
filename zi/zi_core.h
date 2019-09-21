@@ -16,64 +16,57 @@
 class ZIPlayer;
 class ZIRoundMode;
 class ZIItem;
-class ZITimersCallback;
-class ZIMenusCallback;
 
 enum ItemReturn;
 
-class ZICore
+namespace ZICore
 {
-public:
-	static void OnLoad();
-	static void OnUnload();
+	void OnLoad();
+	void OnUnload();
 
-	static bool OnPreClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin);
-	static void OnPostClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin);
+	bool OnPreClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin);
+	void OnPostClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin);
 
-	static bool OnPreClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper);
-	static void OnPostClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper);
+	bool OnPreClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper);
+	void OnPostClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper);
 
-	static void OnClientLastHuman(ZIPlayer *player);
-	static void OnClientLastZombie(ZIPlayer *player);
+	void OnClientLastHuman(ZIPlayer *player);
+	void OnClientLastZombie(ZIPlayer *player);
 
-	static ItemReturn OnPreItemSelection(ZIItem *item, ZIPlayer *player);
-	static void OnPostItemSelection(ZIItem *item, ZIPlayer *player);
+	ItemReturn OnPreItemSelection(ZIItem *item, ZIPlayer *player);
+	void OnPostItemSelection(ZIItem *item, ZIPlayer *player);
 
-	static void OnRoundModeStart();
-	static void OnRoundModeEnd();
+	void OnRoundModeStart();
+	void OnRoundModeEnd();
 
-public:
-	static SourceHook::CVector<ZIPlayer *> m_pOnlinePlayers;
+	extern SourceHook::CVector<ZIPlayer *> m_pOnlinePlayers;
 
-	static bool m_IsModeStarted;
-	static bool m_IsRoundEnd;
+	extern bool m_IsModeStarted;
+	extern bool m_IsRoundEnd;
 
-	static ZIRoundMode *m_CurrentMode;
-	static ZIRoundMode *m_LastMode;		
+	extern ZIRoundMode *m_CurrentMode;
+	extern ZIRoundMode *m_LastMode;
 
-	static int m_Countdown;
+	extern int m_Countdown;
 
-	static RoundModeWinner m_Winner;
-	static int m_Score[2]; 
+	extern RoundModeWinner m_Winner;
+	extern int m_Score[2];
 
-	static ITimer *m_pInfo;
-	static ITimer *m_pWarningTimer;
-	static ITimer *m_pCountdownTimer;
-	static ITimer *m_pStartModeTimer;
-	static ITimer *m_pAmbientSoundTimer;
-	static ITimer *m_pTeamsRandomization;
-	static ITimer *m_pBulletTime;
+	extern ITimer *m_pInfo;
+	extern ITimer *m_pWarningTimer;
+	extern ITimer *m_pCountdownTimer;
+	extern ITimer *m_pStartModeTimer;
+	extern ITimer *m_pAmbientSoundTimer;
+	extern ITimer *m_pTeamsRandomization;
+	extern ITimer *m_pBulletTime;
 
-	static IBaseMenu *m_pPrimaryWeaponsMenu;
-	static IBaseMenu *m_pSecondaryWeaponsMenu;
+	extern IBaseMenu *m_pPrimaryWeaponsMenu;
+	extern IBaseMenu *m_pSecondaryWeaponsMenu;	
 
-	static ZITimersCallback m_TimersCallback;
-	static ZIMenusCallback m_MenusCallback;
-
-	static hud_obj_t m_RoundStateHud;
-	static hud_obj_t m_InfectionUpdatesHud;
-	static hud_obj_t m_StatsHud;
-	static hud_obj_t m_DamageHud;
+	extern hud_obj_t m_RoundStateHud;
+	extern hud_obj_t m_InfectionUpdatesHud;
+	extern hud_obj_t m_StatsHud;
+	extern hud_obj_t m_DamageHud;
 };
 
 #endif 

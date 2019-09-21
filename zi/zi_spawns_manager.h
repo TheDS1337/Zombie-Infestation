@@ -16,19 +16,16 @@ struct SpawnData
 	}
 };
 
-class ZISpawnsManager
+namespace ZISpawnsManager
 {
-public:
-	static void Load();
-	static void Free();	
+	void Load();
+	void Free();	
 
-	static bool Teleport(ZIPlayer *player);
+	bool Teleport(ZIPlayer *player);
 
-	static SourceHook::CVector<SpawnData> m_SpawnData;
+	extern SourceHook::CVector<SpawnData> m_SpawnData;
 };
 
 extern ConVar g_SpawnProtectionDuration;
-
-extern ZISpawnsManager g_ZISpawnsManager;
 
 #endif 

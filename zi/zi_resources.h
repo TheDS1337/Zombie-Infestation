@@ -32,50 +32,44 @@ enum ModelType
 
 class ZIModel
 {
-private:
+public:
 	char m_Name[32];	
 	char m_PlayerModel[MODELS_PATH_MAXLENGTH];
 	char m_ArmsModel[MODELS_PATH_MAXLENGTH];
 	int m_PlayerModelIndex;
 	int m_ArmsModelIndex;
 
-public:
 	ZIModel();
 	ZIModel(const char *name, const char *playermodel, const char *armsmodel, int playermodelIndex, int armsModelIndex);
 
 	const char *GetPlayerModel(int *playermodelIndex = 0);
 	const char *GetArmsModel(int *armsModelIndex = 0);
-
-	friend class ZIResources;
 };
 
-class ZIResources
+namespace ZIResources
 {
-public:
-	static int m_BloodSprayModelIndex;
-	static int m_BloodDropModelIndex;
+	extern int m_BloodSprayModelIndex;
+	extern int m_BloodDropModelIndex;
 
-	static int m_LaserModelIndex;
-	static int m_BeamModelIndex;
-	static int m_HaloModelIndex;
-	static int m_GlowModelIndex;
+	extern int m_LaserModelIndex;
+	extern int m_BeamModelIndex;
+	extern int m_HaloModelIndex;
+	extern int m_GlowModelIndex;
 
-	static int m_FireModelIndex;
-	static int m_ExplosionModelIndex;
+	extern int m_FireModelIndex;
+	extern int m_ExplosionModelIndex;
 
-	static int m_GlassModelIndex[6];
+	extern int m_GlassModelIndex[6];
 
-	static void Load();
-	static void Free();
+	void Load();
+	void Free();
 
-	static char *RandomLoadingSound();
-	static char *RandomRoundEndSound(RoundEndSound sound);
-	static const char *GetRandomExplosionSound();
+	char *RandomLoadingSound();
+	char *RandomRoundEndSound(RoundEndSound sound);
+	const char *GetRandomExplosionSound();
 
-	static ZIModel *GetModel(const char *name, ModelType type);
-	static ZIModel *RandomModel(ModelType type);
+	ZIModel *GetModel(const char *name, ModelType type);
+	ZIModel *RandomModel(ModelType type);
 };
-
-extern ZIResources g_Resources;
 
 #endif 

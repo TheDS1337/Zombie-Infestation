@@ -8,7 +8,7 @@
 #include "zi_resources.h"
 
 #define GET_INFECTED(player) (dynamic_cast<ZIInfected *> (player->m_pHumanLike))
-#define GET_LAST_INFECTED(player) dynamic_cast<ZIInfected *> (player->m_pLastHumanLike))
+#define GET_LAST_INFECTED(player) (dynamic_cast<ZIInfected *> (player->m_pLastHumanLike))
 
 #define GET_ZOMBIE(player) (dynamic_cast<ZIZombie *> (player->m_pHumanLike))
 #define GET_LAST_ZOMBIE(player) (dynamic_cast<ZIZombie *> (player->m_pLastHumanLike))

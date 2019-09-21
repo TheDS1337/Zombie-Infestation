@@ -257,6 +257,9 @@ public:
 	void SetPlaybackRate(float value);												// Sendprop
 
 	int SelectWeightedSequence(Activity activity);
+
+	int LookupAttachment(const char *name);
+	bool GetAttachment(const char *name, Vector &origin, QAngle &angles);
 };
 
 class BaseWeapon: public BaseEntity
@@ -336,6 +339,7 @@ public:
 
 	Vector GetOrigin();						
 	QAngle GetAngles();		
+	Vector GetEyePosition();
 	QAngle GetEyeAngles();
 
 	BaseEntity *GetAimTarget();	

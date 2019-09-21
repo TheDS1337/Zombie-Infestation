@@ -592,7 +592,7 @@ void ZIPlayer::Initiate()
 	m_pChoosenHumanClass = nullptr;
 	m_pChoosenZombieClass = nullptr;
 
-	m_pStatsTimer = m_IsBot ? nullptr : timersys->CreateTimer(&ZICore::m_TimersCallback.m_Stats, 0.2f, this, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+	m_pStatsTimer = m_IsBot ? nullptr : timersys->CreateTimer(&ZITimersCallback::m_Stats, 0.2f, this, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	m_pSetModelTimer = nullptr;
 	m_pRemoveProtectionTimer = nullptr;
 //	m_pRespawnTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_Respawn, 3.0f, this, TIMER_FLAG_NO_MAPCHANGE);					// Check if we can respawn him
@@ -995,7 +995,7 @@ bool ZIPlayer::Infect(ZIPlayer *attacker, ZIInfected *zclass)
 		m_pEntity->SetSpeed(m_pHumanLike->GetSpeed());
 		m_pEntity->SetGravity(m_pHumanLike->GetGravity());
 
-		m_pSetModelTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_SetModel, 0.1f, this, TIMER_FLAG_NO_MAPCHANGE);
+		m_pSetModelTimer = timersys->CreateTimer(&ZITimersCallback::m_SetModel, 0.1f, this, TIMER_FLAG_NO_MAPCHANGE);
 
 		// Infection sound (to prevent infection sounds from playing at round end)
 		if( !ZICore::m_IsRoundEnd && !GET_NEMESIS(this) && !GET_ASSASSIN(this) )
@@ -1020,8 +1020,8 @@ bool ZIPlayer::Infect(ZIPlayer *attacker, ZIInfected *zclass)
 			CellRecipientFilter filter;
 			g_pExtension->m_pEngineSound->EmitSound(filter, m_Index, CHAN_VOICE, sound, -1, sound, VOL_NORM, ATTN_NORM, 0);		
 
-			m_pZombieGrowlTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_ZombieGrowl, RandomFloat(40.0f, 70.0f), this, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
-			m_pZombieBleedTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_ZombieBleed, 1.0f, this, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);	
+			m_pZombieGrowlTimer = timersys->CreateTimer(&ZITimersCallback::m_ZombieGrowl, RandomFloat(40.0f, 70.0f), this, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+			m_pZombieBleedTimer = timersys->CreateTimer(&ZITimersCallback::m_ZombieBleed, 1.0f, this, TIMER_FLAG_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 		}		
 	}	
 
@@ -1221,7 +1221,7 @@ bool ZIPlayer::Disinfect(ZIPlayer *attacker, ZIHumanoid *hclass)
 		m_pEntity->SetSpeed(m_pHumanLike->GetSpeed());
 		m_pEntity->SetGravity(m_pHumanLike->GetGravity());
 
-		m_pSetModelTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_SetModel, 0.1f, this, TIMER_FLAG_NO_MAPCHANGE);
+		m_pSetModelTimer = timersys->CreateTimer(&ZITimersCallback::m_SetModel, 0.1f, this, TIMER_FLAG_NO_MAPCHANGE);
 		
 		if( GET_SURVIVOR(this) )
 		{
@@ -1378,7 +1378,8 @@ void ZIPlayer::Gib(Vector force)
 
 	if( ragdollEnt )
 	{
-		m_pEntity->AcceptInput("Kill");
+		CONSOLE_DEBUGGER("Found Ragdoll");	
+		ragdollEnt->AcceptInput("Kill");
 	}
 
 //	Vector force = info.GetDamageForce();
@@ -1425,7 +1426,7 @@ bool ZIPlayer::Freeze(float duration)
 	m_pGlowEntity = CreateEntityGlow(m_pEntity, 1, Color(0, 100, 200, 100), "primary");
 
 	// Create a new one 
-	m_pZombieUnfreezeTimer = timersys->CreateTimer(&ZICore::m_TimersCallback.m_ZombieUnfreeze, duration, this, TIMER_FLAG_NO_MAPCHANGE);
+	m_pZombieUnfreezeTimer = timersys->CreateTimer(&ZITimersCallback::m_ZombieUnfreeze, duration, this, TIMER_FLAG_NO_MAPCHANGE);
 
 	return true;
 }
@@ -1488,7 +1489,7 @@ void ZIPlayer::ShowMainMenu()
 	}
 
 	RELEASE_MENU(m_pMainMenu);
-	m_pMainMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZICore::m_MenusCallback.m_Main);
+	m_pMainMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZIMenusCallback::m_Main);
 
 	if( m_pMainMenu )
 	{
@@ -1567,7 +1568,7 @@ void ZIPlayer::ShowItemsMenu()
 	}	
 
 	RELEASE_MENU(m_pItemsMenu);
-	m_pItemsMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZICore::m_MenusCallback.m_Items);
+	m_pItemsMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZIMenusCallback::m_Items);
 
 	if( m_pItemsMenu )
 	{
@@ -1645,7 +1646,7 @@ void ZIPlayer::ShowHumanSelectionMenu()
 	}
 
 	RELEASE_MENU(m_pHumanSelectionMenu);
-	m_pHumanSelectionMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZICore::m_MenusCallback.m_HumanSelection);
+	m_pHumanSelectionMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZIMenusCallback::m_HumanSelection);
 
 	if( m_pHumanSelectionMenu )
 	{
@@ -1695,7 +1696,7 @@ void ZIPlayer::ShowZombieSelectionMenu()
 	}
 
 	RELEASE_MENU(m_pZombieSelectionMenu);
-	m_pZombieSelectionMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZICore::m_MenusCallback.m_ZombieSelection);
+	m_pZombieSelectionMenu = g_pExtension->m_pMenuStyle->CreateMenu(&ZIMenusCallback::m_ZombieSelection);
 
 	if( m_pZombieSelectionMenu )
 	{

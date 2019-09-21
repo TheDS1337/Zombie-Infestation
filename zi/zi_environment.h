@@ -4,18 +4,14 @@
 
 #include "zi_core.h"
 
-class ZIEnvironment
+namespace ZIEnvironment
 {
-private:
-	static void ChangeSkybox();
-	static void ChangeLight();
-	static void ChangeWeather();
+	void ChangeSkybox();
+	void ChangeLight();
+	void ChangeWeather();
 
-public:
-	static void Setup();
-	static void RemoveUndesirableEnts(BaseEntity *entity, const char *classname);	
+	void Setup();
+	void RemoveUndesirableEnts(BaseEntity *entity, const char *classname);	
 };
-
-extern string_t LIGHT_STYLE;
 
 #endif 

@@ -4,24 +4,20 @@
 
 #include "geoip/maxminddb.h"
 
-class ZIGeoIP
+namespace ZIGeoIP
 {
-private:
-	static MMDB_s *m_pDataBase;
+	extern MMDB_s *m_pDataBase;
 
 	// Taken from AMXx's GeoIP+ extension, geoip_utils.h/cpp files
-	static MMDB_entry_data_s *LookupByIP(const char *IP, const char **path);
-	static const char *LookupString(const char *IP, const char **path, int *length);
-	static double LookupDouble(const char *IP, const char **path);
+	MMDB_entry_data_s *LookupByIP(const char *IP, const char **path);
+	const char *LookupString(const char *IP, const char **path, int *length);
+	double LookupDouble(const char *IP, const char **path);
 
-public:
-	static void Load();
-	static void Free();	
+	void Load();
+	void Free();	
 
-	static bool GetCountry(const char *IP, char *output, int outputLen);
-	static bool GetCity(const char *IP, char *output, int outputLen);
+	bool GetCountry(const char *IP, char *output, int outputLen);
+	bool GetCity(const char *IP, char *output, int outputLen);
 };
-
-extern ZIGeoIP g_GeoIP;
 
 #endif 

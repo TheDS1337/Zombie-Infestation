@@ -4,9 +4,8 @@
 
 #include "zi_core.h"
 
-class ZIMenusCallback
+namespace ZIMenusCallback
 {
-public:
 	class Main final: public IMenuHandler 
 	{ 
 	public:
@@ -21,7 +20,7 @@ public:
 		unsigned int OnMenuDisplayItem(IBaseMenu *menu, int client, IMenuPanel *panel, unsigned int item, const ItemDrawInfo &itemDraw) override;
 	};
 
-	static Main m_Main;
+	extern Main m_Main;
 
 	class PrimaryWeapons final: public IMenuHandler
 	{
@@ -37,7 +36,7 @@ public:
 		unsigned int OnMenuDisplayItem(IBaseMenu *menu, int client, IMenuPanel *panel, unsigned int item, const ItemDrawInfo &itemDraw) override;
 	};
 
-	static PrimaryWeapons m_PrimaryWeapons;
+	extern PrimaryWeapons m_PrimaryWeapons;
 
 	class SecondaryWeapons final: public IMenuHandler
 	{
@@ -53,7 +52,7 @@ public:
 		unsigned int OnMenuDisplayItem(IBaseMenu *menu, int client, IMenuPanel *panel, unsigned int item, const ItemDrawInfo &itemDraw) override;
 	};
 
-	static SecondaryWeapons m_SecondaryWeapons;
+	extern SecondaryWeapons m_SecondaryWeapons;
 
 	class Items final: public IMenuHandler
 	{
@@ -69,7 +68,7 @@ public:
 		unsigned int OnMenuDisplayItem(IBaseMenu *menu, int client, IMenuPanel *panel, unsigned int item, const ItemDrawInfo &itemDraw) override;
 	};
 
-	static Items m_Items;
+	extern Items m_Items;
 
 	class HumanSelection final: public IMenuHandler
 	{
@@ -85,7 +84,7 @@ public:
 		unsigned int OnMenuDisplayItem(IBaseMenu *menu, int client, IMenuPanel *panel, unsigned int item, const ItemDrawInfo &itemDraw) override;
 	};
 
-	static HumanSelection m_HumanSelection;
+	extern HumanSelection m_HumanSelection;
 
 	class ZombieSelection final: public IMenuHandler
 	{
@@ -101,7 +100,7 @@ public:
 		unsigned int OnMenuDisplayItem(IBaseMenu *menu, int client, IMenuPanel *panel, unsigned int item, const ItemDrawInfo &itemDraw) override;
 	};
 
-	static ZombieSelection m_ZombieSelection;	
+	extern ZombieSelection m_ZombieSelection;
 };
 
 #endif 

@@ -161,9 +161,6 @@ SH_DECL_MANUALHOOK1_void(ProjectileStartTouch, 0, 0, 0, BaseEntity *)
 static void OnPreProjectileDetonate();
 SH_DECL_MANUALHOOK0_void(ProjectileDetonate, 0, 0, 0)
 
-static void OnPreEngineLightStyle(int style, const char *lightStyle);
-SH_DECL_HOOK2_void(IVEngineServer, LightStyle, SH_NOATTRIB, 0, int, const char *)
-
 static int OnPreEngineEmitSound(IRecipientFilter& filter, int entityIndex, int channel, const char *sound, unsigned int soundHash, const char *soundFile,
 	float volume, soundlevel_t soundlevel, int seed, int flags, int pitch, const Vector *origin, const Vector *direction, CUtlVector<Vector> *origins,
 	bool updatePositions, float soundtime, int speakerEntity, void *unknown);
@@ -551,18 +548,6 @@ static void OnPreWeaponSetTransmit(CCheckTransmitInfo *info, bool always)
 	}
 }
 
-static void OnPreEngineLightStyle(int style, const char *lightStyle)
-{
-	if( lightStyle[0] == 'b' || lightStyle[1] != '\0' )
-	{
-		RETURN_META(MRES_IGNORED);
-	}
-
-	lightStyle = (char *) STRING(LIGHT_STYLE);	
-
-	RETURN_META_NEWPARAMS(MRES_HANDLED, &IVEngineServer::LightStyle, (style, lightStyle));
-}
-
 static int OnPreEngineEmitSound(IRecipientFilter& filter, int entityIndex, int channel, const char *sound, unsigned int soundHash, const char *soundFile,
 	float volume, soundlevel_t soundlevel, int seed, int flags, int pitch, const Vector *origin, const Vector *direction, CUtlVector<Vector> *origins,
 	bool updatePositions, float soundtime, int speakerEntity, void *unknown)
@@ -697,10 +682,6 @@ static void OnPreSayCommmad(const CCommand &cmd)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-int ZIHooks::m_VGUIMenuMsg = -1;
-
-ZIUserMessagesCallback ZIHooks::m_UserMessagesCallback;
-
 void ZIUserMessagesCallback::VGUIMenu::OnUserMessage(int msgId, google::protobuf::Message *msg, IRecipientFilter *filter)
 {
 }
@@ -761,207 +742,208 @@ ResultType ZIUserMessagesCallback::VGUIMenu::InterceptUserMessage(int msgId, goo
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-ZIHooks g_Hooks;
-
-void ZIHooks::SetupDetours()
+namespace ZIHooks
 {
-	void *address = nullptr;
-	
-	DETOUR_HOOK_CREATE_MEMBER(TerminateRound, "CCSGameRules::TerminateRound");
-	DETOUR_HOOK_CREATE_MEMBER(CanControlBot, "CCSPlayer::CanControlBot");
-	DETOUR_HOOK_CREATE_MEMBER(Event_Killed, "CCSPlayer::Event_Killed");
+	int m_VGUIMenuMsg = -1;
+
+	ZIUserMessagesCallback m_UserMessagesCallback;
+
+	void SetupDetours()
+	{
+		void *address = nullptr;
+
+		DETOUR_HOOK_CREATE_MEMBER(TerminateRound, "CCSGameRules::TerminateRound");
+		DETOUR_HOOK_CREATE_MEMBER(CanControlBot, "CCSPlayer::CanControlBot");
+		DETOUR_HOOK_CREATE_MEMBER(Event_Killed, "CCSPlayer::Event_Killed");
 #if defined _WINDOWS
-	DETOUR_HOOK_CREATE_MEMBER(Remove, "IServerNetworkable::Remove");
+		DETOUR_HOOK_CREATE_MEMBER(Remove, "IServerNetworkable::Remove");
 #elif defined _LINUX
-	DETOUR_HOOK_CREATE_STATIC(Remove, "IServerNetworkable::Remove");
+		DETOUR_HOOK_CREATE_STATIC(Remove, "IServerNetworkable::Remove");
 #endif	
-}
-
-void ZIHooks::ReleaseDetours()
-{
-	DETOUR_HOOK_RELEASE(TerminateRound);
-	DETOUR_HOOK_RELEASE(CanControlBot);
-	DETOUR_HOOK_RELEASE(Event_Killed);
-	DETOUR_HOOK_RELEASE(Remove);	
-}
-
-void ZIHooks::GetOffsets()
-{
-	int offset = 0;
-
-	// Players
-	SH_MANUAL_HOOK_GET_OFFSET(ClientSpawn, "Spawn");
-	SH_MANUAL_HOOK_GET_OFFSET(ClientPostThink, "PostThink");
-	SH_MANUAL_HOOK_GET_OFFSET(ClientRunCommand, "PlayerRunCmd");
-	SH_MANUAL_HOOK_GET_OFFSET(ClientTraceAttack, "TraceAttack");
-	SH_MANUAL_HOOK_GET_OFFSET(ClientTakeDamage, "OnTakeDamage");
-	SH_MANUAL_HOOK_GET_OFFSET(ClientWeaponCanUse, "Weapon_CanUse");
-	SH_MANUAL_HOOK_GET_OFFSET(ClientWeaponEquip, "Weapon_Equip");
-	SH_MANUAL_HOOK_GET_OFFSET(ClientWeaponSwitch, "Weapon_Switch");	
-
-	// Weapons
-	SH_MANUAL_HOOK_GET_OFFSET(WeaponSetTransmit, "SetTransmit");
-	
-	// Projectiles
-	SH_MANUAL_HOOK_GET_OFFSET(ProjectileSpawn, "Spawn");
-	SH_MANUAL_HOOK_GET_OFFSET(ProjectileThink, "Think");
-	SH_MANUAL_HOOK_GET_OFFSET(ProjectileStartTouch, "StartTouch");
-	SH_MANUAL_HOOK_GET_OFFSET(ProjectileDetonate, "CBaseCSGrenadeProjectile::Detonate");	
-
-	SetupDetours();
-
-	// Items
-	g_TripmineItem.GetOffsets();
-	g_JetpackBazookaItem.GetOffsets();
-}
-
-void ZIHooks::AttachToServer()
-{
-	CDetourManager::Init(g_pSM->GetScriptingEngine(), nullptr);
-
-	SH_ADD_HOOK(IVEngineServer, LightStyle, g_pExtension->m_pEngineServer, SH_STATIC(OnPreEngineLightStyle), false);
-
-	SH_ADD_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound), false);
-	SH_ADD_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound2), false);
-
-	SH_ADD_HOOK(IServerGameClients, SetCommandClient, g_pExtension->m_pServerGameClients, SH_STATIC(OnPreSetCommandClient), false);
-	SH_ADD_HOOK(IServerPluginHelpers, ClientCommand, g_pExtension->m_pServerPluginHelpers, SH_STATIC(OnPreClientFakeCommand), false);
-	SH_ADD_HOOK(ICvar, CallGlobalChangeCallbacks, g_pExtension->m_pConsoleVars, SH_STATIC(OnPreConVarChange), false);
-
-	g_pSayCommand = g_pExtension->m_pConsoleVars->FindCommand("say");
-	g_pSayTeamCommand = g_pExtension->m_pConsoleVars->FindCommand("say_team");	
-
-	if( g_pSayCommand )
-	{
-		SH_ADD_HOOK(ConCommand, Dispatch, g_pSayCommand, SH_STATIC(OnPreSayCommmad), false);
-	}		
-
-	if( g_pSayTeamCommand )
-	{
-		SH_ADD_HOOK(ConCommand, Dispatch, g_pSayTeamCommand, SH_STATIC(OnPreSayCommmad), false);
-	}	
-
-	// Usermessages
-/*	m_VGUIMenuMsg = usermsgs->GetMessageIndex("VGUIMenu");
-
-	if( m_VGUIMenuMsg != -1 && usermsgs->HookUserMessage(m_VGUIMenuMsg, &m_UserMessagesCallback.m_VGUIMenu, true) )
-	{
-		CONSOLE_DEBUGGER("Hooked VGUIMenu UM");
-	}
-	else
-	{
-		CONSOLE_DEBUGGER("Unable to hook VGUIMenu UM");
-	}
-*/
-
-	GetOffsets();
-}
-
-void ZIHooks::AttachToClient(BasePlayer *clientEnt)
-{
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostSpawn, clientEnt, SH_ADD_MANUALVPHOOK(ClientSpawn, clientEnt, SH_STATIC(OnPostClientSpawn), true));
-	SH_MANUAL_HOOK_CREATE(CBasePlayer_PostThink, clientEnt, SH_ADD_MANUALVPHOOK(ClientPostThink, clientEnt, SH_STATIC(OnPostClientThink), true));
-	SH_MANUAL_HOOK_CREATE(CBasePlayer_RunCommand, clientEnt, SH_ADD_MANUALVPHOOK(ClientRunCommand, clientEnt, SH_STATIC(OnPostClientRunCommand), true));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreTraceAttack, clientEnt, SH_ADD_MANUALVPHOOK(ClientTraceAttack, clientEnt, SH_STATIC(OnPreClientTraceAttack), false));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostTraceAttack, clientEnt, SH_ADD_MANUALVPHOOK(ClientTraceAttack, clientEnt, SH_STATIC(OnPostClientTraceAttack), true));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreTakeDamage, clientEnt, SH_ADD_MANUALVPHOOK(ClientTakeDamage, clientEnt, SH_STATIC(OnPreClientTakeDamage), false));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostTakeDamage, clientEnt, SH_ADD_MANUALVPHOOK(ClientTakeDamage, clientEnt, SH_STATIC(OnPostClientTakeDamage), true));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreWeaponCanUse, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponCanUse, clientEnt, SH_STATIC(OnPreClientWeaponCanUse), false));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreWeaponEquip, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponEquip, clientEnt, SH_STATIC(OnPreClientWeaponEquip), false));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreWeaponSwitch, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponSwitch, clientEnt, SH_STATIC(OnPreClientWeaponSwitch), false));
-	SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostWeaponSwitch, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponSwitch, clientEnt, SH_STATIC(OnPostClientWeaponSwitch), true));
-}
-
-void ZIHooks::AttachToWeapon(BaseWeapon *weaponEnt)
-{
-//	SH_MANUAL_HOOK_CREATE(CBaseCombatWeapon_PreSetTransmit, SH_ADD_MANUALVPHOOK(SetTransmit, weaponEnt, SH_STATIC(OnPreWeaponSetTransmit), false));
-}
-
-void ZIHooks::OnPostProjectileCreation(BaseGrenade *nadeEnt, const char *classname)
-{
-	// Breachcharge doesnt agree on some offsets, we'll fix that later
-	if( strstr(classname, "breachcharge") )
-	{
-		return;
 	}
 
-	SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PostSpawn, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileSpawn, nadeEnt, SH_STATIC(OnPostProjectileSpawn), true));
-	SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PreThink, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileThink, nadeEnt, SH_STATIC(OnPreProjectileThink), false));	
-	SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PostStartTouch, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileStartTouch, nadeEnt, SH_STATIC(OnPostProjectileStartTouch), true));
-	SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PreDetonate, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileDetonate, nadeEnt, SH_STATIC(OnPreProjectileDetonate), false));
-		
-	if( strncmp(classname, "hegrenade", 9) == 0 )
+	void ReleaseDetours()
 	{
-		ZINades::OnPostHEGrenadeCreation(nadeEnt);
+		DETOUR_HOOK_RELEASE(TerminateRound);
+		DETOUR_HOOK_RELEASE(CanControlBot);
+		DETOUR_HOOK_RELEASE(Event_Killed);
+		DETOUR_HOOK_RELEASE(Remove);
 	}
-	else if( strncmp(classname, "flashbang", 9) == 0 )
-	{
-		ZINades::OnPostFlashbangCreation(nadeEnt);
-	}
-	else if( strncmp(classname, "smokegrenade", 12) == 0 )
-	{
-		//ZINades::OnPostSmokeGrenadeCreation(nadeEnt);
-	}
-	else if( strncmp(classname, "molotov", 7) == 0 || strncmp(classname, "incgrenade", 10) == 0 )
-	{
-		ZINades::OnPostMolotovCreation(nadeEnt);
-	}
-	else if( strncmp(classname, "decoy", 5) == 0 )
-	{
-		ZINades::OnPostDecoyCreation(nadeEnt);
-	}	
-	else if( strncmp(classname, "tagrenade", 9) == 0 )
-	{
-		ZINades::OnPostTAGrenadeCreation(nadeEnt);
-	}
-}
 
-bool ZIHooks::OnPreProjectileDestruction(BaseGrenade *nadeEnt, const char *classname)
-{
-	// Breachcharge doesnt agree on some offsets, we'll fix that later
-	if( strstr(classname, "breachcharge") )
+	void GetOffsets()
 	{
+		int offset = 0;
+
+		// Players
+		SH_MANUAL_HOOK_GET_OFFSET(ClientSpawn, "Spawn");
+		SH_MANUAL_HOOK_GET_OFFSET(ClientPostThink, "PostThink");
+		SH_MANUAL_HOOK_GET_OFFSET(ClientRunCommand, "PlayerRunCmd");
+		SH_MANUAL_HOOK_GET_OFFSET(ClientTraceAttack, "TraceAttack");
+		SH_MANUAL_HOOK_GET_OFFSET(ClientTakeDamage, "OnTakeDamage");
+		SH_MANUAL_HOOK_GET_OFFSET(ClientWeaponCanUse, "Weapon_CanUse");
+		SH_MANUAL_HOOK_GET_OFFSET(ClientWeaponEquip, "Weapon_Equip");
+		SH_MANUAL_HOOK_GET_OFFSET(ClientWeaponSwitch, "Weapon_Switch");
+
+		// Weapons
+		SH_MANUAL_HOOK_GET_OFFSET(WeaponSetTransmit, "SetTransmit");
+
+		// Projectiles
+		SH_MANUAL_HOOK_GET_OFFSET(ProjectileSpawn, "Spawn");
+		SH_MANUAL_HOOK_GET_OFFSET(ProjectileThink, "Think");
+		SH_MANUAL_HOOK_GET_OFFSET(ProjectileStartTouch, "StartTouch");
+		SH_MANUAL_HOOK_GET_OFFSET(ProjectileDetonate, "CBaseCSGrenadeProjectile::Detonate");
+
+		SetupDetours();
+
+		// Items
+		g_TripmineItem.GetOffsets();
+		g_JetpackBazookaItem.GetOffsets();
+	}
+
+	void AttachToServer()
+	{
+		CDetourManager::Init(g_pSM->GetScriptingEngine(), nullptr);
+
+		SH_ADD_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound), false);
+		SH_ADD_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound2), false);
+
+		SH_ADD_HOOK(IServerGameClients, SetCommandClient, g_pExtension->m_pServerGameClients, SH_STATIC(OnPreSetCommandClient), false);
+		SH_ADD_HOOK(IServerPluginHelpers, ClientCommand, g_pExtension->m_pServerPluginHelpers, SH_STATIC(OnPreClientFakeCommand), false);
+		SH_ADD_HOOK(ICvar, CallGlobalChangeCallbacks, g_pExtension->m_pConsoleVars, SH_STATIC(OnPreConVarChange), false);
+
+		g_pSayCommand = g_pExtension->m_pConsoleVars->FindCommand("say");
+		g_pSayTeamCommand = g_pExtension->m_pConsoleVars->FindCommand("say_team");
+
+		if( g_pSayCommand )
+		{
+			SH_ADD_HOOK(ConCommand, Dispatch, g_pSayCommand, SH_STATIC(OnPreSayCommmad), false);
+		}
+
+		if( g_pSayTeamCommand )
+		{
+			SH_ADD_HOOK(ConCommand, Dispatch, g_pSayTeamCommand, SH_STATIC(OnPreSayCommmad), false);
+		}
+
+		// Usermessages
+	/*	m_VGUIMenuMsg = usermsgs->GetMessageIndex("VGUIMenu");
+
+		if( m_VGUIMenuMsg != -1 && usermsgs->HookUserMessage(m_VGUIMenuMsg, &m_UserMessagesCallback.m_VGUIMenu, true) )
+		{
+			CONSOLE_DEBUGGER("Hooked VGUIMenu UM");
+		}
+		else
+		{
+			CONSOLE_DEBUGGER("Unable to hook VGUIMenu UM");
+		}
+	*/
+
+		GetOffsets();
+	}
+
+	void AttachToClient(BasePlayer *clientEnt)
+	{
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostSpawn, clientEnt, SH_ADD_MANUALVPHOOK(ClientSpawn, clientEnt, SH_STATIC(OnPostClientSpawn), true));
+		SH_MANUAL_HOOK_CREATE(CBasePlayer_PostThink, clientEnt, SH_ADD_MANUALVPHOOK(ClientPostThink, clientEnt, SH_STATIC(OnPostClientThink), true));
+		SH_MANUAL_HOOK_CREATE(CBasePlayer_RunCommand, clientEnt, SH_ADD_MANUALVPHOOK(ClientRunCommand, clientEnt, SH_STATIC(OnPostClientRunCommand), true));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreTraceAttack, clientEnt, SH_ADD_MANUALVPHOOK(ClientTraceAttack, clientEnt, SH_STATIC(OnPreClientTraceAttack), false));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostTraceAttack, clientEnt, SH_ADD_MANUALVPHOOK(ClientTraceAttack, clientEnt, SH_STATIC(OnPostClientTraceAttack), true));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreTakeDamage, clientEnt, SH_ADD_MANUALVPHOOK(ClientTakeDamage, clientEnt, SH_STATIC(OnPreClientTakeDamage), false));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostTakeDamage, clientEnt, SH_ADD_MANUALVPHOOK(ClientTakeDamage, clientEnt, SH_STATIC(OnPostClientTakeDamage), true));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreWeaponCanUse, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponCanUse, clientEnt, SH_STATIC(OnPreClientWeaponCanUse), false));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreWeaponEquip, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponEquip, clientEnt, SH_STATIC(OnPreClientWeaponEquip), false));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PreWeaponSwitch, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponSwitch, clientEnt, SH_STATIC(OnPreClientWeaponSwitch), false));
+		SH_MANUAL_HOOK_CREATE(CBaseCombatCharacter_PostWeaponSwitch, clientEnt, SH_ADD_MANUALVPHOOK(ClientWeaponSwitch, clientEnt, SH_STATIC(OnPostClientWeaponSwitch), true));
+	}
+
+	void AttachToWeapon(BaseWeapon *weaponEnt)
+	{
+		//	SH_MANUAL_HOOK_CREATE(CBaseCombatWeapon_PreSetTransmit, SH_ADD_MANUALVPHOOK(SetTransmit, weaponEnt, SH_STATIC(OnPreWeaponSetTransmit), false));
+	}
+
+	void OnPostProjectileCreation(BaseGrenade *nadeEnt, const char *classname)
+	{
+		// Breachcharge doesnt agree on some offsets, we'll fix that later
+		if( strstr(classname, "breachcharge") )
+		{
+			return;
+		}
+
+		SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PostSpawn, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileSpawn, nadeEnt, SH_STATIC(OnPostProjectileSpawn), true));
+		SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PreThink, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileThink, nadeEnt, SH_STATIC(OnPreProjectileThink), false));
+		SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PostStartTouch, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileStartTouch, nadeEnt, SH_STATIC(OnPostProjectileStartTouch), true));
+		SH_MANUAL_HOOK_CREATE(CBaseCSGrenadeProjectile_PreDetonate, nadeEnt, SH_ADD_MANUALVPHOOK(ProjectileDetonate, nadeEnt, SH_STATIC(OnPreProjectileDetonate), false));
+
+		if( strncmp(classname, "hegrenade", 9) == 0 )
+		{
+			ZINades::OnPostHEGrenadeCreation(nadeEnt);
+		}
+		else if( strncmp(classname, "flashbang", 9) == 0 )
+		{
+			ZINades::OnPostFlashbangCreation(nadeEnt);
+		}
+		else if( strncmp(classname, "smokegrenade", 12) == 0 )
+		{
+			//ZINades::OnPostSmokeGrenadeCreation(nadeEnt);
+		}
+		else if( strncmp(classname, "molotov", 7) == 0 || strncmp(classname, "incgrenade", 10) == 0 )
+		{
+			ZINades::OnPostMolotovCreation(nadeEnt);
+		}
+		else if( strncmp(classname, "decoy", 5) == 0 )
+		{
+			ZINades::OnPostDecoyCreation(nadeEnt);
+		}
+		else if( strncmp(classname, "tagrenade", 9) == 0 )
+		{
+			ZINades::OnPostTAGrenadeCreation(nadeEnt);
+		}
+	}
+
+	bool OnPreProjectileDestruction(BaseGrenade *nadeEnt, const char *classname)
+	{
+		// Breachcharge doesnt agree on some offsets, we'll fix that later
+		if( strstr(classname, "breachcharge") )
+		{
+			return true;
+		}
+
+		ZINades::OnPreNadeRemoval(nadeEnt);
+
 		return true;
 	}
 
-	ZINades::OnPreNadeRemoval(nadeEnt);
-
-	return true;
-}
-
-void ZIHooks::Release()
-{
-	ReleaseDetours();
-
-	SH_REMOVE_HOOK(IVEngineServer, LightStyle, g_pExtension->m_pEngineServer, SH_STATIC(OnPreEngineLightStyle), false);
-
-	SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound), false);
-	SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound2), false);
-
-	SH_REMOVE_HOOK(IServerGameClients, SetCommandClient, g_pExtension->m_pServerGameClients, SH_STATIC(OnPreSetCommandClient), false);
-	SH_REMOVE_HOOK(IServerPluginHelpers, ClientCommand, g_pExtension->m_pServerPluginHelpers, SH_STATIC(OnPreClientFakeCommand), false);
-	SH_REMOVE_HOOK(ICvar, CallGlobalChangeCallbacks, g_pExtension->m_pConsoleVars, SH_STATIC(OnPreConVarChange), false);
-
-	if( g_pSayCommand )
+	void Release()
 	{
-		SH_REMOVE_HOOK(ConCommand, Dispatch, g_pSayCommand, SH_STATIC(OnPreSayCommmad), false);
+		ReleaseDetours();
+
+		SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound), false);
+		SH_REMOVE_HOOK(IEngineSound, EmitSound, g_pExtension->m_pEngineSound, SH_STATIC(OnPreEngineEmitSound2), false);
+
+		SH_REMOVE_HOOK(IServerGameClients, SetCommandClient, g_pExtension->m_pServerGameClients, SH_STATIC(OnPreSetCommandClient), false);
+		SH_REMOVE_HOOK(IServerPluginHelpers, ClientCommand, g_pExtension->m_pServerPluginHelpers, SH_STATIC(OnPreClientFakeCommand), false);
+		SH_REMOVE_HOOK(ICvar, CallGlobalChangeCallbacks, g_pExtension->m_pConsoleVars, SH_STATIC(OnPreConVarChange), false);
+
+		if( g_pSayCommand )
+		{
+			SH_REMOVE_HOOK(ConCommand, Dispatch, g_pSayCommand, SH_STATIC(OnPreSayCommmad), false);
+		}
+
+		if( g_pSayTeamCommand )
+		{
+			SH_REMOVE_HOOK(ConCommand, Dispatch, g_pSayTeamCommand, SH_STATIC(OnPreSayCommmad), false);
+		}
+
+		RELEASE_POINTERS_ARRAY(EntityHook::totalHooks);
+
+		/*
+			if( m_VGUIMenuMsg != -1 && usermsgs->UnhookUserMessage(m_VGUIMenuMsg, &m_UserMessagesCallback.m_VGUIMenu, true) )
+			{
+				CONSOLE_DEBUGGER("Unhooking VGUIMenu UM");
+			}
+			else
+			{
+				CONSOLE_DEBUGGER("Unable to unhook VGUIMenu UM");
+			}
+		*/
 	}
-
-	if( g_pSayTeamCommand )
-	{
-		SH_REMOVE_HOOK(ConCommand, Dispatch, g_pSayTeamCommand, SH_STATIC(OnPreSayCommmad), false);
-	}	
-
-	RELEASE_POINTERS_ARRAY(EntityHook::totalHooks);
-
-/*
-	if( m_VGUIMenuMsg != -1 && usermsgs->UnhookUserMessage(m_VGUIMenuMsg, &m_UserMessagesCallback.m_VGUIMenu, true) )
-	{
-		CONSOLE_DEBUGGER("Unhooking VGUIMenu UM");
-	}
-	else
-	{
-		CONSOLE_DEBUGGER("Unable to unhook VGUIMenu UM");
-	}
-*/
 }

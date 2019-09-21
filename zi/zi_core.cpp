@@ -38,241 +38,239 @@
 #include "zi_item_rage.h"
 #include "zi_item_infection_bomb.h"
 
-SourceHook::CVector<ZIPlayer *> ZICore::m_pOnlinePlayers;
-
-bool ZICore::m_IsModeStarted = false;
-bool ZICore::m_IsRoundEnd = false;
-
-ZIRoundMode *ZICore::m_CurrentMode = nullptr;
-ZIRoundMode *ZICore::m_LastMode = nullptr;
-
-int ZICore::m_Countdown = -1;
-
-RoundModeWinner ZICore::m_Winner = RoundModeWinner_Unknown;
-int ZICore::m_Score[RoundModeWinner_Max];
-
-ITimer *ZICore::m_pInfo = nullptr;
-ITimer *ZICore::m_pWarningTimer = nullptr;
-ITimer *ZICore::m_pCountdownTimer = nullptr;
-ITimer *ZICore::m_pStartModeTimer = nullptr;
-ITimer *ZICore::m_pAmbientSoundTimer = nullptr;
-ITimer *ZICore::m_pTeamsRandomization = nullptr;
-ITimer *ZICore::m_pBulletTime = nullptr;
-
-IBaseMenu *ZICore::m_pPrimaryWeaponsMenu = nullptr;
-IBaseMenu *ZICore::m_pSecondaryWeaponsMenu = nullptr;
-
-ZITimersCallback ZICore::m_TimersCallback;
-ZIMenusCallback ZICore::m_MenusCallback;
-
-hud_obj_t ZICore::m_RoundStateHud;
-hud_obj_t ZICore::m_InfectionUpdatesHud;
-hud_obj_t ZICore::m_StatsHud;
-hud_obj_t ZICore::m_DamageHud;
-
-ZICore g_Core;
-
-void ZICore::OnLoad()
+namespace ZICore
 {
-	// Human classes
-	ZISoldier::Register(&g_PrivateHuman);
-	ZISoldier::Register(&g_HunterHuman);
-	
-	// Zombie classes
-	ZIZombie::Register(&g_ClassicZombie);
-	ZIZombie::Register(&g_RaptorZombie);
-	ZIZombie::Register(&g_FleshpoundZombie);
-	ZIZombie::Register(&g_PredatorZombie);
+	SourceHook::CVector<ZIPlayer *> m_pOnlinePlayers;
 
-	// Round modes
-	ZIRoundMode::Register(&g_SingleInfectionMode);
-	ZIRoundMode::Register(&g_MultipleInfectionMode);
-	ZIRoundMode::Register(&g_SwarmMode);
-	ZIRoundMode::Register(&g_SurvivorMode);
-	ZIRoundMode::Register(&g_SniperMode);
-	ZIRoundMode::Register(&g_NemesisMode);
-	ZIRoundMode::Register(&g_AssassinMode);
-	ZIRoundMode::Register(&g_PlagueMode);
-	ZIRoundMode::Register(&g_ArmageddonMode);
-	ZIRoundMode::Register(&g_AvSMode);
-	ZIRoundMode::Register(&g_NightmareMode);
+	bool m_IsModeStarted = false;
+	bool m_IsRoundEnd = false;
 
-	// Items
-	ZIItem::Register(&g_TripmineItem);
-	ZIItem::Register(&g_InfiniteClipItem);
-	ZIItem::Register(&g_JetpackBazookaItem);
-	ZIItem::Register(&g_AntidoteItem);
-	ZIItem::Register(&g_RageItem);
-	ZIItem::Register(&g_InfectionBombItem);
+	ZIRoundMode *m_CurrentMode = nullptr;
+	ZIRoundMode *m_LastMode = nullptr;
 
-	m_pPrimaryWeaponsMenu = ZIWeapon::BuildPrimaryWeaponsMenu();
-	m_pSecondaryWeaponsMenu = ZIWeapon::BuildSecondaryWeaponsMenu();
+	int m_Countdown = -1;
 
-	if( !m_pPrimaryWeaponsMenu )
+	RoundModeWinner m_Winner = RoundModeWinner_Unknown;
+	int m_Score[RoundModeWinner_Max];
+
+	ITimer *m_pInfo = nullptr;
+	ITimer *m_pWarningTimer = nullptr;
+	ITimer *m_pCountdownTimer = nullptr;
+	ITimer *m_pStartModeTimer = nullptr;
+	ITimer *m_pAmbientSoundTimer = nullptr;
+	ITimer *m_pTeamsRandomization = nullptr;
+	ITimer *m_pBulletTime = nullptr;
+
+	IBaseMenu *m_pPrimaryWeaponsMenu = nullptr;
+	IBaseMenu *m_pSecondaryWeaponsMenu = nullptr;
+
+	hud_obj_t m_RoundStateHud;
+	hud_obj_t m_InfectionUpdatesHud;
+	hud_obj_t m_StatsHud;
+	hud_obj_t m_DamageHud;
+
+	void OnLoad()
 	{
-		CONSOLE_DEBUGGER("Failed to build the primary weapons menu.");
-	}
+		// Human classes
+		ZISoldier::Register(&g_PrivateHuman);
+		ZISoldier::Register(&g_HunterHuman);
 
-	if( !m_pSecondaryWeaponsMenu )
-	{
-		CONSOLE_DEBUGGER("Failed to build the secondary weapons menu.");
-	}
-}
+		// Zombie classes
+		ZIZombie::Register(&g_ClassicZombie);
+		ZIZombie::Register(&g_RaptorZombie);
+		ZIZombie::Register(&g_FleshpoundZombie);
+		ZIZombie::Register(&g_PredatorZombie);
 
-void ZICore::OnUnload()
-{
-	RELEASE_TIMER(m_pWarningTimer);
-	RELEASE_TIMER(m_pCountdownTimer);
-	RELEASE_TIMER(m_pStartModeTimer);
-	RELEASE_TIMER(m_pAmbientSoundTimer);
-	RELEASE_TIMER(m_pTeamsRandomization);
-	RELEASE_TIMER(m_pBulletTime);
+		// Round modes
+		ZIRoundMode::Register(&g_SingleInfectionMode);
+		ZIRoundMode::Register(&g_MultipleInfectionMode);
+		ZIRoundMode::Register(&g_SwarmMode);
+		ZIRoundMode::Register(&g_SurvivorMode);
+		ZIRoundMode::Register(&g_SniperMode);
+		ZIRoundMode::Register(&g_NemesisMode);
+		ZIRoundMode::Register(&g_AssassinMode);
+		ZIRoundMode::Register(&g_PlagueMode);
+		ZIRoundMode::Register(&g_ArmageddonMode);
+		ZIRoundMode::Register(&g_AvSMode);
+		ZIRoundMode::Register(&g_NightmareMode);
 
-	RELEASE_MENU(m_pPrimaryWeaponsMenu);
-	RELEASE_MENU(m_pSecondaryWeaponsMenu);
+		// Items
+		ZIItem::Register(&g_TripmineItem);
+		ZIItem::Register(&g_InfiniteClipItem);
+		ZIItem::Register(&g_JetpackBazookaItem);
+		ZIItem::Register(&g_AntidoteItem);
+		ZIItem::Register(&g_RageItem);
+		ZIItem::Register(&g_InfectionBombItem);
 
-	RELEASE_POINTERS_ARRAY(m_pOnlinePlayers);	
+		m_pPrimaryWeaponsMenu = ZIWeapon::BuildPrimaryWeaponsMenu();
+		m_pSecondaryWeaponsMenu = ZIWeapon::BuildSecondaryWeaponsMenu();
 
-	g_pHumanClasses.clear();
-	g_pZombieClasses.clear();
-	g_pRoundModes.clear();
-}
-
-bool ZICore::OnPreClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin)
-{
-	if( ZISourceModBridge::m_pPrePlayerInfection )
-	{
-		ZISourceModBridge::m_pPrePlayerInfection->PushCell(player ? player->m_Index : 0);
-		ZISourceModBridge::m_pPrePlayerInfection->PushCell(attacker ? attacker->m_Index : 0);
-		ZISourceModBridge::m_pPrePlayerInfection->PushCell(nemesis ? 1 : 0);
-		ZISourceModBridge::m_pPrePlayerInfection->PushCell(assassin ? 1 : 0);
-
-		cell_t result = Pl_Continue;
-		ZISourceModBridge::m_pPrePlayerInfection->Execute(&result);
-
-		if( result == Pl_Handled )
+		if( !m_pPrimaryWeaponsMenu )
 		{
-			return false;
+			CONSOLE_DEBUGGER("Failed to build the primary weapons menu.");
+		}
+
+		if( !m_pSecondaryWeaponsMenu )
+		{
+			CONSOLE_DEBUGGER("Failed to build the secondary weapons menu.");
 		}
 	}
 
-	return true;
-}
-
-void ZICore::OnPostClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin)
-{
-	g_TripmineItem.OnPostClientInfection(player);
-	g_JetpackBazookaItem.OnPostClientInfection(player);
-	g_RageItem.OnPostClientInfection(player);
-
-	if( ZISourceModBridge::m_pPostPlayerInfection )
+	void OnUnload()
 	{
-		ZISourceModBridge::m_pPostPlayerInfection->PushCell(player ? player->m_Index : 0);
-		ZISourceModBridge::m_pPostPlayerInfection->PushCell(attacker ? attacker->m_Index : 0);
-		ZISourceModBridge::m_pPostPlayerInfection->PushCell(nemesis ? 1 : 0);
-		ZISourceModBridge::m_pPostPlayerInfection->PushCell(assassin ? 1 : 0);
-		ZISourceModBridge::m_pPostPlayerInfection->Execute(NULL);
+		RELEASE_TIMER(m_pWarningTimer);
+		RELEASE_TIMER(m_pCountdownTimer);
+		RELEASE_TIMER(m_pStartModeTimer);
+		RELEASE_TIMER(m_pAmbientSoundTimer);
+		RELEASE_TIMER(m_pTeamsRandomization);
+		RELEASE_TIMER(m_pBulletTime);
+
+		RELEASE_MENU(m_pPrimaryWeaponsMenu);
+		RELEASE_MENU(m_pSecondaryWeaponsMenu);
+
+		RELEASE_POINTERS_ARRAY(m_pOnlinePlayers);
+
+		g_pHumanClasses.clear();
+		g_pZombieClasses.clear();
+		g_pRoundModes.clear();
 	}
-}
 
-bool ZICore::OnPreClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper)
-{
-	if( ZISourceModBridge::m_pPrePlayerDisinfection )
+	bool OnPreClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin)
 	{
-		ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(player ? player->m_Index : 0);
-		ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(attacker ? attacker->m_Index : 0);
-		ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(survivor ? 1 : 0);
-		ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(sniper ? 1 : 0);
-
-		cell_t result = Pl_Continue;
-		ZISourceModBridge::m_pPrePlayerDisinfection->Execute(&result);
-
-		if( result == Pl_Handled )
+		if( ZISourceModBridge::m_pPrePlayerInfection )
 		{
-			return false;
+			ZISourceModBridge::m_pPrePlayerInfection->PushCell(player ? player->m_Index : 0);
+			ZISourceModBridge::m_pPrePlayerInfection->PushCell(attacker ? attacker->m_Index : 0);
+			ZISourceModBridge::m_pPrePlayerInfection->PushCell(nemesis ? 1 : 0);
+			ZISourceModBridge::m_pPrePlayerInfection->PushCell(assassin ? 1 : 0);
+
+			cell_t result = Pl_Continue;
+			ZISourceModBridge::m_pPrePlayerInfection->Execute(&result);
+
+			if( result == Pl_Handled )
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	void OnPostClientInfection(ZIPlayer *player, ZIPlayer *attacker, bool nemesis, bool assassin)
+	{
+		g_TripmineItem.OnPostClientInfection(player);
+		g_JetpackBazookaItem.OnPostClientInfection(player);
+		g_RageItem.OnPostClientInfection(player);
+
+		if( ZISourceModBridge::m_pPostPlayerInfection )
+		{
+			ZISourceModBridge::m_pPostPlayerInfection->PushCell(player ? player->m_Index : 0);
+			ZISourceModBridge::m_pPostPlayerInfection->PushCell(attacker ? attacker->m_Index : 0);
+			ZISourceModBridge::m_pPostPlayerInfection->PushCell(nemesis ? 1 : 0);
+			ZISourceModBridge::m_pPostPlayerInfection->PushCell(assassin ? 1 : 0);
+			ZISourceModBridge::m_pPostPlayerInfection->Execute(NULL);
 		}
 	}
-	
-	return true;
-}
 
-void ZICore::OnPostClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper)
-{
-	g_RageItem.OnPostClientDisinfection(player);
-
-	if( ZISourceModBridge::m_pPostPlayerDisinfection )
+	bool OnPreClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper)
 	{
-		ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(player ? player->m_Index : 0);
-		ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(attacker ? attacker->m_Index : 0);
-		ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(survivor ? 1 : 0);
-		ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(sniper ? 1 : 0);
-		ZISourceModBridge::m_pPostPlayerDisinfection->Execute(NULL);
-	}
-}
+		if( ZISourceModBridge::m_pPrePlayerDisinfection )
+		{
+			ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(player ? player->m_Index : 0);
+			ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(attacker ? attacker->m_Index : 0);
+			ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(survivor ? 1 : 0);
+			ZISourceModBridge::m_pPrePlayerDisinfection->PushCell(sniper ? 1 : 0);
 
-void ZICore::OnClientLastHuman(ZIPlayer *player)
-{
-	if( ZISourceModBridge::m_pPlayerLastHuman )
-	{
-		ZISourceModBridge::m_pPlayerLastHuman->PushCell(player ? player->m_Index : 0);
-		ZISourceModBridge::m_pPlayerLastHuman->Execute(NULL);
-	}
-}
+			cell_t result = Pl_Continue;
+			ZISourceModBridge::m_pPrePlayerDisinfection->Execute(&result);
 
-void ZICore::OnClientLastZombie(ZIPlayer *player)
-{
-	if( ZISourceModBridge::m_pPlayerLastZombie )
-	{
-		ZISourceModBridge::m_pPlayerLastZombie->PushCell(player ? player->m_Index : 0);
-		ZISourceModBridge::m_pPlayerLastZombie->Execute(NULL);
-	}
-}
+			if( result == Pl_Handled )
+			{
+				return false;
+			}
+		}
 
-ItemReturn ZICore::OnPreItemSelection(ZIItem *item, ZIPlayer *player)
-{
-	if( ZISourceModBridge::m_pPreItemSelection )
-	{
-		ZISourceModBridge::m_pPreItemSelection->PushCell(item ? item->GetIndex() : -1);		
-		ZISourceModBridge::m_pPreItemSelection->PushCell(player ? player->m_Index : 0);
-
-		cell_t result = Pl_Continue;
-		ZISourceModBridge::m_pPreItemSelection->Execute(&result);
-
-		return (ItemReturn) result;
+		return true;
 	}
 
-	return ItemReturn_Show;
-}
-
-void ZICore::OnPostItemSelection(ZIItem *item, ZIPlayer *player)
-{
-	if( ZISourceModBridge::m_pPostItemSelection )
+	void OnPostClientDisinfection(ZIPlayer *player, ZIPlayer *attacker, bool survivor, bool sniper)
 	{
-		ZISourceModBridge::m_pPostItemSelection->PushCell(item ? item->GetIndex() : -1);		
-		ZISourceModBridge::m_pPostItemSelection->PushCell(player ? player->m_Index : 0);
-		ZISourceModBridge::m_pPostItemSelection->Execute(NULL);
-	}
-}
+		g_RageItem.OnPostClientDisinfection(player);
 
-void ZICore::OnRoundModeStart()
-{
-	if( ZISourceModBridge::m_pRoundModeStart )
-	{
-		ZISourceModBridge::m_pRoundModeStart->PushCell(m_CurrentMode ? m_CurrentMode->GetIndex() : -1);
-		ZISourceModBridge::m_pRoundModeStart->PushCell(ZIRoundMode::m_RoundTarget ? ZIRoundMode::m_RoundTarget->m_Index : 0);
-		ZISourceModBridge::m_pRoundModeStart->Execute(NULL);
+		if( ZISourceModBridge::m_pPostPlayerDisinfection )
+		{
+			ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(player ? player->m_Index : 0);
+			ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(attacker ? attacker->m_Index : 0);
+			ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(survivor ? 1 : 0);
+			ZISourceModBridge::m_pPostPlayerDisinfection->PushCell(sniper ? 1 : 0);
+			ZISourceModBridge::m_pPostPlayerDisinfection->Execute(NULL);
+		}
 	}
-}
 
-void ZICore::OnRoundModeEnd()
-{
-	if( ZISourceModBridge::m_pRoundModeEnd )
+	void OnClientLastHuman(ZIPlayer *player)
 	{
-		ZISourceModBridge::m_pRoundModeEnd->PushCell(m_Winner);
-		ZISourceModBridge::m_pRoundModeEnd->PushCell(ZIRoundMode::m_RoundTarget ? ZIRoundMode::m_RoundTarget->m_Index : 0);
-		ZISourceModBridge::m_pRoundModeEnd->Execute(NULL);
+		if( ZISourceModBridge::m_pPlayerLastHuman )
+		{
+			ZISourceModBridge::m_pPlayerLastHuman->PushCell(player ? player->m_Index : 0);
+			ZISourceModBridge::m_pPlayerLastHuman->Execute(NULL);
+		}
 	}
-	
-	// Free our target so we can look for a new one the next round
-	ZIRoundMode::m_RoundTarget = nullptr;
+
+	void OnClientLastZombie(ZIPlayer *player)
+	{
+		if( ZISourceModBridge::m_pPlayerLastZombie )
+		{
+			ZISourceModBridge::m_pPlayerLastZombie->PushCell(player ? player->m_Index : 0);
+			ZISourceModBridge::m_pPlayerLastZombie->Execute(NULL);
+		}
+	}
+
+	ItemReturn OnPreItemSelection(ZIItem *item, ZIPlayer *player)
+	{
+		if( ZISourceModBridge::m_pPreItemSelection )
+		{
+			ZISourceModBridge::m_pPreItemSelection->PushCell(item ? item->GetIndex() : -1);
+			ZISourceModBridge::m_pPreItemSelection->PushCell(player ? player->m_Index : 0);
+
+			cell_t result = Pl_Continue;
+			ZISourceModBridge::m_pPreItemSelection->Execute(&result);
+
+			return (ItemReturn) result;
+		}
+
+		return ItemReturn_Show;
+	}
+
+	void OnPostItemSelection(ZIItem *item, ZIPlayer *player)
+	{
+		if( ZISourceModBridge::m_pPostItemSelection )
+		{
+			ZISourceModBridge::m_pPostItemSelection->PushCell(item ? item->GetIndex() : -1);
+			ZISourceModBridge::m_pPostItemSelection->PushCell(player ? player->m_Index : 0);
+			ZISourceModBridge::m_pPostItemSelection->Execute(NULL);
+		}
+	}
+
+	void OnRoundModeStart()
+	{
+		if( ZISourceModBridge::m_pRoundModeStart )
+		{
+			ZISourceModBridge::m_pRoundModeStart->PushCell(m_CurrentMode ? m_CurrentMode->GetIndex() : -1);
+			ZISourceModBridge::m_pRoundModeStart->PushCell(ZIRoundMode::m_RoundTarget ? ZIRoundMode::m_RoundTarget->m_Index : 0);
+			ZISourceModBridge::m_pRoundModeStart->Execute(NULL);
+		}
+	}
+
+	void OnRoundModeEnd()
+	{
+		if( ZISourceModBridge::m_pRoundModeEnd )
+		{
+			ZISourceModBridge::m_pRoundModeEnd->PushCell(m_Winner);
+			ZISourceModBridge::m_pRoundModeEnd->PushCell(ZIRoundMode::m_RoundTarget ? ZIRoundMode::m_RoundTarget->m_Index : 0);
+			ZISourceModBridge::m_pRoundModeEnd->Execute(NULL);
+		}
+
+		// Free our target so we can look for a new one the next round
+		ZIRoundMode::m_RoundTarget = nullptr;
+	}
 }

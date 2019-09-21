@@ -150,7 +150,7 @@ IBaseMenu *ZIWeapon::BuildPrimaryWeaponsMenu()
 
 	static IBaseMenu *menu = nullptr;
 
-	if( !menu && (menu = g_pExtension->m_pMenuStyle->CreateMenu(&ZICore::m_MenusCallback.m_PrimaryWeapons)) )
+	if( !menu && (menu = g_pExtension->m_pMenuStyle->CreateMenu(&ZIMenusCallback::m_PrimaryWeapons)) )
 	{	
 		menu->SetDefaultTitle("Primary Weapons");
 
@@ -188,7 +188,7 @@ IBaseMenu *ZIWeapon::BuildSecondaryWeaponsMenu()
 
 	static IBaseMenu *menu = nullptr;
 
-	if( !menu && (menu = g_pExtension->m_pMenuStyle->CreateMenu(&ZICore::m_MenusCallback.m_SecondaryWeapons)) )
+	if( !menu && (menu = g_pExtension->m_pMenuStyle->CreateMenu(&ZIMenusCallback::m_SecondaryWeapons)) )
 	{
 		menu->SetDefaultTitle("Secondary Weapons");
 
