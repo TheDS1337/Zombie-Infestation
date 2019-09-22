@@ -11,10 +11,7 @@ EntityHook::EntityHook(int hookId, const char *name, const char *serverclass)
 
 EntityHook::~EntityHook()
 {
-	CONSOLE_DEBUGGER("Releasing hook: %d, class: %s", hookId, classname);
-	SH_REMOVE_HOOK_ID(hookId); 
-	
-	hookId = 0;
+	SH_REMOVE_HOOK_ID(hookId), hookId = 0;
 }
 
 int EntityHook::GetHookId()

@@ -19,7 +19,7 @@ namespace ZISpawnsManager
 
 		if( !libsys->PathExists(path) || !libsys->IsPathFile(path) )
 		{
-			CONSOLE_DEBUGGER("No spawns data was found for the map: %s", mapname);
+			g_pSM->LogError(myself, "Map '%s' needs spawns data.", mapname);
 			return;
 		}
 
@@ -61,6 +61,11 @@ namespace ZISpawnsManager
 
 			fclose(file);
 		}
+
+		if( m_SpawnData.size() < 1 )
+		{
+			g_pSM->LogError(myself, "Atleast 1 spawn data is required, more tha 10 are recommanded however.");			
+		}
 	}
 
 	void Free()
@@ -74,7 +79,6 @@ namespace ZISpawnsManager
 
 		if( size < 1 )
 		{
-			CONSOLE_DEBUGGER("Unable to find any spawn point.");
 			return false;
 		}
 

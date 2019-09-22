@@ -12,10 +12,6 @@ Evolutionary g_Extension;
 Evolutionary *g_pExtension = &g_Extension;		
 SDKExtension *g_pExtensionIface = &g_Extension;
 
-FILE *g_pDebugFile = nullptr;
-
-static bool g_FullyLoaded = false;
-
 SH_DECL_HOOK2_void(IServerGameClients, ClientCommand, SH_NOATTRIB, 0, edict_t *, const CCommand &);
 SH_DECL_HOOK2(IGameEventManager2, FireEvent, SH_NOATTRIB, 0, bool, IGameEvent *, bool)
 
@@ -38,41 +34,9 @@ const char *Evolutionary::GetExtensionTag()
 {
 	return g_pGameMod->GetTag();
 }
-//////////////////////
-static const char *monthString[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-static const char *dayString[] = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
-
-static void getTm(int &year, int &month, int &day, int &hour, int &mins, int &secs, int &weekDay)
-{
-	time_t tt;
-	time(&tt);
-	tm TM = *localtime(&tt);
-
-	year = TM.tm_year + 1900;
-	month = TM.tm_mon;
-	day = TM.tm_mday;
-	hour = TM.tm_hour;
-	mins = TM.tm_min;
-	secs = TM.tm_sec;
-	weekDay = TM.tm_wday;
-}
-////////////////
 
 bool Evolutionary::SDK_OnMetamodLoad(ISmmAPI *ismm, char *error, size_t maxlen, bool late)
 {
-	int year, month, day, hour, mins, secs, weekDay;
-	getTm(year, month, day, hour, mins, secs, weekDay);	
-
-#if defined _WINDOWS
-	g_pDebugFile = fopen("E:\\csgosl\\server\\csgo\\addons\\sourcemod\\extensions\\zi_debugger.txt", "a+");
-
-	fprintf(g_pDebugFile, "WINDOWS DEBUGGER for: %s, %d %s %d @ %d:%d\n\n", dayString[weekDay], day, monthString[month], year, hour, mins);
-#elif defined _LINUX
-	g_pDebugFile = fopen("/home/ds/Steam/server/csgo/addons/sourcemod/extensions/zi_debugger.txt", "a+");
-
-	fprintf(g_pDebugFile, "LINUX DEBUGGER for: %s, %d %s %d @ %d:%d\n\n", dayString[weekDay], day, monthString[month], year, hour, mins);
-#endif	
-	
 	m_pEngineServer = engine; 
 	m_pServerGameDLL = gamedll; 
 	
@@ -98,29 +62,21 @@ bool Evolutionary::SDK_OnMetamodLoad(ISmmAPI *ismm, char *error, size_t maxlen, 
 	SH_ADD_HOOK(IServerGameClients, ClientCommand, m_pServerGameClients, SH_MEMBER(this, &Evolutionary::OnPostClientCommand), true);
 	SH_ADD_HOOK(IGameEventManager2, FireEvent, m_pGameEventManager, SH_MEMBER(this, &Evolutionary::OnPreFireEvent), false);
 
-	CONSOLE_DEBUGGER("Call ended.");
-
 	// Load the extras from our desired mod
 	return g_pGameMod->OnMetamodLoad(ismm, error, maxlen, late);
 }
 
 bool Evolutionary::SDK_OnMetamodUnload(char *error, size_t maxlen)
 {
-	CONSOLE_DEBUGGER("Called!");
-
 	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, m_pServerGameClients, SH_MEMBER(this, &Evolutionary::OnPreClientCommand), false);
 	SH_REMOVE_HOOK(IServerGameClients, ClientCommand, m_pServerGameClients, SH_MEMBER(this, &Evolutionary::OnPostClientCommand), true);
 	SH_REMOVE_HOOK(IGameEventManager2, FireEvent, m_pGameEventManager, SH_MEMBER(this, &Evolutionary::OnPreFireEvent), false);
-	
-	CONSOLE_DEBUGGER("Call ended.");	
 	
 	return g_pGameMod->OnMetamodUnload(error, maxlen);
 }
 
 bool Evolutionary::SDK_OnLoad(char *error, size_t maxlength, bool late)
 {
-	CONSOLE_DEBUGGER("Called!");
-
 	g_pShareSys->AddDependency(myself, "bintools.ext", true, true);
 	g_pShareSys->AddDependency(myself, "sdkhooks.ext", true, true);
 
@@ -131,25 +87,16 @@ bool Evolutionary::SDK_OnLoad(char *error, size_t maxlength, bool late)
 	LOOKUP_FOR_CONFIG(m_pHooksConfig, "sdkhooks.games");
 	LOOKUP_FOR_CONFIG(m_pCStrikeConfig, "sm-cstrike.games");
 
-	CONSOLE_DEBUGGER("Call ended.");
-
 	bool ret =  g_pGameMod->OnLoad(error, maxlength, late);
 
 	// Loading here, just after our ZI config is finally loaded (UNTIL I make a global fix with configs being everywhere...)
-	m_pEntityList = gamehelpers->GetGlobalEntityList();
-
-	if( !m_pEntityList )
-	{
-		CONSOLE_DEBUGGER("Couldn't find gEntList pointer... Getting it harder");		
-	}	
+	m_pEntityList = gamehelpers->GetGlobalEntityList();	
 
 	return ret;
 }
 
 bool Evolutionary::QueryRunning(char *error, size_t maxlength)
 {
-	CONSOLE_DEBUGGER("Called!");
-
 	SM_CHECK_IFACE(BINTOOLS, m_pBinTools);
 	SM_CHECK_IFACE(SDKHOOKS, m_pSDKHooks);
 	SM_CHECK_IFACE(SDKTOOLS, m_pSDKTools);
@@ -157,29 +104,14 @@ bool Evolutionary::QueryRunning(char *error, size_t maxlength)
 	if( !m_pMenuStyle )
 	{
 		// Menu styles can be "default", "valve" or "radio" (use FindStyleByName(style) instead of GetDefaultStyle);
-		m_pMenuStyle = menus->GetDefaultStyle();
-
-		if( m_pMenuStyle )
-		{
-			CONSOLE_DEBUGGER("Menu style retrieved with success!");
-		}
-		else
-		{
-			CONSOLE_DEBUGGER("Failed to load menu style.");
-		}
+		m_pMenuStyle = menus->GetDefaultStyle();		
 	}
-
-	CONSOLE_DEBUGGER("Call ended.");
 
 	return true;
 }
 
 void Evolutionary::SDK_OnAllLoaded()
 {
-	g_FullyLoaded = true;
-
-	CONSOLE_DEBUGGER("Called!");
-
 	SM_GET_LATE_IFACE(BINTOOLS, m_pBinTools);
 	SM_GET_LATE_IFACE(SDKHOOKS, m_pSDKHooks);	
 	SM_GET_LATE_IFACE(SDKTOOLS, m_pSDKTools);
@@ -368,16 +300,12 @@ void Evolutionary::SDK_OnAllLoaded()
 		m_pChatColors->Insert("yellowgreen", (void *) 0x9ACD32);
 	}
 
-	CONSOLE_DEBUGGER("Call ended.");
-
 	g_pGameMod->OnAllLoaded();
 }
 
 void Evolutionary::SDK_OnUnload()
 {
 	g_pGameMod->OnUnload();
-
-	CONSOLE_DEBUGGER("Called!");
 
 	playerhelpers->RemoveClientListener(this);
 	m_pSDKHooks->RemoveEntityListener(this);
@@ -395,23 +323,11 @@ void Evolutionary::SDK_OnUnload()
 		m_pChatColors->Clear();
 		m_pChatColors->Destroy();
 		m_pChatColors = nullptr;
-	}
-
-	CONSOLE_DEBUGGER("Call ended.");		
-	
-	if( g_pDebugFile )
-	{
-		fprintf(g_pDebugFile, "Debug file should be closed on: %s", __FUNCTION__);
-		fclose(g_pDebugFile); g_pDebugFile = nullptr;
-	}
-	
-	g_FullyLoaded = false;
+	}	
  }
 
 void Evolutionary::OnCoreMapStart(edict_t *edictList, int edictCount, int clientMax)
 {
-	CONSOLE_DEBUGGER("Called!");
-
 	static bool gotOffsets = false;
 
 	if( !gotOffsets )
@@ -423,8 +339,6 @@ void Evolutionary::OnCoreMapStart(edict_t *edictList, int edictCount, int client
 
 	if( m_pSDKTools->GetGameRules() && m_pGameRulesProxyEnt )
 	{
-		CONSOLE_DEBUGGER("GameRules loaded and ready to go!");
-
 		// Get offsets
 		static bool gotGameRulesOffsets = false;
 
@@ -436,15 +350,12 @@ void Evolutionary::OnCoreMapStart(edict_t *edictList, int edictCount, int client
 
 	FindStringTables();
 	
-	g_pGameMod->OnCoreMapStart(edictList, edictCount, clientMax);
-	CONSOLE_DEBUGGER("Call ended.");
+	g_pGameMod->OnCoreMapStart(edictList, edictCount, clientMax);	
 }
 
 void Evolutionary::OnCoreMapEnd()
 {
-	CONSOLE_DEBUGGER("Called!");
-	g_pGameMod->OnCoreMapEnd();
-	CONSOLE_DEBUGGER("Call ended.");	
+	g_pGameMod->OnCoreMapEnd();		
 }
 
 void Evolutionary::OnPreClientCommand(edict_t *client, const CCommand &args)
@@ -691,27 +602,4 @@ bool Evolutionary::GetGameRulesOffsets()
 	GET_GAMERULES_OFFSET(m_bCTCantBuy);
 
 	return gotOffsets;
-}
-
-char g_DebugInfoBuffer[80];
-void DoDebug(const char *format, ...)
-{
-	static char tempbuffer[100], finalbuffer[200];
-
-	va_list variables;
-	va_start(variables, format);
-	ke::SafeVsprintf(tempbuffer, 100, format, variables);
-	va_end(variables);
-
-	ke::SafeSprintf(finalbuffer, 200, "\t%s: %s", g_DebugInfoBuffer, tempbuffer);
-	
-	if( g_pDebugFile )
-	{
-		fprintf(g_pDebugFile, "%s\n", finalbuffer);
-	}
-
-	if( g_FullyLoaded )
-	{
-		rootconsole->ConsolePrint(finalbuffer);
-	}
 }

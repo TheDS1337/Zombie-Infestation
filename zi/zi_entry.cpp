@@ -265,16 +265,8 @@ void ZombieInfestation::OnClientConnected(int client)
 
 void ZombieInfestation::OnClientPutInServer(IGamePlayer *gameplayer)
 {
-	ZIPlayer *player = new ZIPlayer(gameplayer->GetEdict());
-
-	if( player )
-	{
-		ZIHooks::AttachToClient(player->m_pEntity);	
-	}
-	else
-	{
-		CONSOLE_DEBUGGER("Couldn't register edict: %d", gameplayer->GetEdict());
-	}	
+	ZIPlayer *player = new ZIPlayer(gameplayer->GetEdict());	
+	ZIHooks::AttachToClient(player->m_pEntity);			
 }
 
 void ZombieInfestation::OnClientSettingsChanged(int client)
@@ -666,8 +658,10 @@ void ZombieInfestation::OnPostClientChangeNameEvent(IGameEvent *event)
 		return;
 	}
 
-	ke::SafeStrcpy(player->m_Name, 32, event->GetString("newname"));
-	CONSOLE_DEBUGGER("Player changed name: %s", player->m_Name);	
+	const char *newName = event->GetString("newname");
+
+	g_pSM->LogMessage(myself, "Player %s changed his name to %s.", player->m_Name, newName);
+	ke::SafeStrcpy(player->m_Name, sizeof(player->m_Name), newName);
 }
 
 bool ZombieInfestation::OnPreClientCommand(edict_t *client, const CCommand &args)
@@ -1155,6 +1149,8 @@ HookReturnValue<int> ZombieInfestation::OnPreClientTakeDamage(ZIPlayer *player, 
 		// Human attacking zombie
 		if( player->m_IsInfected && !attacker->m_IsInfected )
 		{
+			float requiredDamage = 750.0f;
+
 			if( survivor )
 			{
 				info.ScaleDamage(survivor->GetDamageMultiplier());
@@ -1167,6 +1163,8 @@ HookReturnValue<int> ZombieInfestation::OnPreClientTakeDamage(ZIPlayer *player, 
 				{
 					info.SetDamage(sniper->GetDamage());
 				}
+
+				requiredDamage *= RandomFloat(1.4, 1.6f);
 			}
 			// VIP players deal a little bit more damage than usual players
 			else if( player->m_IsVIP )
@@ -1188,12 +1186,12 @@ HookReturnValue<int> ZombieInfestation::OnPreClientTakeDamage(ZIPlayer *player, 
 				attacker->m_pDamageDealtToZombies[playerId] += damage;
 			}
 
-			int points = attacker->m_pDamageDealtToZombies[playerId] / 750.0f;
+			int points = attacker->m_pDamageDealtToZombies[playerId] / requiredDamage;
 
 			if( points > 0 )
 			{
 				attacker->m_Points += points;
-				attacker->m_pDamageDealtToZombies[playerId] -= points * 750.0f;				
+				attacker->m_pDamageDealtToZombies[playerId] -= points * requiredDamage;
 			}	
 
 			// Apply damage multipification
@@ -1346,7 +1344,7 @@ bool ZombieInfestation::OnPreClientDeath(ZIPlayer *player, CTakeDamageInfo2 &inf
 	// Remove any attached flames
 	if( playerEnt->GetFlags() & FL_ONFIRE )
 	{
-		playerEnt->Extinguish(); CONSOLE_DEBUGGER("Removing the fiery...");
+		playerEnt->Extinguish(); 
 	}
 
 	// Remove the freeze if he was frozen..

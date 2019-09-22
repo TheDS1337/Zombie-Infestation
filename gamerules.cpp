@@ -7,14 +7,13 @@ void TerminateRound(float delay, CSGORoundEndReason reason)
 
 	if( !gamerules )
 	{
-		CONSOLE_DEBUGGER("Couldn't find gamerules pointer");
 		return;
 	}
 
 	static void *address = nullptr;
 	if( !g_pGameMod->GetConfig()->GetMemSig("CCSGameRules::TerminateRound", &address) || !address )
 	{
-		CONSOLE_DEBUGGER("CCSGameRules::TerminateRound address is not found!");
+		g_pSM->LogError(myself, "CCSGameRules::TerminateRound address is not found!");
 		return;
 	}
 		
@@ -37,7 +36,7 @@ void TerminateRound(float delay, CSGORoundEndReason reason)
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CCSGameRules::TerminateRound", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CCSGameRules::TerminateRound address is not found!");
+			g_pSM->LogError(myself, "CCSGameRules::TerminateRound address is not found!");
 			return;
 		}
 
@@ -60,7 +59,6 @@ void TerminateRound(float delay, CSGORoundEndReason reason)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -86,7 +84,6 @@ int RoundTime()
 
 	if( !gamerules || !g_pExtension->m_pGameRulesProxyEnt )
 	{
-		CONSOLE_DEBUGGER("Unable to find GameRules pointer.");
 		return false;
 	}
 
@@ -99,7 +96,6 @@ float RoundStartTime()
 
 	if( !gamerules || !g_pExtension->m_pGameRulesProxyEnt )
 	{
-		CONSOLE_DEBUGGER("Unable to find GameRules pointer.");
 		return false;
 	}
 
@@ -112,7 +108,6 @@ bool CanCTBuy()
 
 	if( !gamerules || !g_pExtension->m_pGameRulesProxyEnt )
 	{
-		CONSOLE_DEBUGGER("Unable to find GameRules pointer.");
 		return false;
 	}
 

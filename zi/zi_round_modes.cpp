@@ -2,6 +2,7 @@
 #include "zi_players.h"
 #include "zi_timers.h"
 #include "zi_resources.h"
+#include "zi_round_mode_single_infection.h"
 
 int ZIRoundMode::m_TotalChances = 0;
 ZIPlayer *ZIRoundMode::m_RoundTarget = nullptr;
@@ -49,28 +50,28 @@ ZIRoundMode *ZIRoundMode::Choose()
 {
 	ZIRoundMode *mode = nullptr;
 
-	do
+	while( !mode || !mode->OnPreSelection() )
 	{
 		// Search for a new mode
 		mode = GetFromTotalChances(RandomInt(1, m_TotalChances));
 		
-		if( !mode || ZICore::m_LastMode == mode )
+		if( !mode )
+		{
+			continue;
+		}
+
+		if( ZICore::m_LastMode == mode && mode != &g_SingleInfectionMode  )
 		{
 			continue;
 		}
 		
-		// Was last mode and not the one with the highest chance? I.E. First infection
-		if( strcmp(mode->GetName(), "Single Infection") == 0 )
+/*		// Was last mode and not the one with the highest chance? I.E. First infection
+		if( mode == &g_SingleInfectionMode )
 		{
 			break;
-		}		
-	} while( !mode->OnPreSelection() );
+		}	*/	
+	} 
 	
-	if( !mode )
-	{
-		CONSOLE_DEBUGGER("Warning! no mode was chosen");
-	}
-		
 	return mode;
 }
 
@@ -78,13 +79,11 @@ void ZIRoundMode::Start(ZIRoundMode *mode, ZIPlayer *target)
 {
 	if( !mode )
 	{
-		CONSOLE_DEBUGGER("Invalid round mode.");
 		return;
 	}
 	
 	if( ZICore::m_IsRoundEnd || ZICore::m_IsModeStarted )
 	{
-		CONSOLE_DEBUGGER("A mode is already on progress or the round is ending....");
 		return;
 	}
 
@@ -118,11 +117,6 @@ void ZIRoundMode::Start(ZIRoundMode *mode, ZIPlayer *target)
 
 	m_RoundTarget = target ? target : ZIPlayer::RandomAlive();	
 	
-	if( !m_RoundTarget )
-	{
-		CONSOLE_DEBUGGER("Warning! no target was found");
-	}	
-
 	// Start the mode after a short delay (fixes the HUD not appearing)
 	ZICore::m_pStartModeTimer = timersys->CreateTimer(&ZITimersCallback::m_StartMode, 0.5f, mode, TIMER_FLAG_NO_MAPCHANGE);
 }
@@ -136,7 +130,6 @@ ZIRoundMode *ZIRoundMode::GetFromTotalChances(int chance)
 	}
 	
 	ZIRoundMode *mode = nullptr;
-
 	int chances = 0;
 
 	for( auto iterator = g_pRoundModes.begin(); iterator != g_pRoundModes.end(); iterator++ )

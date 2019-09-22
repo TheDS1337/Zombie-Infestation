@@ -6,7 +6,7 @@
 
 namespace ZIGeoIP
 {
-	extern MMDB_s *m_pDataBase;
+	extern MMDB_s *m_pDatabase;
 
 	// Taken from AMXx's GeoIP+ extension, geoip_utils.h/cpp files
 	MMDB_entry_data_s *LookupByIP(const char *IP, const char **path);

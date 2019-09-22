@@ -24,7 +24,6 @@ ZIPlayer *ZIPlayer::Find(const char *name)
 
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
 		return nullptr;
 	}
 
@@ -51,7 +50,6 @@ ZIPlayer *ZIPlayer::Find(int id, bool userId)
 
 	if( size < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
 		return nullptr;
 	}
 	
@@ -88,7 +86,6 @@ ZIPlayer *ZIPlayer::Find(edict_t *client)
 
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
 		return nullptr;
 	}
 
@@ -118,7 +115,6 @@ ZIPlayer *ZIPlayer::Find(BasePlayer *clientEntity)
 
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
 		return nullptr;
 	}
 
@@ -143,7 +139,6 @@ void ZIPlayer::RandomizeTeams()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
 		return;
 	}
 
@@ -202,8 +197,7 @@ int ZIPlayer::ConnectedCount(bool includeBots)
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int connectedCount = 0;
@@ -229,8 +223,7 @@ int ZIPlayer::TsCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int TsCount = 0;
@@ -256,8 +249,7 @@ int ZIPlayer::CTsCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int CTsCount = 0;
@@ -283,8 +275,7 @@ int ZIPlayer::PlayingCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int team = 0, playingCount = 0;
@@ -315,8 +306,7 @@ int ZIPlayer::AliveCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int aliveCount = 0;
@@ -342,8 +332,7 @@ int ZIPlayer::HumansCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int humansCount = 0;
@@ -369,8 +358,7 @@ int ZIPlayer::SurvivorsCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int survivorsCount = 0;
@@ -396,8 +384,7 @@ int ZIPlayer::SnipersCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int snipersCount = 0;
@@ -423,8 +410,7 @@ int ZIPlayer::ZombiesCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int zombiesCount = 0;
@@ -450,8 +436,7 @@ int ZIPlayer::NemesisCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int nemesisCount = 0;
@@ -477,8 +462,7 @@ int ZIPlayer::AssassinsCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
-		return -1;
+		return 0;
 	}
 
 	int assassinsCount = 0;
@@ -506,7 +490,6 @@ ZIPlayer *ZIPlayer::RandomAlive()
 	
 	if( size < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
 		return nullptr;
 	}
 	
@@ -525,7 +508,6 @@ ZIPlayer *ZIPlayer::RandomAlive()
 	{
 		if( ++loops == size )
 		{
-			CONSOLE_DEBUGGER("Unable to find a suitable player after looping through all players.");
 			return nullptr;
 		}
 
@@ -546,7 +528,6 @@ void ZIPlayer::Initiate()
 
 	if( !m_pGamePlayer )
 	{
-		CONSOLE_DEBUGGER("CS:GO is not supported!");
 		return;
 	}
 
@@ -739,7 +720,7 @@ ZIPlayer::~ZIPlayer()
 
 	ZIPlayer *target = nullptr;
 	
-	if( ZICore::m_IsModeStarted && m_pHumanLike  )
+	if( ZICore::m_IsModeStarted && m_pLastHumanLike  )
 	{
 		float oldHealthRatio = 0.0f;
 
@@ -748,7 +729,7 @@ ZIPlayer::~ZIPlayer()
 			m_IsLastZombie = false;
 
 			// Add some health up, for a faire gameplay
-			if( m_pEntity->GetHealth() / m_pHumanLike->GetHealth() < 0.25f  )
+			if( m_pEntity->GetHealth() / m_pLastHumanLike->GetHealth() < 0.25f  )
 			{
 				oldHealthRatio = 0.5f;
 			}
@@ -763,7 +744,7 @@ ZIPlayer::~ZIPlayer()
 				target->m_IsLastZombie = true;
 
 				// Infect him
-				target->Infect(nullptr, GET_ZOMBIE(this) ? nullptr : (ZIInfected *) m_pHumanLike);
+				target->Infect(nullptr, GET_LAST_ZOMBIE(this) ? nullptr : (ZIInfected *) m_pLastHumanLike);
 
 				ke::SafeSprintf(buffer, sizeof(buffer), "The last zombie has left,\x04 %s\x01 is the new zombie.", target->m_Name);
 
@@ -787,7 +768,7 @@ ZIPlayer::~ZIPlayer()
 			m_IsLastHuman = false;
 
 			// Add some health up, for a faire gameplay
-			if( m_pEntity->GetHealth() / m_pHumanLike->GetHealth() < 0.25f )
+			if( m_pEntity->GetHealth() / m_pLastHumanLike->GetHealth() < 0.25f )
 			{
 				oldHealthRatio = 0.5f;
 			}
@@ -802,7 +783,7 @@ ZIPlayer::~ZIPlayer()
 				target->m_IsLastHuman = true;
 
 				// Disinfect him
-				target->Disinfect(nullptr, GET_SOLDIER(this) ? nullptr : m_pHumanLike);
+				target->Disinfect(nullptr, GET_LAST_SOLDIER(this) ? nullptr : m_pLastHumanLike);
 
 				ke::SafeSprintf(buffer, sizeof(buffer), "The last human has left,\x04 %s\x01 is the new human.", target->m_Name);
 
@@ -824,13 +805,12 @@ ZIPlayer::~ZIPlayer()
 
 		if( oldHealthRatio > 0.0f )
 		{
-			target->m_pEntity->SetHealth(target->m_pHumanLike->GetHealth() * oldHealthRatio);
+			target->m_pEntity->SetHealth(target->m_pLastHumanLike->GetHealth() * oldHealthRatio);
 		}
 	}
 	else
 	{
-/*	GetClientTeam is breaking here
-		int team = GetClientTeam(m_pGamePlayer);
+		int team = m_pEntity->GetTeam();
 
 		if( team == CSGO_TEAM_T && TsCount() == 1 && CTsCount() > 1 )
 		{
@@ -841,7 +821,7 @@ ZIPlayer::~ZIPlayer()
 					continue;
 				}
 
-				SetClientTeam(m_pEntity, CSGO_TEAM_T);
+				m_pEntity->SetTeam(CSGO_TEAM_T);
 				break;
 			}
 		}
@@ -854,13 +834,12 @@ ZIPlayer::~ZIPlayer()
 					continue;
 				}
 
-				SetClientTeam(m_pEntity, CSGO_TEAM_CT);
+				m_pEntity->SetTeam(CSGO_TEAM_CT);
 				break;
 			}
 		}
 
 		ZICore::m_CurrentMode = ZIRoundMode::Choose();
-*/
 	}
 
 	UpdateCount();	
@@ -1098,7 +1077,6 @@ bool ZIPlayer::Disinfect(ZIPlayer *attacker, ZIHumanoid *hclass)
 
 	if( hclass && infected )
 	{
-		CONSOLE_DEBUGGER("Trying to disinfect player with an infected class.");
 		return false;
 	}
 
@@ -1378,7 +1356,6 @@ void ZIPlayer::Gib(Vector force)
 
 	if( ragdollEnt )
 	{
-		CONSOLE_DEBUGGER("Found Ragdoll");	
 		ragdollEnt->AcceptInput("Kill");
 	}
 
@@ -1635,7 +1612,6 @@ void ZIPlayer::ShowHumanSelectionMenu()
 {
 	if( !g_pExtension->m_pMenuStyle )
 	{
-		CONSOLE_DEBUGGER("No style was found");
 		return;
 	}
 
@@ -1767,7 +1743,6 @@ void ZIPlayer::UpdateCount()
 {
 	if( ZICore::m_pOnlinePlayers.size() < 1 )
 	{
-		CONSOLE_DEBUGGER("No players are created.");
 		return;
 	}	
 

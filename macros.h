@@ -9,8 +9,6 @@
 #define TICK_INTERVAL2	g_pExtension->m_pGlobals->interval_per_tick
 #define TIME_TO_TICKS2(dt) (int) (0.5f + (float) (dt / TICK_INTERVAL2))
 
-#define CONSOLE_DEBUGGER ke::SafeSprintf(g_DebugInfoBuffer, 80, "%s - %s (line %d)", __FILE__, __FUNCTION__, __LINE__); DoDebug
-
 #define LOOKUP_FOR_CONFIG(var, name) if( !gameconfs->LoadGameConfigFile(name, &var, buffer, sizeof(buffer)) ) \
 									 { \
 										 ke::SafeSprintf(error, maxlength, "Error loading " name ": %s", buffer); \
@@ -64,11 +62,7 @@
                                          } \
                                      }
  
-#define SH_MANUAL_HOOK_CREATE(name, entity, hookId) EntityHook *name ## Hook = EntityHook::CreateHookIfNotFound(entity, #name, hookId); \
-											if( !name ## Hook ) \
-											{ \
-												CONSOLE_DEBUGGER("Cannot create " #name " hook on entity: %d", entity); \
-											}	
+#define SH_MANUAL_HOOK_CREATE(name, entity, hookId) EntityHook *name ## Hook = EntityHook::CreateHookIfNotFound(entity, #name, hookId); 											
 
 #define SH_MANUAL_HOOK_GET_OFFSET(name, key)	if( g_pExtension->m_pHooksConfig->GetOffset(key, &offset) ) \
 												{ \
@@ -88,7 +82,7 @@
 												} \
 												else \
 												{ \
-													CONSOLE_DEBUGGER("Offset for " key " was not found!"); \
+													g_pSM->LogError(myself, "Offset for " key " was not found!"); \
 												}
 
 #define DETOUR_HOOK_DECLARE(name) CDetour *g_p ## name ## Detour = nullptr;
@@ -127,7 +121,7 @@
 											 } \
 											 else \
 											 { \
-												CONSOLE_DEBUGGER("Signature for " key " was not found!"); \
+												g_pSM->LogError(myself, "Signature for " key " was not found!"); \
 											 }
 
 #define DETOUR_HOOK_CREATE_MEMBER(name, key) if( g_pExtension->m_pHooksConfig->GetMemSig(key, &address) && address ) \
@@ -137,7 +131,7 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 CONSOLE_DEBUGGER("Found signature for " key ""); \
+                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
 											 } \
 											 else if( g_pExtension->m_pSDKConfig->GetMemSig(key, &address) && address ) \
 											 { \
@@ -146,7 +140,7 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 CONSOLE_DEBUGGER("Found signature for " key ""); \
+                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
 											 } \
 											 else if( g_pExtension->m_pCStrikeConfig->GetMemSig(key, &address) && address ) \
 											 { \
@@ -155,7 +149,7 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 CONSOLE_DEBUGGER("Found signature for " key ""); \
+                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
 											 } \
 											 else if( g_ZombieInfestation.m_pConfig->GetMemSig(key, &address) && address ) \
 											 { \
@@ -164,11 +158,11 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 CONSOLE_DEBUGGER("Found signature for " key ""); \
+                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
 											 } \
 											 else \
 											 { \
-												 CONSOLE_DEBUGGER("Signature for " key " was not found!"); \
+												 g_pSM->LogError(myself, "Signature for " key " was not found!"); \
 											 }
 
 #define DETOUR_HOOK_RELEASE(name) if( g_p ## name ## Detour ) \

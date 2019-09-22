@@ -62,7 +62,6 @@ namespace ZIEnvironment
 
 		while( (lightEnt = BaseEntity::FindEntity(lightEnt, "env_cascade_light")) )
 		{
-			CONSOLE_DEBUGGER("Killed light entity: %d", lightEnt);
 			lightEnt->AcceptInput("Kill");
 		}
 
@@ -70,8 +69,6 @@ namespace ZIEnvironment
 
 		while( (lightEnt = BaseEntity::FindEntity(lightEnt, "light_environment")) )
 		{
-			CONSOLE_DEBUGGER("Found enviromental light entity: %d", lightEnt);
-
 			lightEnt->SetKeyValue("Brightness", "192 211 222 5");
 			lightEnt->SetKeyValue("BrightnessHDR ", "-1 -1 -1 1");
 			lightEnt->SetKeyValue("Ambient", "218 208 194 2");
@@ -84,7 +81,6 @@ namespace ZIEnvironment
 
 		if( shadowEnt )
 		{
-			CONSOLE_DEBUGGER("Found shadow entity: %d", shadowEnt);
 			shadowEnt->SetKeyValue("Shadow Color", "50 50 50");
 		}
 
@@ -100,39 +96,31 @@ namespace ZIEnvironment
 
 		if( sunEnt )
 		{
-			CONSOLE_DEBUGGER("TurnedOff the sun entity: %d", sunEnt);
 			sunEnt->AcceptInput("TurnOff");
 		}
 
 		BaseEntity *fogEnt = BaseEntity::FindEntity(nullptr, "env_fog_controller");
 
-		if( fogEnt )
+		if( !fogEnt )
 		{
-			CONSOLE_DEBUGGER("Fog entity found: %d", fogEnt);
-		}
-		else if( (fogEnt = BaseEntity::CreateEntity("env_fog_controller")) )
-		{
-			CONSOLE_DEBUGGER("Fog entity created: %d", fogEnt);
+			fogEnt = BaseEntity::CreateEntity("env_fog_controller");
 			fogEnt->Spawn();
 		}
-
+		
 		// TODO: Fog (Play with settings)
-		if( fogEnt )
-		{
-			fogEnt->AcceptInput("TurnOff");
+		fogEnt->AcceptInput("TurnOff");
 
-			fogEnt->SetKeyValue("fogenable", "1");
-			fogEnt->SetKeyValue("fogblend", "0");
-			fogEnt->SetKeyValue("fogcolor", "0 0 0");
-			fogEnt->SetKeyValue("fogcolor2", "0 0 0");
-			fogEnt->SetKeyValue("fogstart", 0.0f);
-			fogEnt->SetKeyValue("fogend", 200.0f);
-			fogEnt->SetKeyValue("fogmaxdensity", 0.95f);
-//			fogEnt->SetKeyValue("foglerptime", 0.0f);
-//			fogEnt->SetKeyValue("farz", "-1");
+		fogEnt->SetKeyValue("fogenable", "1");
+		fogEnt->SetKeyValue("fogblend", "0");
+		fogEnt->SetKeyValue("fogcolor", "0 0 0");
+		fogEnt->SetKeyValue("fogcolor2", "0 0 0");
+		fogEnt->SetKeyValue("fogstart", 0.0f);
+		fogEnt->SetKeyValue("fogend", 200.0f);
+		fogEnt->SetKeyValue("fogmaxdensity", 0.95f);
+//		fogEnt->SetKeyValue("foglerptime", 0.0f);
+//		fogEnt->SetKeyValue("farz", "-1");
 
-			fogEnt->AcceptInput("TurnOn");
-		}
+		fogEnt->AcceptInput("TurnOn");
 	}
 
 	void Setup()
@@ -146,7 +134,7 @@ namespace ZIEnvironment
 	{
 		if( strstr(classname, "defuse") || strstr(classname, "vip") )
 		{
-			CONSOLE_DEBUGGER("Suspecious entity: %s", classname);
+			rootconsole->ConsolePrint("Suspecious entity: %s", classname);
 		}
 
 		else if( strcmp(classname, "weapon_c4") == 0 || strcmp(classname, "planted_c4") == 0 || strcmp(classname, "planted_c4_training") == 0 || strcmp(classname, "planted_c4_survival") == 0 )
@@ -170,8 +158,6 @@ namespace ZIEnvironment
 		/*
 			if( strcmp(classname, "func_dustcloud") == 0 )
 			{
-				CONSOLE_DEBUGGER("Dustcloud found!");
-
 				AcceptEntityInput(entity, "TurnOff");
 
 				SetEntityKeyValue(entity, "Color", "115 28 28");
@@ -183,8 +169,6 @@ namespace ZIEnvironment
 
 			if( strstr(classname, "light") )
 			{
-				CONSOLE_DEBUGGER("Turning light off.... %d", entity);
-
 				AcceptEntityInput(entity, "TurnOff");
 				AcceptEntityInput(entity, "LightOff");
 			}

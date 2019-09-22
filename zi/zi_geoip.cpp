@@ -6,35 +6,33 @@
 
 namespace ZIGeoIP
 {
-	MMDB_s *m_pDataBase = nullptr;
+	MMDB_s *m_pDatabase = nullptr;
 
 	void Load()
 	{
-		m_pDataBase = new MMDB_s();
+		m_pDatabase = new MMDB_s();
 
 		char path[256];
 		g_pSM->BuildPath(Path_Game, path, sizeof(path), GEOIP_DATABASE_CITY);
 
-		int status = MMDB_open(path, MMDB_MODE_MMAP, m_pDataBase);
+		int status = MMDB_open(path, MMDB_MODE_MMAP, m_pDatabase);
 
 		if( status != MMDB_SUCCESS )
 		{
 			g_pSM->BuildPath(Path_Game, path, sizeof(path), GEOIP_DATABASE_COUNTRY);
-
-			status = MMDB_open(path, MMDB_MODE_MMAP, m_pDataBase);
+			status = MMDB_open(path, MMDB_MODE_MMAP, m_pDatabase);
 		}
 
 		if( status != MMDB_SUCCESS )
 		{
-			CONSOLE_DEBUGGER("Cannot open database file!");
-			return;
+			g_pSM->LogError(myself, "Unable to load GeoIP database.");			
+			MMDB_close(m_pDatabase), delete m_pDatabase, m_pDatabase = nullptr;
 		}
 	}
 
 	void Free()
 	{
-		MMDB_close(m_pDataBase);
-		delete m_pDataBase;
+		MMDB_close(m_pDatabase), delete m_pDatabase;
 	}
 
 	bool GetCountry(const char *IP, char *output, int outputLen)
@@ -73,8 +71,13 @@ namespace ZIGeoIP
 
 	MMDB_entry_data_s *LookupByIP(const char *IP, const char **path)
 	{
+		if( !m_pDatabase )
+		{
+			return nullptr;
+		}
+
 		int gai_error = 0, mmdb_error = 0;
-		MMDB_lookup_result_s lookup = MMDB_lookup_string(m_pDataBase, IP, &gai_error, &mmdb_error);
+		MMDB_lookup_result_s lookup = MMDB_lookup_string(m_pDatabase, IP, &gai_error, &mmdb_error);
 
 		if( gai_error != 0 || mmdb_error != MMDB_SUCCESS || !lookup.found_entry )
 		{

@@ -88,8 +88,6 @@ namespace ZITimersCallback
 		if( !ZICore::m_CurrentMode )
 		{
 			// TODO END ROUND
-			CONSOLE_DEBUGGER("Cannot start round mode!");
-
 			ZICore::m_pCountdownTimer = nullptr;
 			return Pl_Stop;
 		}
@@ -207,7 +205,7 @@ namespace ZITimersCallback
 
 		if( aliveCount == ZIPlayer::HumansCount() || aliveCount == ZIPlayer::ZombiesCount() )
 		{
-			CONSOLE_DEBUGGER("Something is wrong with this game mode! (%s)", mode->GetName());
+			g_pSM->LogError(myself, "The round mode '%s' is not properly configured.", mode->GetName());
 		}
 
 		// Play ambient sound

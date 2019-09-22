@@ -78,7 +78,6 @@ BaseEntity *BaseEntity::CreateEntity(const char *classname)
 {
 	if( !g_pSM->IsMapRunning() )
 	{
-		CONSOLE_DEBUGGER("Attempting to create an entity without map loaded.");
 		return nullptr;
 	}
 
@@ -219,7 +218,7 @@ bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntit
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("AcceptInput", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("AcceptInput offset is not found!");
+			g_pSM->LogError(myself, "AcceptInput offset is not found!");
 			return false;
 		}
 
@@ -245,7 +244,6 @@ bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntit
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return false;
 		}
 
@@ -288,7 +286,7 @@ void BaseEntity::Activate()
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("Activate", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("Activate offset is not found!");
+			g_pSM->LogError(myself, "Activate offset is not found!");
 			return;
 		}
 
@@ -296,7 +294,6 @@ void BaseEntity::Activate()
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -320,7 +317,7 @@ void BaseEntity::Teleport(Vector *origin, QAngle *angles, Vector *velocity)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("Teleport", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("Teleport offset is not found!");
+			g_pSM->LogError(myself, "Teleport offset is not found!");
 			return;
 		}
 
@@ -340,7 +337,6 @@ void BaseEntity::Teleport(Vector *origin, QAngle *angles, Vector *velocity)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -367,7 +363,7 @@ void BaseEntity::Ignite(float duration, bool NPCOnly, float size, bool called)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("Ignite", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("Ignite offset is not found!");
+			g_pSM->LogError(myself, "Ignite offset is not found!");
 			return;
 		}
 
@@ -390,7 +386,6 @@ void BaseEntity::Ignite(float duration, bool NPCOnly, float size, bool called)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -418,7 +413,7 @@ void BaseEntity::Extinguish()
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("Extinguish", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("Extinguish offset is not found!");
+			g_pSM->LogError(myself, "Extinguish offset is not found!");
 			return;
 		}
 
@@ -426,7 +421,6 @@ void BaseEntity::Extinguish()
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -450,7 +444,7 @@ int BaseEntity::TakeDamage(CTakeDamageInfo2 info)
 		int offset = 0;
 		if( !g_pExtension->m_pHooksConfig->GetOffset("OnTakeDamage", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("OnTakeDamage offset is not found!");
+			g_pSM->LogError(myself, "OnTakeDamage offset is not found!");
 			return -1;
 		}
 
@@ -467,7 +461,6 @@ int BaseEntity::TakeDamage(CTakeDamageInfo2 info)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return -1;
 		}
 
@@ -490,7 +483,6 @@ const char *BaseEntity::GetClassname()
 {
 	if( g_pExtension->m_iClassname < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 	
@@ -506,7 +498,7 @@ void BaseEntity::SetModel(const char *model)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("SetEntityModel", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("SetEntityModel offset is not found!");
+			g_pSM->LogError(myself, "SetEntityModel offset is not found!");
 			return;
 		}
 
@@ -520,7 +512,6 @@ void BaseEntity::SetModel(const char *model)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -545,7 +536,7 @@ void BaseEntity::SetSize(const Vector &min, const Vector &max)
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("UTIL_SetSize", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("UTIL_SetSize address is not found!");
+			g_pSM->LogError(myself, "UTIL_SetSize address is not found!");
 			return;
 		}
 
@@ -562,7 +553,6 @@ void BaseEntity::SetSize(const Vector &min, const Vector &max)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -583,7 +573,6 @@ int BaseEntity::GetHealth()
 {
 	if( g_pExtension->m_iHealth < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -594,7 +583,6 @@ void BaseEntity::SetHealth(int value)
 {
 	if( g_pExtension->m_iHealth < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -612,7 +600,6 @@ float BaseEntity::GetGravity()
 {
 	if( g_pExtension->m_flGravity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1.0f;
 	}
 
@@ -623,7 +610,6 @@ void BaseEntity::SetGravity(float value)
 {
 	if( g_pExtension->m_flGravity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -641,7 +627,6 @@ int BaseEntity::GetModelIndex()
 {
 	if( g_pExtension->m_nModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -652,7 +637,6 @@ void BaseEntity::SetModelIndex(int modelIndex)
 {
 	if( g_pExtension->m_nModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -670,7 +654,6 @@ const char *BaseEntity::GetModelName()
 {
 	if( g_pExtension->m_ModelName < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
@@ -681,7 +664,6 @@ int BaseEntity::GetMoveType()
 {
 	if( g_pExtension->m_MoveType < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -692,7 +674,6 @@ void BaseEntity::SetMoveType(int value)
 {
 	if( g_pExtension->m_MoveType < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -703,7 +684,6 @@ int BaseEntity::GetSolidType()
 {
 	if( g_pExtension->m_nSolidType < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -714,7 +694,6 @@ void BaseEntity::SetSolidType(int value)
 {
 	if( g_pExtension->m_nSolidType < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -725,7 +704,6 @@ int BaseEntity::GetSolidFlags()
 {
 	if( g_pExtension->m_usSolidFlags < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -736,7 +714,6 @@ void BaseEntity::SetSolidFlags(int value)
 {
 	if( g_pExtension->m_usSolidFlags < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -747,7 +724,6 @@ int BaseEntity::GetCollisionGroup()
 {
 	if( g_pExtension->m_CollisionGroup < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -758,7 +734,6 @@ void BaseEntity::SetCollisionGroup(int value)
 {
 	if( g_pExtension->m_CollisionGroup < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -769,7 +744,6 @@ int BaseEntity::GetFlags()
 {
 	if( g_pExtension->m_fFlags < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -780,7 +754,6 @@ void BaseEntity::SetFlags(int value)
 {
 	if( g_pExtension->m_fFlags < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -791,7 +764,6 @@ int BaseEntity::GetSpawnFlags()
 {
 	if( g_pExtension->m_spawnflags < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -802,7 +774,6 @@ void BaseEntity::SetSpawnFlags(int value)
 {
 	if( g_pExtension->m_spawnflags < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -820,7 +791,6 @@ int BaseEntity::GetEffects()
 {
 	if( g_pExtension->m_fEffects < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -831,7 +801,6 @@ void BaseEntity::SetEffects(int value)
 {
 	if( g_pExtension->m_fEffects < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -849,20 +818,19 @@ BaseEntity *BaseEntity::GetOwner()
 {
 	if( g_pExtension->m_hOwner < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *ownerHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwner);
+	CBaseHandle &ownerHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwner);
 
-	if( !ownerHandle->IsValid() )
+	if( !ownerHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *ownerEnt = gamehelpers->ReferenceToEntity(ownerHandle->GetEntryIndex());
+	CBaseEntity *ownerEnt = gamehelpers->ReferenceToEntity(ownerHandle.GetEntryIndex());
 
-	if( !ownerEnt || *ownerHandle != ((IHandleEntity *) ownerEnt)->GetRefEHandle() )
+	if( !ownerEnt || ownerHandle != ((IHandleEntity *) ownerEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -874,12 +842,11 @@ void BaseEntity::SetOwner(BaseEntity *ownerEnt)
 {
 	if( g_pExtension->m_hOwner < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
-	CBaseHandle *ownerHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwner);
-	ownerHandle->Set((IHandleEntity *) ownerEnt);
+	CBaseHandle &ownerHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwner);
+	ownerHandle.Set((IHandleEntity *) ownerEnt);
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
@@ -893,20 +860,19 @@ BaseEntity *BaseEntity::GetOwnerEntity()
 {
 	if( g_pExtension->m_hOwnerEntity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *ownerHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwnerEntity);
+	CBaseHandle &ownerHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwnerEntity);
 
-	if( !ownerHandle->IsValid() )
+	if( !ownerHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *ownerEnt = gamehelpers->ReferenceToEntity(ownerHandle->GetEntryIndex());
+	CBaseEntity *ownerEnt = gamehelpers->ReferenceToEntity(ownerHandle.GetEntryIndex());
 
-	if( !ownerEnt || *ownerHandle != ((IHandleEntity *) ownerEnt)->GetRefEHandle() )
+	if( !ownerEnt || ownerHandle != ((IHandleEntity *) ownerEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -918,12 +884,11 @@ void BaseEntity::SetOwnerEntity(BaseEntity *ownerEnt)
 {
 	if( g_pExtension->m_hOwnerEntity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
-	CBaseHandle *ownerHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwnerEntity);
-	ownerHandle->Set((IHandleEntity *) ownerEnt);
+	CBaseHandle &ownerHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hOwnerEntity);
+	ownerHandle.Set((IHandleEntity *) ownerEnt);
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
@@ -937,7 +902,6 @@ BaseEntity *BaseEntity::GetParent()
 {
 	if( g_pExtension->m_pParent < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
@@ -948,7 +912,6 @@ void BaseEntity::SetParent(BaseEntity *parentEnt)
 {
 	if( g_pExtension->m_pParent < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -966,7 +929,6 @@ Vector BaseEntity::GetOrigin()
 {
 	if( g_pExtension->m_vecOrigin < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return Vector(0.0f, 0.0f, 0.0f);
 	}
 
@@ -977,7 +939,6 @@ void BaseEntity::SetOrigin(Vector value)
 {
 	if( g_pExtension->m_vecOrigin < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -995,7 +956,6 @@ Vector BaseEntity::GetVelocity()
 {
 	if( g_pExtension->m_vecVelocity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return Vector(0.0f, 0.0f, 0.0f);
 	}
 
@@ -1011,7 +971,7 @@ Vector BaseEntity::GetVelocity(AngularImpulse &angVelocity)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("GetVelocity", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("GetVelocity offset is not found!");
+			g_pSM->LogError(myself, "GetVelocity offset is not found!");
 			return Vector(0.0f, 0.0f, 0.0f);
 		}
 
@@ -1028,7 +988,6 @@ Vector BaseEntity::GetVelocity(AngularImpulse &angVelocity)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return Vector(0.0f, 0.0f, 0.0f);
 		}
 
@@ -1053,7 +1012,6 @@ void BaseEntity::SetVelocity(Vector value)
 {
 	if( g_pExtension->m_vecVelocity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1064,7 +1022,6 @@ Vector BaseEntity::GetAbsVelocity()
 {
 	if( g_pExtension->m_vecAbsVelocity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return Vector(0.0f, 0.0f, 0.0f);
 	}
 
@@ -1075,7 +1032,6 @@ void BaseEntity::SetAbsVelocity(Vector value)
 {
 	if( g_pExtension->m_vecAbsVelocity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1086,7 +1042,6 @@ CUtlVector<ThinkFuncData> *BaseEntity::GetThinkFunctions()
 {
 	if( g_pExtension->m_aThinkFunctions < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
@@ -1097,7 +1052,6 @@ TF BaseEntity::GetThink()
 {
 	if( g_pExtension->m_pfnThink < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
@@ -1108,7 +1062,6 @@ void BaseEntity::SetThink(TF func)
 {
 	if( g_pExtension->m_pfnThink < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1233,7 +1186,6 @@ int BaseEntity::GetNextThinkTick()
 {
 	if( g_pExtension->m_nNextThinkTick < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1244,7 +1196,6 @@ void BaseEntity::SetNextThinkTick(int value)
 {
 	if( g_pExtension->m_nNextThinkTick < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1262,7 +1213,6 @@ int BaseEntity::GetTakeDamage()
 {
 	if( g_pExtension->m_takedamage < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1273,7 +1223,6 @@ void BaseEntity::SetTakeDamage(int value)
 {
 	if( g_pExtension->m_takedamage < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1284,7 +1233,6 @@ Color BaseEntity::GetRenderColor()
 {
 	if( g_pExtension->m_clrRender < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return Color(0, 0, 0, 0);
 	}
 
@@ -1297,7 +1245,6 @@ void BaseEntity::SetRenderColor(Color color)
 {
 	if( g_pExtension->m_clrRender < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1315,7 +1262,6 @@ RenderFx_t BaseEntity::GetRenderFx()
 {
 	if( g_pExtension->m_nRenderFX < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return kRenderFxNone;
 	}
 
@@ -1326,7 +1272,6 @@ void BaseEntity::SetRenderFx(RenderFx_t value)
 {
 	if( g_pExtension->m_nRenderFX < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1344,7 +1289,6 @@ RenderMode_t BaseEntity::GetRenderMode()
 {
 	if( g_pExtension->m_nRenderMode < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return kRenderNone;
 	}
 
@@ -1355,7 +1299,6 @@ void BaseEntity::SetRenderMode(RenderMode_t value)
 {
 	if( g_pExtension->m_nRenderMode < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1509,7 +1452,6 @@ int BaseAnimating::GetSkin()
 {
 	if( g_pExtension->m_nSkin < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1520,7 +1462,6 @@ void BaseAnimating::SetSkin(int skin)
 {
 	if( g_pExtension->m_nSkin < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1538,7 +1479,6 @@ int BaseAnimating::GetBody()
 {
 	if( g_pExtension->m_nBody < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1549,7 +1489,6 @@ void BaseAnimating::SetBody(int body)
 {
 	if( g_pExtension->m_nBody < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1567,7 +1506,6 @@ int BaseAnimating::GetSequence()
 {
 	if( g_pExtension->m_nSequence < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1578,7 +1516,6 @@ void BaseAnimating::SetSequence(int value)
 {
 	if( g_pExtension->m_nSequence < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1596,7 +1533,6 @@ float BaseAnimating::GetPlaybackRate()
 {
 	if( g_pExtension->m_flPlaybackRate < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1607,7 +1543,6 @@ void BaseAnimating::SetPlaybackRate(float value)
 {
 	if( g_pExtension->m_flPlaybackRate < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1630,7 +1565,7 @@ int BaseAnimating::SelectWeightedSequence(Activity activity)
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CBaseAnimating::SelectWeightedSequence", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CBaseAnimating::SelectWeightedSequence address is not found!");
+			g_pSM->LogError(myself, "CBaseAnimating::SelectWeightedSequence address is not found!");
 			return -1;
 		}
 
@@ -1647,7 +1582,6 @@ int BaseAnimating::SelectWeightedSequence(Activity activity)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return -1;
 		}
 
@@ -1675,7 +1609,7 @@ int BaseAnimating::LookupAttachment(const char *name)
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CBaseAnimating::LookupAttachment", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CBaseAnimating::LookupAttachment address is not found!");
+			g_pSM->LogError(myself, "CBaseAnimating::LookupAttachment address is not found!");
 			return -1;
 		}
 
@@ -1692,7 +1626,6 @@ int BaseAnimating::LookupAttachment(const char *name)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return -1;
 		}
 
@@ -1720,7 +1653,7 @@ bool BaseAnimating::GetAttachment(const char *name, Vector &origin, QAngle &angl
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CBaseAnimating::GetAttachment", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CBaseAnimating::GetAttachment address is not found!");
+			g_pSM->LogError(myself, "CBaseAnimating::GetAttachment address is not found!");
 			return false;
 		}
 
@@ -1743,7 +1676,6 @@ bool BaseAnimating::GetAttachment(const char *name, Vector &origin, QAngle &angl
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return false;
 		}
 
@@ -1768,7 +1700,6 @@ bool BaseProp::IsGlowing()
 {
 	if( g_pExtension->m_bShouldGlow < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return false;
 	}
 
@@ -1779,7 +1710,6 @@ void BaseProp::SetGlow(bool on)
 {
 	if( g_pExtension->m_bShouldGlow < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1797,7 +1727,6 @@ int BaseProp::GetGlowStyle()
 {
 	if( g_pExtension->m_nGlowStyle < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1808,7 +1737,6 @@ void BaseProp::SetGlowStyle(int value)
 {
 	if( g_pExtension->m_nGlowStyle < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1826,8 +1754,7 @@ Color BaseProp::GetGlowColor()
 {
 	if( g_pExtension->m_clrGlow < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
-		return { 0, 0, 0, 0 };
+		return Color(0, 0, 0, 0);
 	}
 
 	color32 color = *(color32 *) ((unsigned char *) this + g_pExtension->m_clrGlow);
@@ -1839,7 +1766,6 @@ void BaseProp::SetGlowColor(Color color)
 {
 	if( g_pExtension->m_clrGlow < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1857,7 +1783,6 @@ float BaseProp::GetGlowMaxDist()
 {
 	if( g_pExtension->m_flGlowMaxDist < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1868,7 +1793,6 @@ void BaseProp::SetGlowMaxDist(float value)
 {
 	if( g_pExtension->m_flGlowMaxDist < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1886,7 +1810,6 @@ int BaseWeapon::GetViewModel()
 {
 	if( g_pExtension->m_nViewModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1897,7 +1820,6 @@ void BaseWeapon::SetViewModel(int value)
 {
 	if( g_pExtension->m_nViewModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1915,7 +1837,6 @@ int BaseWeapon::GetViewModelIndex()
 {
 	if( g_pExtension->m_iViewModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1926,7 +1847,6 @@ void BaseWeapon::SetViewModelIndex(int value)
 {
 	if( g_pExtension->m_iViewModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1944,7 +1864,6 @@ int BaseWeapon::GetWorldModelIndex()
 {
 	if( g_pExtension->m_iWorldModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -1955,7 +1874,6 @@ void BaseWeapon::SetWorldModelIndex(int value)
 {
 	if( g_pExtension->m_iWorldModelIndex < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -1973,7 +1891,6 @@ bool BaseWeapon::IsUsingClip1()
 {
 	if( g_pExtension->m_iClip1 < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return false;
 	}
 
@@ -1984,7 +1901,6 @@ bool BaseWeapon::IsUsingClip2()
 {
 	if( g_pExtension->m_iClip2 < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return false;
 	}
 
@@ -1995,7 +1911,6 @@ int BaseWeapon::GetClip()
 {
 	if( g_pExtension->m_iClip1 < 1 || g_pExtension->m_iClip2 < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -2015,7 +1930,6 @@ void BaseWeapon::SetClip(int value)
 {
 	if( g_pExtension->m_iClip1 < 1 || g_pExtension->m_iClip2 < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -2054,7 +1968,7 @@ void BaseGrenade::Detonate()
 		int offset = 0;
 		if( !g_pGameMod->GetConfig()->GetOffset("CBaseCSGrenadeProjectile::Detonate", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("CBaseCSGrenadeProjectile::Detonate offset is not found!");
+			g_pSM->LogError(myself, "CBaseCSGrenadeProjectile::Detonate offset is not found!");
 			return;
 		}
 
@@ -2062,7 +1976,6 @@ void BaseGrenade::Detonate()
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -2082,7 +1995,6 @@ Vector BaseGrenade::GetInitialVelocity()
 {
 	if( g_pExtension->m_vInitialVelocity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return Vector(0.0f, 0.0f, 0.0f);
 	}
 
@@ -2094,7 +2006,6 @@ void BaseGrenade::SetInitialVelocity(Vector value)
 
 	if( g_pExtension->m_vInitialVelocity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -2112,21 +2023,19 @@ BasePlayer *BaseGrenade::GetThrower()
 {
 	if( g_pExtension->m_hThrower < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *throwerHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hThrower);
+	CBaseHandle &throwerHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hThrower);
 
-	if( !throwerHandle->IsValid() )
+	if( !throwerHandle.IsValid() )
 	{
-		CONSOLE_DEBUGGER("Invalid handle");
 		return nullptr;
 	}
 
-	CBaseEntity *throwerEnt = gamehelpers->ReferenceToEntity(throwerHandle->GetEntryIndex());
+	CBaseEntity *throwerEnt = gamehelpers->ReferenceToEntity(throwerHandle.GetEntryIndex());
 
-	if( !throwerEnt || *throwerHandle != ((IHandleEntity *) throwerEnt)->GetRefEHandle() )
+	if( !throwerEnt || throwerHandle != ((IHandleEntity *) throwerEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -2138,12 +2047,11 @@ void BaseGrenade::SetThrower(BasePlayer *throwerEnt)
 {
 	if( g_pExtension->m_hThrower < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
-	CBaseHandle *throwerHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hThrower);
-	throwerHandle->Set((IHandleEntity *) throwerEnt);
+	CBaseHandle &throwerHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hThrower);
+	throwerHandle.Set((IHandleEntity *) throwerEnt);
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
@@ -2157,7 +2065,6 @@ float BaseGrenade::GetDamage()
 {
 	if( g_pExtension->m_flDamage < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0.0f;
 	}
 
@@ -2168,7 +2075,6 @@ void BaseGrenade::SetDamage(float value)
 {
 	if( g_pExtension->m_flDamage < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -2186,7 +2092,6 @@ float BaseGrenade::GetDamageRadius()
 {
 	if( g_pExtension->m_DmgRadius < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1.0f;
 	}
 
@@ -2197,7 +2102,6 @@ void BaseGrenade::SetDamageRadius(float value)
 {
 	if( g_pExtension->m_DmgRadius < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -2215,7 +2119,6 @@ bool BaseGrenade::IsLive()
 {
 	if( g_pExtension->m_bIsLive < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return false;
 	}
 
@@ -2226,7 +2129,6 @@ void BaseGrenade::SetLive(bool on)
 {
 	if( g_pExtension->m_bIsLive < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -2244,7 +2146,6 @@ int BaseViewModel::GetViewModelIndex()
 {
 	if( g_pExtension->m_nViewModelIndex2 < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -2255,7 +2156,6 @@ void BaseViewModel::SetViewModelIndex(int value)
 {
 	if( g_pExtension->m_nViewModelIndex2 < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -2278,7 +2178,7 @@ int BaseViewModel::UpdateTransmitState()
 		int offset = 0;
 		if( !g_pGameMod->GetConfig()->GetOffset("CBaseViewModel::UpdateTransmitState", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("CBaseViewModel::UpdateTransmitState offset is not found!");
+			g_pSM->LogError(myself, "CBaseViewModel::UpdateTransmitState offset is not found!");
 			return 0;
 		}
 
@@ -2292,7 +2192,6 @@ int BaseViewModel::UpdateTransmitState()
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return 0;
 		}
 
@@ -2319,7 +2218,7 @@ void BasePlayer::Kill(bool explode, bool force)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("CommitSuicide", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("CommitSuicide offset is not found!");
+			g_pSM->LogError(myself, "CommitSuicide offset is not found!");
 			return;
 		}
 
@@ -2336,7 +2235,6 @@ void BasePlayer::Kill(bool explode, bool force)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -2362,7 +2260,7 @@ void BasePlayer::Respawn()
 		void *address = nullptr;
 		if( !g_pExtension->m_pCStrikeConfig->GetMemSig("RoundRespawn", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("RoundRespawn address is not found!");
+			g_pSM->LogError(myself, "RoundRespawn address is not found!");
 			return;
 		}
 
@@ -2370,7 +2268,6 @@ void BasePlayer::Respawn()
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -2394,7 +2291,7 @@ void BasePlayer::SetName(const char *name)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("SetClientName", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("SetClientName offset is not found!");
+			g_pSM->LogError(myself, "SetClientName offset is not found!");
 			return;
 		}
 
@@ -2408,7 +2305,6 @@ void BasePlayer::SetName(const char *name)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -2438,7 +2334,7 @@ void BasePlayer::SetProgressBarTime(int time)
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CCSPlayer::SetProgressBarTime", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CCSPlayer::SetProgressBarTime address is not found!");
+			g_pSM->LogError(myself, "CCSPlayer::SetProgressBarTime address is not found!");
 			return;
 		}
 
@@ -2452,7 +2348,6 @@ void BasePlayer::SetProgressBarTime(int time)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -2529,7 +2424,7 @@ BaseWeapon *BasePlayer::GiveItem(const char *item, int subtype, bool removeIfNot
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("GiveNamedItem", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("GiveNamedItem offset is not found!");
+			g_pSM->LogError(myself, "GiveNamedItem offset is not found!");
 			return nullptr;
 		}
 
@@ -2558,7 +2453,6 @@ BaseWeapon *BasePlayer::GiveItem(const char *item, int subtype, bool removeIfNot
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return nullptr;
 		}
 
@@ -2590,7 +2484,7 @@ int BasePlayer::GiveAmmo(int amount, int ammotype, bool suppressSound)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("GiveAmmo", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("GiveAmmo offset is not found!");
+			g_pSM->LogError(myself, "GiveAmmo offset is not found!");
 			return -1;
 		}
 
@@ -2613,7 +2507,6 @@ int BasePlayer::GiveAmmo(int amount, int ammotype, bool suppressSound)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return 0;
 		}
 
@@ -2643,7 +2536,7 @@ void BasePlayer::EquipItem(BaseEntity *itemEntity)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("WeaponEquip", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("WeaponEquip offset is not found!");
+			g_pSM->LogError(myself, "WeaponEquip offset is not found!");
 			return;
 		}
 
@@ -2657,7 +2550,6 @@ void BasePlayer::EquipItem(BaseEntity *itemEntity)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -2682,7 +2574,7 @@ bool BasePlayer::RemoveItem(BaseEntity *itemEntity)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("RemovePlayerItem", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("RemovePlayerItem offset is not found!");
+			g_pSM->LogError(myself, "RemovePlayerItem offset is not found!");
 			return false;
 		}
 
@@ -2699,7 +2591,6 @@ bool BasePlayer::RemoveItem(BaseEntity *itemEntity)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return false;
 		}
 
@@ -2727,7 +2618,7 @@ BaseWeapon *BasePlayer::GetItemFromSlot(int slot)
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("Weapon_GetSlot", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("Weapon_GetSlot offset is not found!");
+			g_pSM->LogError(myself, "Weapon_GetSlot offset is not found!");
 			return nullptr;
 		}
 
@@ -2744,7 +2635,6 @@ BaseWeapon *BasePlayer::GetItemFromSlot(int slot)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return nullptr;
 		}
 
@@ -2772,7 +2662,7 @@ void BasePlayer::SelectItem(const char *classname, int subType)
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CBasePlayer::SelectItem", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CBasePlayer::SelectItem address is not found!");
+			g_pSM->LogError(myself, "CBasePlayer::SelectItem address is not found!");
 			return;
 		}
 
@@ -2789,7 +2679,6 @@ void BasePlayer::SelectItem(const char *classname, int subType)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -2888,11 +2777,7 @@ void BasePlayer::RemoveItemFromSlot(int slot, const char *cls)
 		if( RemoveItem(weaponEnt) )
 		{
 			weaponEnt->AcceptInput("Kill");
-		}
-		else
-		{
-			CONSOLE_DEBUGGER("Item isn't removable: %s", classname);
-		}
+		}		
 	}
 }
 
@@ -2905,10 +2790,6 @@ void BasePlayer::RemoveItemsFromSlot(int slot)
 		if( RemoveItem(weaponEnt) )
 		{
 			weaponEnt->AcceptInput("Kill");
-		}
-		else
-		{
-			CONSOLE_DEBUGGER("Item isn't removable: %s", weaponEnt->GetClassname());
 		}
 	}	
 }
@@ -2954,7 +2835,6 @@ Vector BasePlayer::GetOrigin()
 
 	if( !player )
 	{
-		CONSOLE_DEBUGGER("CS:GO is not supported!");
 		return Vector(0.0f, 0.0f, 0.0f);
 	}
 
@@ -2962,7 +2842,6 @@ Vector BasePlayer::GetOrigin()
 
 	if( !info )
 	{
-		CONSOLE_DEBUGGER("Could not find player info");
 		return Vector(0.0f, 0.0f, 0.0f);
 	}
 
@@ -2976,7 +2855,6 @@ QAngle BasePlayer::GetAngles()
 
 	if( !player )
 	{
-		CONSOLE_DEBUGGER("CS:GO is not supported!");
 		return QAngle(0.0f, 0.0f, 0.0f);
 	}
 
@@ -2984,7 +2862,6 @@ QAngle BasePlayer::GetAngles()
 
 	if( !info )
 	{
-		CONSOLE_DEBUGGER("Could not find player info");
 		return QAngle(0.0f, 0.0f, 0.0f);
 	}
 
@@ -3018,7 +2895,7 @@ QAngle BasePlayer::GetEyeAngles()
 		int offset = 0;
 		if( !g_pExtension->m_pSDKConfig->GetOffset("EyeAngles", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("EyeAngles offset is not found!");
+			g_pSM->LogError(myself, "EyeAngles offset is not found!");
 			return QAngle(0.0f, 0.0f, 0.0f);
 		}
 
@@ -3031,7 +2908,6 @@ QAngle BasePlayer::GetEyeAngles()
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return QAngle(0.0f, 0.0f, 0.0f);
 		}
 
@@ -3115,7 +2991,6 @@ int BasePlayer::GetArmor()
 {
 	if( g_pExtension->m_ArmorValue < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -3126,7 +3001,6 @@ void BasePlayer::SetArmor(int value, bool helmet)
 {
 	if( g_pExtension->m_ArmorValue < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3157,7 +3031,6 @@ float BasePlayer::GetSpeed()
 {
 	if( g_pExtension->m_flLaggedMovementValue < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1.0f;
 	}
 
@@ -3168,7 +3041,6 @@ void BasePlayer::SetSpeed(float value)
 {
 	if( g_pExtension->m_flLaggedMovementValue < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3186,7 +3058,6 @@ float BasePlayer::GetVelocityModifier()
 {
 	if( g_pExtension->m_flVelocityModifier < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1.0f;
 	}
 
@@ -3197,7 +3068,6 @@ void BasePlayer::SetVelocityModifier(float value)
 {
 	if( g_pExtension->m_flVelocityModifier < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3215,7 +3085,6 @@ bool BasePlayer::IsScoped()
 {
 	if( g_pExtension->m_bIsScoped < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return false;
 	}
 
@@ -3226,7 +3095,6 @@ void BasePlayer::SetScoped(bool value)
 {
 	if( g_pExtension->m_bIsScoped < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3244,7 +3112,6 @@ int BasePlayer::GetFOV()
 {
 	if( g_pExtension->m_iFOV < 1 || g_pExtension->m_iDefaultFOV < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 90.0f;
 	}
 
@@ -3255,7 +3122,6 @@ void BasePlayer::SetFOV(int value)
 {
 	if( g_pExtension->m_iFOV < 1 || g_pExtension->m_iDefaultFOV < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3300,7 +3166,6 @@ bool BasePlayer::IsNightVisionOn()
 {
 	if( g_pExtension->m_bHasNightVision < 1 || g_pExtension->m_bNightVisionOn < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return false;
 	}
 
@@ -3316,7 +3181,6 @@ void BasePlayer::SetNightVision(bool on, const char *overlay)
 {
 	if( g_pExtension->m_bHasNightVision < 1 || g_pExtension->m_bNightVisionOn < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3329,26 +3193,6 @@ void BasePlayer::SetNightVision(bool on, const char *overlay)
 	{
 //		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bHasNightVision);
 //		gamehelpers->SetEdictStateChanged(edict, g_pExtension->m_bNightVisionOn);
-
-//		static ConCommandBase *r_screenoverlay = g_pExtension->m_pConsoleVars->FindCommandBase("r_screenoverlay");
-		static ConVarRef r_screenoverlay("r_screenoverlay");
-
-		if( r_screenoverlay.IsValid() )
-		{
-			if( r_screenoverlay.IsFlagSet(FCVAR_CHEAT) )
-			{
-				CONSOLE_DEBUGGER("r_screenoverlay is cheaty!");
-			}
-			else
-			{
-				CONSOLE_DEBUGGER("r_screenoverlay is not cheaty!");
-			}
-
-		}
-		else
-		{
-			CONSOLE_DEBUGGER("Could not find r_screenoverlay!");
-		}
 
 		if( on && overlay && *overlay )
 		{
@@ -3373,7 +3217,6 @@ const char *BasePlayer::GetArmsmodel()
 {
 	if( g_pExtension->m_szArmsModel < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
@@ -3384,7 +3227,6 @@ void BasePlayer::SetArmsmodel(const char *model)
 {
 	if( g_pExtension->m_szArmsModel < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3407,7 +3249,7 @@ BaseViewModel *BasePlayer::CreateViewModel(int id)
 		int offset = 0;
 		if( !g_pGameMod->GetConfig()->GetOffset("CCSPlayer::CreateViewModel", &offset) || offset < 1 )
 		{
-			CONSOLE_DEBUGGER("CCSPlayer::CreateViewModel offset is not found!");
+			g_pSM->LogError(myself, "CCSPlayer::CreateViewModel offset is not found!");
 			return nullptr;
 		}
 
@@ -3424,7 +3266,6 @@ BaseViewModel *BasePlayer::CreateViewModel(int id)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return nullptr;
 		}
 
@@ -3447,20 +3288,19 @@ BaseViewModel *BasePlayer::GetViewModel(int id)
 {
 	if( g_pExtension->m_hViewModel < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *viewModelHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hViewModel + id * sizeof(CBaseHandle *));
+	CBaseHandle &viewModelHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hViewModel + id * sizeof(CBaseHandle *));
 
-	if( !viewModelHandle->IsValid() )
+	if( !viewModelHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *viewModelEnt = gamehelpers->ReferenceToEntity(viewModelHandle->GetEntryIndex());
+	CBaseEntity *viewModelEnt = gamehelpers->ReferenceToEntity(viewModelHandle.GetEntryIndex());
 
-	if( !viewModelEnt || *viewModelHandle != ((IHandleEntity *) viewModelEnt)->GetRefEHandle() )
+	if( !viewModelEnt || viewModelHandle != ((IHandleEntity *) viewModelEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -3472,12 +3312,11 @@ void BasePlayer::SetViewModel(int id, BaseViewModel *viewModelEnt)
 {
 	if( g_pExtension->m_hViewModel < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
-	CBaseHandle *viewModelHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hViewModel + id * sizeof(CBaseHandle *));
-	viewModelHandle->Set((IHandleEntity *) viewModelEnt);
+	CBaseHandle &viewModelHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hViewModel + id * sizeof(CBaseHandle *));
+	viewModelHandle.Set((IHandleEntity *) viewModelEnt);
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
@@ -3492,47 +3331,43 @@ BaseEntity *BasePlayer::GetRagdoll()
 {
 	if( g_pExtension->m_hRagdoll < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *ragdollHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hRagdoll);
-/*
-	if( !ragdollHandle->IsValid() )
-	{
-		return nullptr;
-	}
-*/
-	CONSOLE_DEBUGGER("ragdollHandle->GetEntryIndex(): %d", ragdollHandle->GetEntryIndex());
+	CBaseHandle &ragdollHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hRagdoll);
 
-	CBaseEntity *ragdollEnt = gamehelpers->ReferenceToEntity(ragdollHandle->GetEntryIndex());
-
-	if( !ragdollEnt || *ragdollHandle != ((IHandleEntity *) ragdollEnt)->GetRefEHandle() )
+	if( !ragdollHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	return (BaseWeapon *) ragdollEnt;
+	CBaseEntity *ragdollEnt = gamehelpers->ReferenceToEntity(ragdollHandle.GetEntryIndex());
+
+	if( !ragdollEnt || ragdollHandle != ((IHandleEntity *) ragdollEnt)->GetRefEHandle() )
+	{
+		return nullptr;
+	}
+
+	return (BaseEntity *) ragdollEnt;
 }
 
 BaseWeapon *BasePlayer::GetActiveWeapon()
 {
 	if( g_pExtension->m_hActiveWeapon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *weaponHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hActiveWeapon);
+	CBaseHandle &weaponHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hActiveWeapon);
 
-	if( !weaponHandle->IsValid() )
+	if( !weaponHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *weaponEnt = gamehelpers->ReferenceToEntity(weaponHandle->GetEntryIndex());
+	CBaseEntity *weaponEnt = gamehelpers->ReferenceToEntity(weaponHandle.GetEntryIndex());
 
-	if( !weaponEnt || *weaponHandle != ((IHandleEntity *) weaponEnt)->GetRefEHandle() )
+	if( !weaponEnt || weaponHandle != ((IHandleEntity *) weaponEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -3544,12 +3379,11 @@ void BasePlayer::SetActiveWeapon(BaseWeapon *weaponEnt)
 {
 	if( g_pExtension->m_hActiveWeapon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
-	CBaseHandle *weaponHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hActiveWeapon);
-	weaponHandle->Set((IHandleEntity *) weaponEnt);
+	CBaseHandle &weaponHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hActiveWeapon);
+	weaponHandle.Set((IHandleEntity *) weaponEnt);
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
@@ -3563,20 +3397,19 @@ BaseWeapon *BasePlayer::GetLastWeapon()
 {
 	if( g_pExtension->m_hLastWeapon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *weaponHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hLastWeapon);
+	CBaseHandle &weaponHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hLastWeapon);
 
-	if( !weaponHandle->IsValid() )
+	if( !weaponHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *weaponEnt = gamehelpers->ReferenceToEntity(weaponHandle->GetEntryIndex());
+	CBaseEntity *weaponEnt = gamehelpers->ReferenceToEntity(weaponHandle.GetEntryIndex());
 
-	if( !weaponEnt || *weaponHandle != ((IHandleEntity *) weaponEnt)->GetRefEHandle() )
+	if( !weaponEnt || weaponHandle != ((IHandleEntity *) weaponEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -3588,12 +3421,11 @@ void BasePlayer::SetLastWeapon(BaseWeapon *weaponEnt)
 {
 	if( g_pExtension->m_hLastWeapon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
-	CBaseHandle *weaponHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hLastWeapon);
-	weaponHandle->Set((IHandleEntity *) weaponEnt);
+	CBaseHandle &weaponHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hLastWeapon);
+	weaponHandle.Set((IHandleEntity *) weaponEnt);
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
@@ -3607,20 +3439,19 @@ BaseWeapon *BasePlayer::GetWeapons(int id)
 {
 	if( g_pExtension->m_hMyWeapons < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *weaponHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hMyWeapons + (id * sizeof(CBaseHandle *)));
+	CBaseHandle &weaponHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hMyWeapons + (id * sizeof(CBaseHandle *)));
 
-	if( !weaponHandle->IsValid() )
+	if( !weaponHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *weaponEnt = gamehelpers->ReferenceToEntity(weaponHandle->GetEntryIndex());
+	CBaseEntity *weaponEnt = gamehelpers->ReferenceToEntity(weaponHandle.GetEntryIndex());
 
-	if( !weaponEnt || *weaponHandle != ((IHandleEntity *) weaponEnt)->GetRefEHandle() )
+	if( !weaponEnt || weaponHandle != ((IHandleEntity *) weaponEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -3632,12 +3463,11 @@ void BasePlayer::SetWeapons(int id, BaseWeapon *weaponEnt)
 {
 	if( g_pExtension->m_hMyWeapons < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
-	CBaseHandle *weaponHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hMyWeapons + (id * sizeof(CBaseHandle *)));
-	weaponHandle->Set((IHandleEntity *) weaponEnt);
+	CBaseHandle &weaponHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hMyWeapons + (id * sizeof(CBaseHandle *)));
+	weaponHandle.Set((IHandleEntity *) weaponEnt);
 
 	edict_t *edict = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 
@@ -3697,7 +3527,6 @@ int BasePlayer::GetTeam()
 
 	if( !player )
 	{
-		CONSOLE_DEBUGGER("CS:GO is not supported!");
 		return CSGO_TEAM_NONE;
 	}
 
@@ -3705,7 +3534,6 @@ int BasePlayer::GetTeam()
 
 	if( !info )
 	{
-		CONSOLE_DEBUGGER("Could not find player info");
 		return CSGO_TEAM_NONE;
 	}
 
@@ -3721,7 +3549,6 @@ void BasePlayer::SetTeam(int team)
 
 		if( !player )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -3729,7 +3556,6 @@ void BasePlayer::SetTeam(int team)
 
 		if( !info )
 		{
-			CONSOLE_DEBUGGER("Could not find player info");
 			return;
 		}
 
@@ -3741,7 +3567,7 @@ void BasePlayer::SetTeam(int team)
 	static void *address = nullptr;
 	if( !g_pExtension->m_pCStrikeConfig->GetMemSig("SwitchTeam", &address) || !address )
 	{
-		CONSOLE_DEBUGGER("SwitchTeam address is not found!");
+		g_pSM->LogError(myself, "SwitchTeam address is not found!");
 		return;
 	}
 
@@ -3750,7 +3576,6 @@ void BasePlayer::SetTeam(int team)
 
 	if( !gamerules )
 	{
-		CONSOLE_DEBUGGER("Couldn't find gamerules pointer");
 		return;
 	}
 
@@ -3770,7 +3595,7 @@ void BasePlayer::SetTeam(int team)
 		void *address = nullptr;
 		if( !g_pExtension->m_pCStrikeConfig->GetMemSig("SwitchTeam", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("SwitchTeam address is not found!");
+			g_pSM->LogError(myself, "SwitchTeam address is not found!");
 			return;
 		}
 
@@ -3784,7 +3609,6 @@ void BasePlayer::SetTeam(int team)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -3806,7 +3630,6 @@ int BasePlayer::GetMVPs()
 {
 	if( g_pExtension->m_bIsHoldingLookAtWeapon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -3817,7 +3640,6 @@ void BasePlayer::SetMVPs(int value)
 {
 	if( g_pExtension->m_bIsHoldingLookAtWeapon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3837,7 +3659,6 @@ int BasePlayer::GetHideHUD()
 {
 	if( g_pExtension->m_iHideHUD < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -3848,7 +3669,6 @@ void BasePlayer::SetHideHUD(int value)
 {
 	if( g_pExtension->m_iHideHUD < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3866,7 +3686,6 @@ int BasePlayer::GetAddon()
 {
 	if( g_pExtension->m_iAddonBits < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -3877,7 +3696,6 @@ void BasePlayer::SetAddon(int value)
 {
 	if( g_pExtension->m_iAddonBits < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3895,7 +3713,6 @@ int BasePlayer::GetPrimaryAddon()
 {
 	if( g_pExtension->m_iPrimaryAddon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -3906,7 +3723,6 @@ void BasePlayer::SetPrimaryAddon(int value)
 {
 	if( g_pExtension->m_iPrimaryAddon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3924,7 +3740,6 @@ int BasePlayer::GetSecondaryAddon()
 {
 	if( g_pExtension->m_iSecondaryAddon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -3935,7 +3750,6 @@ void BasePlayer::SetSecondaryAddon(int value)
 {
 	if( g_pExtension->m_iSecondaryAddon < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -3958,7 +3772,6 @@ int BasePlayer::GetWeaponAmmo(BaseWeapon *weaponEnt)
 {
 	if( g_pExtension->m_iAmmo < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -3999,7 +3812,6 @@ void BasePlayer::SetWeaponAmmo(BaseWeapon *weaponEnt, int value)
 {
 	if( g_pExtension->m_iAmmo < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -4064,7 +3876,6 @@ int BasePlayer::GetSpecMode()
 {
 	if( g_pExtension->m_iObserverMode < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1;
 	}
 
@@ -4075,20 +3886,19 @@ BasePlayer *BasePlayer::GetSpecTarget()
 {
 	if( g_pExtension->m_hObserverTarget < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *targetHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hObserverTarget);
+	CBaseHandle &targetHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hObserverTarget);
 
-	if( !targetHandle->IsValid() )
+	if( !targetHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *targetEnt = gamehelpers->ReferenceToEntity(targetHandle->GetEntryIndex());
+	CBaseEntity *targetEnt = gamehelpers->ReferenceToEntity(targetHandle.GetEntryIndex());
 
-	if( !targetEnt || *targetHandle != ((IHandleEntity *) targetEnt)->GetRefEHandle() )
+	if( !targetEnt || targetHandle != ((IHandleEntity *) targetEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -4100,20 +3910,19 @@ BaseEntity *BasePlayer::GetGroundEntity()
 {
 	if( g_pExtension->m_hGroundEntity < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return nullptr;
 	}
 
-	CBaseHandle *groundEntityHandle = (CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hGroundEntity);
+	CBaseHandle &groundEntityHandle = *(CBaseHandle *) ((unsigned char *) this + g_pExtension->m_hGroundEntity);
 
-	if( !groundEntityHandle->IsValid() )
+	if( !groundEntityHandle.IsValid() )
 	{
 		return nullptr;
 	}
 
-	CBaseEntity *groundEnt = gamehelpers->ReferenceToEntity(groundEntityHandle->GetEntryIndex());
+	CBaseEntity *groundEnt = gamehelpers->ReferenceToEntity(groundEntityHandle.GetEntryIndex());
 
-	if( !groundEnt || *groundEntityHandle != ((IHandleEntity *) groundEnt)->GetRefEHandle() )
+	if( !groundEnt || groundEntityHandle != ((IHandleEntity *) groundEnt)->GetRefEHandle() )
 	{
 		return nullptr;
 	}
@@ -4125,7 +3934,6 @@ int BasePlayer::GetButtons()
 {
 	if( g_pExtension->m_nButtons < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return 0;
 	}
 
@@ -4136,7 +3944,6 @@ float GetFlameEntityLifeTime(BaseEntity *entity)
 {
 	if( g_pExtension->m_flLifetime < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1.0f;
 	}
 
@@ -4147,7 +3954,6 @@ void SetFlameEntityLifeTime(BaseEntity *entity, float time)
 {
 	if( g_pExtension->m_flLifetime < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -4165,7 +3971,6 @@ float GetEntityDissolveTime(BaseEntity *entity)
 {
 	if( g_pExtension->m_flDissolveStartTime < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return -1.0f;
 	}
 
@@ -4176,7 +3981,6 @@ void SetEntityDissolveTime(BaseEntity *entity, float time)
 {
 	if( g_pExtension->m_flDissolveStartTime < 1 )
 	{
-		CONSOLE_DEBUGGER("Offset not found yet.");
 		return;
 	}
 
@@ -4199,7 +4003,7 @@ void SpawnGib(BaseEntity *gibEnt, const char *model)
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CGib::Spawn", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CGib::Spawn address is not found!");
+			g_pSM->LogError(myself, "CGib::Spawn address is not found!");
 			return;
 		}
 
@@ -4213,7 +4017,6 @@ void SpawnGib(BaseEntity *gibEnt, const char *model)
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 
@@ -4238,7 +4041,7 @@ void InitGib(BaseEntity *gibEnt, BasePlayer *victimEnt, float minSpeed, float ma
 		void *address = nullptr;
 		if( !g_pGameMod->GetConfig()->GetMemSig("CGib::InitGib", &address) || !address )
 		{
-			CONSOLE_DEBUGGER("CGib::InitGib address is not found!");
+			g_pSM->LogError(myself, "CGib::InitGib address is not found!");
 			return;
 		}
 
@@ -4258,7 +4061,6 @@ void InitGib(BaseEntity *gibEnt, BasePlayer *victimEnt, float minSpeed, float ma
 
 		if( !callWrapper )
 		{
-			CONSOLE_DEBUGGER("CS:GO is not supported!");
 			return;
 		}
 

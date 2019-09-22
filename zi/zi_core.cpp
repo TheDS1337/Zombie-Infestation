@@ -103,17 +103,7 @@ namespace ZICore
 		ZIItem::Register(&g_InfectionBombItem);
 
 		m_pPrimaryWeaponsMenu = ZIWeapon::BuildPrimaryWeaponsMenu();
-		m_pSecondaryWeaponsMenu = ZIWeapon::BuildSecondaryWeaponsMenu();
-
-		if( !m_pPrimaryWeaponsMenu )
-		{
-			CONSOLE_DEBUGGER("Failed to build the primary weapons menu.");
-		}
-
-		if( !m_pSecondaryWeaponsMenu )
-		{
-			CONSOLE_DEBUGGER("Failed to build the secondary weapons menu.");
-		}
+		m_pSecondaryWeaponsMenu = ZIWeapon::BuildSecondaryWeaponsMenu();		
 	}
 
 	void OnUnload()

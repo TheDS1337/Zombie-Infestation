@@ -142,7 +142,7 @@ bool TempEntity::GetFirstTempEntity()
 
 			if( !g_pExtension->m_pSDKConfig->GetOffset("s_pTempEntities", &offset) || offset < 1 )
 			{
-				CONSOLE_DEBUGGER("s_pTempEntities offset is not found!");
+				g_pSM->LogError(myself, "s_pTempEntities offset is not found!");
 				return false;
 			}
 
@@ -154,31 +154,30 @@ bool TempEntity::GetFirstTempEntity()
 #endif
 			if( !g_pFirstTempEntity )
 			{
-				CONSOLE_DEBUGGER("Unable to find g_pFirstTempEntity pointer.");
 				return false;
 			}
 		}
 		else
 		{
-			CONSOLE_DEBUGGER("CBaseTempEntity address is not found!");
+			g_pSM->LogError(myself, "CBaseTempEntity address is not found!");
 		}
 	}
 
 	if( !g_pExtension->m_pSDKConfig->GetOffset("GetTEName", &g_NameOffset) )
 	{
-		CONSOLE_DEBUGGER("s_pTempEntities offset is not found!");
+		g_pSM->LogError(myself, "s_pTempEntities offset is not found!");
 		return false;
 	}
 
 	if( !g_pExtension->m_pSDKConfig->GetOffset("GetTENext", &g_NextTempEntityOffset) )
 	{
-		CONSOLE_DEBUGGER("GetTENext offset is not found!");
+		g_pSM->LogError(myself, "GetTENext offset is not found!");
 		return false;
 	}
 
 	if( !g_pExtension->m_pSDKConfig->GetOffset("TE_GetServerClass", &g_ServerClassOffset) )
 	{
-		CONSOLE_DEBUGGER("TE_GetServerClass offset is not found!");
+		g_pSM->LogError(myself, "TE_GetServerClass offset is not found!");
 		return false;
 	}
 	
@@ -192,7 +191,6 @@ bool TempEntity::GetFirstTempEntity()
 
 	if( !g_pCallWrapper )
 	{
-		CONSOLE_DEBUGGER("CS:GO is not supported!");
 		return false;
 	}
 
@@ -207,7 +205,6 @@ TempEntity *TempEntity::FindTempEntity(const char *name)
 		
 	if( !address )
 	{
-		CONSOLE_DEBUGGER("Couldn't locate the first entity: %s", name);
 		return nullptr;
 	}
 
@@ -283,7 +280,6 @@ void TempEntityHooker::Load()
 {
 	if( !TempEntity::GetFirstTempEntity() )
 	{
-		CONSOLE_DEBUGGER("Cannot find temp entities!");
 		return;
 	}
 

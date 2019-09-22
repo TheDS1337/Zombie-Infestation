@@ -24,7 +24,6 @@ public:
 
 		if( !gamehelpers->FindSendPropInfo(m_pServerClass->GetName(), propname, &sendprop) )
 		{
-			CONSOLE_DEBUGGER("Couldn't find entity property: %s", propname);
 			return (T) 0;
 		}
 
@@ -37,7 +36,6 @@ public:
 
 		if( !gamehelpers->FindSendPropInfo(m_pServerClass->GetName(), propname, &sendprop) )
 		{
-			CONSOLE_DEBUGGER("Couldn't find entity property: %s", propname);
 			return;
 		}
 

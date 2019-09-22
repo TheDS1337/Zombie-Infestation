@@ -17,13 +17,11 @@ void AddFileToDownloadsTable(const char *file)
 {
 	if( !g_pExtension->m_pNetworkStringTable )
 	{
-		CONSOLE_DEBUGGER("NetworkStringTable interface is not loaded yet.");
 		return;
 	}
 
 	if( !g_pDownloadablesTable )
 	{
-		CONSOLE_DEBUGGER("Could not find 'downloadables' table");
 		return;
 	}
 
@@ -36,13 +34,11 @@ void AddSoundToPrecacheTable(const char *sound)
 {
 	if( !g_pExtension->m_pNetworkStringTable )
 	{
-		CONSOLE_DEBUGGER("NetworkStringTable interface is not loaded yet.");
 		return;
 	}
 
 	if( !g_pSoundPrecacheTable )
 	{
-		CONSOLE_DEBUGGER("Could not find 'soundprecache' table");
 		return;
 	}
 
@@ -56,13 +52,11 @@ void AddEffectToParticleEffectNamesTable(const char *effect)
 {
 	if( !g_pExtension->m_pNetworkStringTable )
 	{
-		CONSOLE_DEBUGGER("NetworkStringTable interface is not loaded yet.");
 		return;
 	}
 
 	if( !g_pParticleEffectNamesTable )
 	{
-		CONSOLE_DEBUGGER("Could not find 'ParticleEffectNames' table");
 		return;
 	}
 
@@ -76,7 +70,6 @@ const char *GetStringInTable(const char *tablename, int index)
 {
 	if( !g_pExtension->m_pNetworkStringTable )
 	{
-		CONSOLE_DEBUGGER("NetworkStringTable interface is not loaded yet.");
 		return nullptr;
 	}
 
@@ -104,13 +97,11 @@ int PrecacheEffect(const char *name)
 {
 	if( !g_pExtension->m_pNetworkStringTable )
 	{
-		CONSOLE_DEBUGGER("NetworkStringTable interface is not loaded yet.");
 		return -1;
 	}
 
 	if( !g_pEffectDispatchTable )
 	{
-		CONSOLE_DEBUGGER("Could not find 'EffectDispatch' table");
 		return -1;
 	}
 

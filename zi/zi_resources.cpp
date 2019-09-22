@@ -147,7 +147,7 @@ namespace ZIResources
 		}
 		else
 		{
-			CONSOLE_DEBUGGER("%s failed to load", ZOMBIEINFESTATION_SOUNDS_CONFIG);
+			g_pSM->LogError(myself, "Failed to load sounds config: %s", ZOMBIEINFESTATION_SOUNDS_CONFIG);
 		}
 
 		//// EXTRAS: TODO (DO ALL SOUNDS LIKE THIS, FUCK CONFIG FILES, THEY'RE TOO COMPLEXE)
@@ -312,7 +312,7 @@ namespace ZIResources
 		}
 		else
 		{
-			CONSOLE_DEBUGGER("%s failed to load", ZOMBIEINFESTATION_MODELS_CONFIG);
+			g_pSM->LogError(myself, "Failed to load models config: %s", ZOMBIEINFESTATION_MODELS_CONFIG);
 		}
 
 		// GIBS
@@ -367,7 +367,6 @@ namespace ZIResources
 
 		if( !libsys->PathExists(config) || !libsys->IsPathFile(config) )
 		{
-			CONSOLE_DEBUGGER("The config file was not found!");
 			return;
 		}
 
@@ -442,7 +441,6 @@ namespace ZIResources
 
 		if( soundsCount < 1 )
 		{
-			CONSOLE_DEBUGGER("Sound files are not precached yet!");
 			return nullptr;
 		}
 
@@ -453,7 +451,6 @@ namespace ZIResources
 	{
 		if( sound <= RoundEndSound_None || sound >= RoundEndSound_Max )
 		{
-			CONSOLE_DEBUGGER("Invalid access, carefull!");
 			return nullptr;
 		}
 
@@ -461,7 +458,6 @@ namespace ZIResources
 
 		if( soundsCount < 1 )
 		{
-			CONSOLE_DEBUGGER("Sound files are not precached yet!");
 			return nullptr;
 		}
 
@@ -493,7 +489,6 @@ namespace ZIResources
 
 		if( modelsCount < 1 )
 		{
-			CONSOLE_DEBUGGER("Zombie model files are not precached yet!");
 			return nullptr;
 		}
 
@@ -521,7 +516,6 @@ namespace ZIResources
 	{
 		if( type < ModelType_Human || type >= ModelType_Max )
 		{
-			CONSOLE_DEBUGGER("Invalid access, carefull!");
 			return nullptr;
 		}
 
@@ -529,7 +523,6 @@ namespace ZIResources
 
 		if( modelsCount < 1 )
 		{
-			CONSOLE_DEBUGGER("Model files are not precached yet!");
 			return nullptr;
 		}
 

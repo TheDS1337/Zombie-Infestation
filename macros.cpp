@@ -7,22 +7,17 @@ void FireEventToClient(int clientIndex, IGameEvent *event)
 {
 	IClient *client = g_pExtension->m_pSDKTools->GetIServer()->GetClient(clientIndex - 1);
 
-	if( client )
+	if( !client )
 	{
-		IGameEventListener2 *eventListener = (IGameEventListener2 *) ((char *) client - sizeof(void *));
+		return;
+	}
+		
+	IGameEventListener2 *eventListener = (IGameEventListener2 *) ((char *) client - sizeof(void *));
 
-		if( !eventListener )
-		{
-			CONSOLE_DEBUGGER("Unable to locate the event listener within the client %d", client);
-			return;
-		}
-
+	if( eventListener )
+	{
 		eventListener->FireGameEvent(event);
-	}
-	else
-	{
-		CONSOLE_DEBUGGER("Failed to find client %d", client);
-	}
+	}	
 }
 
 string_t AllocPooledString(const char *str)

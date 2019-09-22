@@ -622,8 +622,6 @@ static void OnPreConVarChange(ConVar *cvar, const char *oldString, float oldValu
 
 		if( delay > 0 )
 		{
-			CONSOLE_DEBUGGER("Round is going to be restarted in %d secs, clearing everything out...", delay);
-
 			ZICore::m_Score[RoundModeWinner_Humans] = 0;
 			ZICore::m_Score[RoundModeWinner_Zombies] = 0;
 
@@ -642,8 +640,6 @@ static void OnPreConVarChange(ConVar *cvar, const char *oldString, float oldValu
 
 		if( delay > 0 )
 		{
-			CONSOLE_DEBUGGER("Round is going to be restarted in %d secs, clearing everything out...", delay);
-
 			TerminateRound(delay, CSGORoundEnd_Draw);
 
 			// Block the change, otherwise the termination would be registered twice!
