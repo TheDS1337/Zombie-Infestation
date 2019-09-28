@@ -4,13 +4,28 @@
 
 #include "zi_core.h"
 
-#define NADE_TARGETNAME_EXPLOSIVE	"zi_nade_explosive"
-#define NADE_TARGETNAME_FROST		"zi_nade_frost"
-#define NADE_TARGETNAME_FLAME		"zi_nade_napalm"
-#define NADE_TARGETNAME_CONCUSSION	"zi_nade_concussion"
-#define NADE_TARGETNAME_FLARE		"zi_nade_flare"
-#define NADE_TARGETNAME_TOXIC		"zi_nade_toxic"
-#define NADE_TARGETNAME_INFECTION	"zi_nade_infection"
+#define NADE_CONCUSSION_TARGETNAME	"zi_nade_concussion"
+
+#define NADE_EXPLOSIVE_TARGETNAME	"zi_nade_explosive"
+#define NADE_EXPLOSIVE_COLOR Color(200, 0, 0, 200)
+
+#define NADE_FROST_TARGETNAME		"zi_nade_frost"
+#define NADE_FROST_COLOR Color(0, 100, 200, 200)
+
+#define NADE_TOXIC_TARGETNAME		"zi_nade_toxic"
+#define NADE_TOXIC_COLOR Color(0, 200, 50, 200)
+
+#define NADE_FLAME_TARGETNAME		"zi_nade_napalm"
+#define NADE_FLAME_COLOR Color(200, 100, 0, 200)
+
+#define NADE_FLARE_TARGETNAME		"zi_nade_flare"
+#define NADE_FLARE_DURATION RandomFloat(15.0f, 25.0f)
+#define NADE_FLARE_COLOR Color(RandomInt(0, 255), RandomInt(0, 255), RandomInt(0, 255), 200)
+#define NADE_FLARE_DISTANCE 600.0f
+#define NADE_FLARE_RADIUS 150.0f
+
+#define NADE_INFECTION_TARGETNAME	"zi_nade_infection"
+#define NADE_INFECTION_COLOR Color(0, 200, 0, 200)
 
 // We'll be using 4 byes of this Vector, since it's not really used after the nade creation so we'll survive
 #define GET_NADE_DATA_ADDRESS(nadeEnt) *(NadeData **) ((char *) nadeEnt + g_pExtension->m_OnUser4)

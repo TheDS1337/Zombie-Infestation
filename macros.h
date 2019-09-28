@@ -131,7 +131,6 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
 											 } \
 											 else if( g_pExtension->m_pSDKConfig->GetMemSig(key, &address) && address ) \
 											 { \
@@ -140,7 +139,6 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
 											 } \
 											 else if( g_pExtension->m_pCStrikeConfig->GetMemSig(key, &address) && address ) \
 											 { \
@@ -149,8 +147,7 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
-											 } \
+		                                     } \
 											 else if( g_ZombieInfestation.m_pConfig->GetMemSig(key, &address) && address ) \
 											 { \
 												 g_p ## name ## Detour = DETOUR_CREATE_MEMBER(name, address); \
@@ -158,7 +155,6 @@
 												 { \
 													  g_p ## name ## Detour->EnableDetour(); \
 												 } \
-                                                 g_pSM->LogError(myself, "Found signature for " key ""); \
 											 } \
 											 else \
 											 { \

@@ -404,7 +404,7 @@ namespace ZIResources
 
 		if( g_pSoundsKeyValues )
 		{
-			g_pSoundsKeyValues->deleteThis(); g_pSoundsKeyValues = nullptr;
+			g_pSoundsKeyValues->deleteThis(), g_pSoundsKeyValues = nullptr;
 		}
 		/*
 			for( file = 0; file < RoundEndSound_Max; file++ )
@@ -431,7 +431,7 @@ namespace ZIResources
 
 		if( g_pModelsKeyValues )
 		{
-			g_pModelsKeyValues->deleteThis(); g_pModelsKeyValues = nullptr;
+			g_pModelsKeyValues->deleteThis(), g_pModelsKeyValues = nullptr;
 		}
 	}
 

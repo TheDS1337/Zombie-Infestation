@@ -65,16 +65,7 @@ void TerminateRound(float delay, CSGORoundEndReason reason)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(void *) + sizeof(float) + sizeof(CSGORoundEndReason) + 2 * sizeof(int)];
-	unsigned char *vparams = params;
-
-	*(void **) vparams = g_pExtension->m_pGameRules; vparams += sizeof(void *);
-	*(float *) vparams = delay; vparams += sizeof(float);
-	*(CSGORoundEndReason *) vparams = reason; vparams += sizeof(CSGORoundEndReason);
-	*(int *) vparams = 0; vparams += sizeof(int);
-	*(int *) vparams = 0; 
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<void *, float, CSGORoundEndReason, int, int>(g_pExtension->m_pGameRules, delay, reason, 0, 0), nullptr);
 #endif
 }
 

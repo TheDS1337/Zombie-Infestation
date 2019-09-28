@@ -173,7 +173,7 @@ public:
 	void SetOrigin(Vector value);													// Sendprop
 
 	Vector GetVelocity();															// Sendprop
-	Vector GetVelocity(AngularImpulse &angVelocity);
+	Vector GetVelocity(AngularImpulse *angVelocity);
 	void SetVelocity(Vector value);													// Sendprop
 
 	Vector GetAbsVelocity();														// Sendprop
@@ -209,7 +209,7 @@ public:
 	bool GetKeyValue(const char *key, char *value, int valueLen);
 	bool SetKeyValue(const char *key, char *value);
 
-	bool GetKeyValue(const char *key, bool *value);
+	bool GetKeyValue(const char *key, bool &value);
 	bool SetKeyValue(const char *key, bool value);
 
 	bool GetKeyValue(const char *key, int &value);
@@ -223,6 +223,9 @@ public:
 
 	bool GetKeyValue(const char *key, QAngle &value);
 	bool SetKeyValue(const char *key, QAngle value);
+
+	bool GetKeyValue(const char *key, Color &value); // does not work
+	bool SetKeyValue(const char *key, Color value);
 };
 
 class BaseProp: public BaseEntity
@@ -259,7 +262,7 @@ public:
 	int SelectWeightedSequence(Activity activity);
 
 	int LookupAttachment(const char *name);
-	bool GetAttachment(const char *name, Vector &origin, QAngle &angles);
+	bool GetAttachment(const char *name, Vector *org, QAngle *ang);
 };
 
 class BaseWeapon: public BaseEntity
@@ -469,5 +472,7 @@ extern void SpawnSpecificGibs(BasePlayer *victimEnt, int gibs, float minSpeed, f
 
 extern BaseProp *CreateEntityGlow(BaseEntity *entity, int style, Color color, const char *attachement);
 extern BaseEntity *CreateParticleSystem(Vector pos, QAngle angles, const char *effect, BaseEntity *parentEnt = nullptr, const char *attachement = nullptr, float killDelay = -1.0f);
+
+extern BaseEntity *CreateLight(Vector pos, Color color, float distance, float radius, int flags, BaseEntity *parentEnt = nullptr, const char *attachement = nullptr, int innerCone = 0, int cone = 80, int brightness = 1, int pitch = 90, int style = 1, float killDelay = -1.0f);
 
 #endif 

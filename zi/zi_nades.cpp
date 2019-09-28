@@ -61,11 +61,11 @@ namespace ZINades
 
 	void OnPostHEGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner)
 	{
-		NadeData *data = new NadeData(NADE_TARGETNAME_EXPLOSIVE, owner->m_IsInfected);
+		NadeData *data = new NadeData(NADE_EXPLOSIVE_TARGETNAME, owner->m_IsInfected);
 
 		if( !data->infected )
 		{
-			data->color = Color(200, 0, 0, 200);
+			data->color = NADE_EXPLOSIVE_COLOR;
 			SetColor(nadeEnt, data->color);
 
 			// Just for the fun of testing
@@ -100,11 +100,11 @@ namespace ZINades
 
 	void OnPostFlashbangSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner)
 	{
-		NadeData *data = new NadeData(NADE_TARGETNAME_FROST, owner->m_IsInfected);
+		NadeData *data = new NadeData(NADE_FROST_TARGETNAME, owner->m_IsInfected);
 
 		if( !data->infected )
 		{
-			data->color = Color(0, 100, 200, 200);
+			data->color = NADE_FROST_COLOR;
 			SetColor(nadeEnt, data->color);
 		}
 
@@ -150,9 +150,11 @@ namespace ZINades
 			CellRecipientFilter filter;
 			g_pExtension->m_pEngineSound->EmitSound(filter, gamehelpers->ReferenceToIndex(gamehelpers->EntityToReference((CBaseEntity *) nadeEnt)), CHAN_WEAPON, "ZombieInfestation/grenade_frost_explode.mp3", -1, "ZombieInfestation/grenade_frost_explode.mp3", VOL_NORM, ATTN_NORM, 0);
 
-			TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 50.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 385.0f);
-			TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 40.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 470.0f);
-			TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 20.0f, 50, Color(0, 100, 200, 200), 0, origin, 0.0f, 550.0f);
+			Color color = data->color;
+
+			TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 50.0f, 50, color, 0, origin, 0.0f, 385.0f);
+			TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 40.0f, 50, color, 0, origin, 0.0f, 470.0f);
+			TE_BeamRingPoint(filter, 0.0f, ZIResources::m_BeamModelIndex, ZIResources::m_HaloModelIndex, 0, 0, 0.5f, 5.0f, 5.0f, 0, 20.0f, 50, color, 0, origin, 0.0f, 550.0f);
 
 			TE_Sparks(filter, 0.0f, origin, 5000, 1000, Vector(0.0f, 0.0f, 0.0f));
 
@@ -185,11 +187,11 @@ namespace ZINades
 
 	void OnPostSmokeGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner)
 	{
-		NadeData *data = new NadeData(NADE_TARGETNAME_TOXIC, owner->m_IsInfected);
+		NadeData *data = new NadeData(NADE_TOXIC_TARGETNAME, owner->m_IsInfected);
 
 		if( !data->infected )
 		{
-			data->color = Color(0, 200, 50, 200);
+			data->color = NADE_TOXIC_COLOR;
 			SetColor(nadeEnt, data->color);
 		}
 
@@ -236,11 +238,11 @@ namespace ZINades
 
 	void OnPostMolotovSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner)
 	{
-		NadeData *data = new NadeData(NADE_TARGETNAME_FLAME, owner->m_IsInfected);
+		NadeData *data = new NadeData(NADE_FLAME_TARGETNAME, owner->m_IsInfected);
 
 		if( !data->infected )
 		{
-			data->color = Color(200, 100, 0, 200);
+			data->color = NADE_FLAME_COLOR;
 			SetColor(nadeEnt, data->color);
 
 			nadeEnt->Ignite(3.0f);
@@ -255,15 +257,11 @@ namespace ZINades
 
 	void OnPostDecoySpawn(BaseGrenade *nadeEnt, ZIPlayer *owner)
 	{
-		float r = RandomInt(100, 255);
-		float g = RandomInt(100, 255);
-		float b = RandomInt(100, 255);
-
-		NadeData *data = new NadeData(NADE_TARGETNAME_FLARE, owner->m_IsInfected);
+		NadeData *data = new NadeData(NADE_FLARE_TARGETNAME, owner->m_IsInfected);
 
 		if( !data->infected )
 		{
-			data->color = Color(r, g, g, 200);
+			data->color = NADE_FLARE_COLOR;
 			SetColor(nadeEnt, data->color);
 		}
 
@@ -305,57 +303,12 @@ namespace ZINades
 		{
 			CellRecipientFilter filter;
 			g_pExtension->m_pEngineSound->EmitSound(filter, gamehelpers->ReferenceToIndex(gamehelpers->EntityToReference((CBaseEntity *) nadeEnt)), CHAN_WEAPON, "ZombieInfestation/grenade_flare_on.mp3", -1, "ZombieInfestation/grenade_flare_on.mp3", VOL_NORM, ATTN_NORM, 0);
-			/////
-			static char sTime[128];
 
-			BaseEntity *lightEnt = BaseEntity::CreateEntity("light_dynamic");
+			Vector pos = nadeEnt->GetOrigin();
+			float duration = NADE_FLARE_DURATION;
 
-			// If entity isn't valid, then skip
-			if( lightEnt )
-			{
-				ke::SafeSprintf(sTime, sizeof(sTime), "%d %d %d %d", data->color.r(), data->color.g(), data->color.b(), data->color.a());
-
-				// Dispatch main values of the entity
-				lightEnt->SetKeyValue("origin", nadeEnt->GetOrigin());
-				lightEnt->SetKeyValue("inner_cone", "0");
-				lightEnt->SetKeyValue("cone", "80");
-				lightEnt->SetKeyValue("brightness", "1");
-				lightEnt->SetKeyValue("pitch", "90");
-				lightEnt->SetKeyValue("style", "5");
-				lightEnt->SetKeyValue("_light", sTime);
-				lightEnt->SetKeyValue("distance", 1000.0f);
-				lightEnt->SetKeyValue("spotlight_radius", 300.0f);
-
-				// Spawn the entity into the world
-				lightEnt->Spawn();
-
-				// Activate the entity
-				lightEnt->AcceptInput("TurnOn");
-
-				// Sets parent to the entity
-				BaseEntity::SetInputVariant("!activator");
-				lightEnt->AcceptInput("SetParent", nadeEnt, lightEnt);
-				//			SetEntPropEnt(lightIndex, Prop_Data, "m_pParent", grenadeIndex);
-			}
-
-			// Initialize time char
-			ke::SafeSprintf(sTime, sizeof(sTime), "OnUser1 !self:Kill::%f:1", 15.0f);
-
-			// Sets modified flags on the entity
-			BaseEntity::SetInputVariant(sTime);
-			nadeEnt->AcceptInput("AddOutput");
-			nadeEnt->AcceptInput("FireUser1");
-
-			BaseEntity::SetInputVariant(sTime);
-			lightEnt->AcceptInput("AddOutput");
-			lightEnt->AcceptInput("FireUser1");
-
-			ke::SafeSprintf(sTime, sizeof(sTime), "OnUser2 !self:TurnOff::%f:1", 14.0f);
-
-			BaseEntity::SetInputVariant(sTime);
-			lightEnt->AcceptInput("AddOutput");
-			lightEnt->AcceptInput("FireUser2");
-			/////	
+			CreateLight(pos, data->color, NADE_FLARE_DISTANCE, NADE_FLARE_RADIUS, 0, nullptr, nullptr, 0, 80, 1, 90, 1, duration);
+			CreateParticleSystem(pos, QAngle(0.0f, 0.0f, 0.0f), "smoking", nullptr, nullptr, duration);
 		}
 
 		HOOK_RETURN_VOID(MRES_IGNORED, false);
@@ -386,11 +339,11 @@ namespace ZINades
 
 	void OnPostTAGrenadeSpawn(BaseGrenade *nadeEnt, ZIPlayer *owner)
 	{
-		NadeData *data = new NadeData(NADE_TARGETNAME_INFECTION, owner->m_IsInfected);
+		NadeData *data = new NadeData(NADE_INFECTION_TARGETNAME, owner->m_IsInfected);
 
 		if( data->infected )
 		{
-			data->color = Color(0, 200, 0, 200);
+			data->color = NADE_INFECTION_COLOR;
 			SetColor(nadeEnt, data->color);
 		}
 
@@ -490,7 +443,7 @@ namespace ZINades
 			return;
 		}
 
-		delete data; data = nullptr;
+		delete data, data = nullptr;
 
 		SET_NADE_DATA_ADDRESS(nadeEnt, data);
 	}

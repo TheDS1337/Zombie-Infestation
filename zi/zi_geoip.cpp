@@ -32,7 +32,7 @@ namespace ZIGeoIP
 
 	void Free()
 	{
-		MMDB_close(m_pDatabase), delete m_pDatabase;
+		MMDB_close(m_pDatabase), delete m_pDatabase, m_pDatabase = nullptr;
 	}
 
 	bool GetCountry(const char *IP, char *output, int outputLen)

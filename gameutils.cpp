@@ -250,24 +250,11 @@ bool BaseEntity::AcceptInput(const char *input, BaseEntity *activator, BaseEntit
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char *params = new unsigned char[3 * sizeof(CBaseEntity *) + sizeof(const char *) + variantSize + sizeof(int) + sizeof(bool)];
-	unsigned char *vparams = params;
-	
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(const char **) vparams = input; vparams += sizeof(const char *);
-	*(CBaseEntity **) vparams = (CBaseEntity *) activator; vparams += sizeof(CBaseEntity *);
-	*(CBaseEntity **) vparams = (CBaseEntity *) caller; vparams += sizeof(CBaseEntity *);	
-	memcpy(vparams, &g_Variant, variantSize); vparams += variantSize;
-	*(int *) vparams = outputId;
-
 	bool ret;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, const char *, BaseEntity *, BaseEntity *, VariantWrapper, int>(this, input, activator, caller, g_Variant, outputId), &ret);
 
 	// Reset the global variant
-	g_Variant.Reset();
-
-	// Release the memory
-	delete params;
+	g_Variant.Reset();	
 
 	return ret;
 }
@@ -300,12 +287,7 @@ void BaseEntity::Activate()
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *>(this), nullptr);
 }
 
 void BaseEntity::Teleport(Vector *origin, QAngle *angles, Vector *velocity)
@@ -343,15 +325,7 @@ void BaseEntity::Teleport(Vector *origin, QAngle *angles, Vector *velocity)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + 2 * sizeof(Vector *) + sizeof(QAngle *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(Vector **) vparams = origin; vparams += sizeof(Vector *);
-	*(QAngle **) vparams = angles; vparams += sizeof(QAngle *);
-	*(Vector **) vparams = velocity;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, Vector *, QAngle *, Vector *>(this, origin, angles, velocity), nullptr);
 }
 
 void BaseEntity::Ignite(float duration, bool NPCOnly, float size, bool called)
@@ -392,16 +366,7 @@ void BaseEntity::Ignite(float duration, bool NPCOnly, float size, bool called)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + 2 * (sizeof(float) + sizeof(bool))];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(float *) vparams = duration; vparams += sizeof(float);
-	*(bool *) vparams = NPCOnly; vparams += sizeof(bool);
-	*(float *) vparams = size; vparams += sizeof(float);
-	*(bool *) vparams = called;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, float, bool, float, bool>(this, duration, NPCOnly, size, called), nullptr);
 }
 
 void BaseEntity::Extinguish()
@@ -427,12 +392,7 @@ void BaseEntity::Extinguish()
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *>(this), nullptr);
 }
 
 int BaseEntity::TakeDamage(CTakeDamageInfo2 info)
@@ -467,14 +427,8 @@ int BaseEntity::TakeDamage(CTakeDamageInfo2 info)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(CTakeDamageInfo2 &)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(CTakeDamageInfo2 *) vparams = info;	
-
 	int ret = -1;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, CTakeDamageInfo2>(this, info), &ret);
 
 	return ret;
 }
@@ -518,13 +472,7 @@ void BaseEntity::SetModel(const char *model)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(const char **) vparams = model;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, const char *>(this, model), nullptr);
 }
 
 void BaseEntity::SetSize(const Vector &min, const Vector &max)
@@ -559,14 +507,7 @@ void BaseEntity::SetSize(const Vector &min, const Vector &max)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + 2 * sizeof(Vector &)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(Vector *) vparams = min; vparams += sizeof(Vector *);
-	*(Vector *) vparams = max;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, Vector, Vector>(this, min, max), nullptr);
 }
 
 int BaseEntity::GetHealth()
@@ -962,7 +903,7 @@ Vector BaseEntity::GetVelocity()
 	return *(Vector *) ((unsigned char *) this + g_pExtension->m_vecVelocity);
 }
 
-Vector BaseEntity::GetVelocity(AngularImpulse &angVelocity)
+Vector BaseEntity::GetVelocity(AngularImpulse *ang)
 {
 	static ICallWrapper *callWrapper = nullptr;
 
@@ -994,16 +935,13 @@ Vector BaseEntity::GetVelocity(AngularImpulse &angVelocity)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(Vector *) + sizeof(AngularImpulse *)];
-	unsigned char *vparams = params;
+	static Vector velocity, angVelocity;
+	callWrapper->Execute(ArgBuffer<BaseEntity *, Vector *, AngularImpulse *>(this, &velocity, &angVelocity), nullptr);
 
-	static Vector velocity;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(Vector **) vparams = &velocity; vparams += sizeof(Vector *);
-	*(AngularImpulse **) vparams = &angVelocity;
-
-	callWrapper->Execute(params, nullptr);
+	if( ang )
+	{
+		memcpy(ang, &angVelocity, sizeof(Vector));
+	}
 
 	return velocity;
 }
@@ -1322,13 +1260,13 @@ bool BaseEntity::SetKeyValue(const char *key, char *value)
 	return g_pExtension->m_pServerTools->SetKeyValue(this, key, value);
 }
 
-bool BaseEntity::GetKeyValue(const char *key, bool *value)
+bool BaseEntity::GetKeyValue(const char *key, bool &value)
 {
 	static char strValue[32];
 
 	if( GetKeyValue(key, strValue, sizeof(strValue)) )
 	{
-		*value = strtoul(strValue, nullptr, 10) > 0;
+		value = strtoul(strValue, nullptr, 10) > 0;
 		return true;
 	}
 
@@ -1441,6 +1379,28 @@ bool BaseEntity::GetKeyValue(const char *key, QAngle &value)
 	}
 
 	return false;
+}
+
+bool BaseEntity::GetKeyValue(const char *key, Color &value) // does not work
+{
+	static char strValue[32];
+
+	if( GetKeyValue(key, strValue, sizeof(strValue)) )
+	{
+		int color = strtoul(strValue, nullptr, 10);
+		value = Color(color, color, color, color);
+		return true;
+	}
+
+	return false;
+}
+
+bool BaseEntity::SetKeyValue(const char *key, Color value)
+{
+	static char strValue[12];
+	ke::SafeSprintf(strValue, sizeof(strValue), "%d %d %d %d", value.r(), value.g(), value.b(), value.a());
+
+	return g_pExtension->m_pServerTools->SetKeyValue(this, key, strValue);
 }
 
 bool BaseEntity::SetKeyValue(const char *key, QAngle value)
@@ -1588,14 +1548,8 @@ int BaseAnimating::SelectWeightedSequence(Activity activity)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(Activity)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(Activity *) vparams = activity;
-
 	int ret = -1;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, Activity>(this, activity), &ret);
 
 	return ret;
 }
@@ -1632,19 +1586,13 @@ int BaseAnimating::LookupAttachment(const char *name)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(const char **) vparams = name;
-
 	int ret = -1;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, const char *>(this, name), &ret);
 
 	return ret;
 }
 
-bool BaseAnimating::GetAttachment(const char *name, Vector &origin, QAngle &angles)
+bool BaseAnimating::GetAttachment(const char *name, Vector *org, QAngle *ang)
 {
 	static ICallWrapper *callWrapper = nullptr;
 
@@ -1682,16 +1630,21 @@ bool BaseAnimating::GetAttachment(const char *name, Vector &origin, QAngle &angl
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *) + sizeof(Vector *) + sizeof(QAngle *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(const char **) vparams = name; vparams += sizeof(const char *);
-	*(Vector **) vparams = &origin; vparams += sizeof(Vector);
-	*(QAngle **) vparams = &angles; 
+	static Vector origin;
+	static QAngle angles;
 
 	bool ret = true;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, const char *, Vector *, QAngle *>(this, name, &origin, &angles), &ret);
+
+	if( org )
+	{
+		memcpy(org, &origin, sizeof(Vector));
+	}
+
+	if( ang )
+	{
+		memcpy(ang, &angles, sizeof(QAngle));
+	}
 
 	return ret;
 }
@@ -1982,12 +1935,7 @@ void BaseGrenade::Detonate()
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *>(this), nullptr);
 }
 
 /* Doesnt work properly */
@@ -2198,13 +2146,8 @@ int BaseViewModel::UpdateTransmitState()
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; 
-
 	int ret;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *>(this), &ret);
 
 	return ret;
 }
@@ -2241,14 +2184,7 @@ void BasePlayer::Kill(bool explode, bool force)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + 2 * sizeof(bool)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(bool *) vparams = explode; vparams += sizeof(bool);
-	*(bool *) vparams = force;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, bool, bool>(this, explode, force), nullptr);
 }
 
 void BasePlayer::Respawn()
@@ -2274,12 +2210,7 @@ void BasePlayer::Respawn()
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *)];	
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this;	
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *>(this), nullptr);
 }
 
 void BasePlayer::SetName(const char *name)
@@ -2313,13 +2244,7 @@ void BasePlayer::SetName(const char *name)
 
 	edict_t *client = g_pExtension->m_pServerGameEntities->BaseEntityToEdict((CBaseEntity *) this);
 	
-	unsigned char params[sizeof(void *) + sizeof(const char *)];
-	unsigned char *vparams = params;
-
-	*(void **) vparams = (void *) ((int) g_pExtension->m_pSDKTools->GetIServer()->GetClient(gamehelpers->IndexOfEdict(client) - 1) - sizeof(void *)); vparams += sizeof(void *);
-	*(const char **) vparams = name;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<void *, const char *>((void *) ((int) g_pExtension->m_pSDKTools->GetIServer()->GetClient(gamehelpers->IndexOfEdict(client) - 1) - sizeof(void *)), name), nullptr);
 
 	// Alert the server of the change
 	g_pExtension->m_pServerGameClients->ClientSettingsChanged(client);
@@ -2354,13 +2279,7 @@ void BasePlayer::SetProgressBarTime(int time)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(int)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(int *) vparams = time;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, int>(this, time), nullptr);
 }
 
 // See: https://developer.valvesoftware.com/wiki/Dimensions for more info, the values here are calculated using Pythagoras's theorem
@@ -2459,18 +2378,8 @@ BaseWeapon *BasePlayer::GiveItem(const char *item, int subtype, bool removeIfNot
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *) + sizeof(int) + sizeof(CEconItemView *) + sizeof(bool) + sizeof(void *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(const char **) vparams = item; vparams += sizeof(const char *);
-	*(int *) vparams = subtype; vparams += sizeof(int);
-	*(CEconItemView **) vparams = nullptr; vparams += sizeof(CEconItemView *);
-	*(bool *) vparams = removeIfNotCarried; vparams += sizeof(bool);
-	*(void **) vparams = nullptr;
-
 	BaseWeapon *itemEnt;
-	callWrapper->Execute(params, &itemEnt);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, const char *, int, CEconItemView *, bool, void *>(this, item, subtype, nullptr, removeIfNotCarried, nullptr), &itemEnt);
 
 	return itemEnt;
 }
@@ -2513,16 +2422,8 @@ int BasePlayer::GiveAmmo(int amount, int ammotype, bool suppressSound)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + 2 * sizeof(int) + sizeof(bool)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(int *) vparams = amount; vparams += sizeof(int);
-	*(int *) vparams = ammotype; vparams += sizeof(int);
-	*(bool *) vparams = suppressSound;
-
 	int ret;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, int, int, bool>(this, amount, ammotype, suppressSound), &ret);
 
 	return ret;
 }
@@ -2556,13 +2457,7 @@ void BasePlayer::EquipItem(BaseEntity *itemEntity)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[2 * sizeof(CBaseEntity *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(CBaseEntity **) vparams = (CBaseEntity *) itemEntity;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, BaseEntity *>(this, itemEntity), nullptr);
 }
 
 bool BasePlayer::RemoveItem(BaseEntity *itemEntity)
@@ -2597,14 +2492,8 @@ bool BasePlayer::RemoveItem(BaseEntity *itemEntity)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[2 * sizeof(CBaseEntity *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(CBaseEntity **) vparams = (CBaseEntity *) itemEntity;
-
 	bool ret;
-	callWrapper->Execute(params, &ret);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, BaseEntity *>(this, itemEntity), &ret);
 
 	return ret;
 }
@@ -2641,15 +2530,9 @@ BaseWeapon *BasePlayer::GetItemFromSlot(int slot)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(int)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(int *) vparams = slot;
-
 	BaseWeapon *itemEnt;
-	callWrapper->Execute(params, &itemEnt);
-
+	callWrapper->Execute(ArgBuffer<BaseEntity *, int>(this, slot), &itemEnt);
+	
 	return itemEnt;
 }
 
@@ -2685,14 +2568,7 @@ void BasePlayer::SelectItem(const char *classname, int subType)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *) + sizeof(int)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(const char **) vparams = classname; vparams += sizeof(const char *);
-	*(int *) vparams = subType;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, const char *, int>(this, classname, subType), nullptr);
 }
 
 int BasePlayer::GetItemsCountFromSlot(int slot)
@@ -2914,13 +2790,8 @@ QAngle BasePlayer::GetEyeAngles()
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this;
-
 	QAngle *angles;
-	callWrapper->Execute(vparams, &angles);
+	callWrapper->Execute(ArgBuffer<BaseEntity *>(this), &angles);
 
 	return angles ? *angles : QAngle(0.0f, 0.0f, 0.0f);
 }
@@ -3272,14 +3143,8 @@ BaseViewModel *BasePlayer::CreateViewModel(int id)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(int)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(int *) vparams = id;	
-
 	BaseViewModel *viewmodelEnt;
-	callWrapper->Execute(params, &viewmodelEnt);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, int>(this, id), &viewmodelEnt);
 
 	return viewmodelEnt;
 }
@@ -3615,13 +3480,7 @@ void BasePlayer::SetTeam(int team)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(int)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) this; vparams += sizeof(CBaseEntity *);
-	*(int *) vparams = team;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, int>(this, team), nullptr);
 #endif
 }
 
@@ -4023,13 +3882,7 @@ void SpawnGib(BaseEntity *gibEnt, const char *model)
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[sizeof(CBaseEntity *) + sizeof(const char *)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) gibEnt; vparams += sizeof(CBaseEntity *);
-	*(const char **) vparams = model;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, const char *>(gibEnt, model), nullptr);
 }
 
 void InitGib(BaseEntity *gibEnt, BasePlayer *victimEnt, float minSpeed, float maxSpeed)
@@ -4067,15 +3920,7 @@ void InitGib(BaseEntity *gibEnt, BasePlayer *victimEnt, float minSpeed, float ma
 		g_pExtension->m_pBinCallWrappers.push_back(callWrapper);
 	}
 
-	unsigned char params[2 * sizeof(CBaseEntity *) + 2 * sizeof(float)];
-	unsigned char *vparams = params;
-
-	*(CBaseEntity **) vparams = (CBaseEntity *) gibEnt; vparams += sizeof(CBaseEntity *);
-	*(CBaseEntity **) vparams = (CBaseEntity *) victimEnt; vparams += sizeof(CBaseEntity *);
-	*(float *) vparams = maxSpeed; vparams += sizeof(float);									
-	*(float *) vparams = minSpeed;
-
-	callWrapper->Execute(params, nullptr);
+	callWrapper->Execute(ArgBuffer<BaseEntity *, BaseEntity *, float, float>(gibEnt, victimEnt, maxSpeed, minSpeed), nullptr);
 }
 
 void SpawnSpecificGibs(BasePlayer *victimEnt, int gibs, float minSpeed, float maxSpeed, const char *model, float lifeTime)
@@ -4211,4 +4056,53 @@ BaseEntity *CreateParticleSystem(Vector pos, QAngle angles, const char *effect, 
 	}
 
 	return particlesEnt;
+}
+
+BaseEntity *CreateLight(Vector pos, Color color, float distance, float radius, int flags, BaseEntity *parentEnt, const char *attachement, int innerCone, int cone, int brightness, int pitch, int style, float killDelay)
+{
+	BaseEntity *lightEnt = BaseEntity::CreateEntity("light_dynamic");
+
+	if( !lightEnt )
+	{
+		return nullptr;
+	}
+
+	lightEnt->SetKeyValue("origin", pos);
+	lightEnt->SetKeyValue("spawnflags", flags);
+	lightEnt->SetKeyValue("inner_cone", innerCone);
+	lightEnt->SetKeyValue("cone", cone);
+	lightEnt->SetKeyValue("brightness", brightness);
+	lightEnt->SetKeyValue("pitch", pitch);
+	lightEnt->SetKeyValue("style", style);
+	lightEnt->SetKeyValue("_light", color);
+	lightEnt->SetKeyValue("distance", distance);
+	lightEnt->SetKeyValue("spotlight_radius", radius);
+
+	lightEnt->Spawn();
+
+	if( parentEnt )
+	{
+		BaseEntity::SetInputVariant("!activator");
+		lightEnt->AcceptInput("SetParent", parentEnt, lightEnt);
+
+		if( attachement && *attachement )
+		{
+			BaseEntity::SetInputVariant(attachement);
+			lightEnt->AcceptInput("SetParentAttachment", parentEnt, lightEnt);
+		}
+	}
+
+	lightEnt->AcceptInput("TurnOn");
+	
+	if( killDelay > 0.0f )
+	{
+		static char buffer[64];
+		ke::SafeSprintf(buffer, sizeof(buffer), "OnUser1 !self:Kill::%f:1", killDelay);
+
+		BaseEntity::SetInputVariant(buffer);
+		lightEnt->AcceptInput("AddOutput");
+		lightEnt->AcceptInput("FireUser1");
+	}
+
+	return lightEnt;
 }

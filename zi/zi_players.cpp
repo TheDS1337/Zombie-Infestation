@@ -688,7 +688,7 @@ ZIPlayer::ZIPlayer(edict_t *edict)
 
 ZIPlayer::~ZIPlayer()
 {
-	delete[] m_pDamageDealtToZombies; m_pDamageDealtToZombies = nullptr;
+	delete[] m_pDamageDealtToZombies, m_pDamageDealtToZombies = nullptr;
 	
 	RELEASE_TIMER(m_pStatsTimer);
 	RELEASE_TIMER(m_pSetModelTimer);

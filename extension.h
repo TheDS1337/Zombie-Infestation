@@ -23,6 +23,7 @@
 #include <mathlib/vector.h>
 #include <vstdlib/random.h>
 #include "CDetour/detours.h"
+#include "sm_argbuffer.h"
 #include "CellRecipientFilter.h"
 #include "hud_manager.h"
 #include "sh_string.h"
